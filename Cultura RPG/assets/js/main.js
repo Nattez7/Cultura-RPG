@@ -3,30 +3,67 @@ const loginForm = document.getElementById('login-form');
 const registerForm = document.getElementById('register-form');
 const googleBtn = document.querySelector('.google');
 const facebookBtn = document.querySelector('.facebook');
+const dragonLogo = document.querySelector('.logo');
 
 // Função para alternar entre formulários
 function toggleForm() {
-    loginForm.classList.toggle('active');
-    registerForm.classList.toggle('active');
+    const currentActive = document.querySelector('.form.active');
+    const nextForm = currentActive === loginForm ? registerForm : loginForm;
+    
+    currentActive.classList.add('fade-out');
+    
+    setTimeout(() => {
+        currentActive.classList.remove('active', 'fade-out');
+        nextForm.classList.add('active');
+    }, 200);
 }
+
+// Função para alternar modo escuro
+function toggleDarkMode() {
+    document.body.classList.toggle('dark-mode');
+}
+
+// Evento do dragão
+dragonLogo.addEventListener('click', () => {
+    dragonLogo.classList.add('wing-flap');
+    
+    setTimeout(() => {
+        toggleDarkMode();
+    }, 400);
+    
+    setTimeout(() => {
+        dragonLogo.classList.remove('wing-flap');
+    }, 800);
+});
 
 // Login com email/senha
 loginForm.addEventListener('submit', (e) => {
     e.preventDefault();
-    const email = loginForm.querySelector('input[type="text"]').value;
-    const password = loginForm.querySelector('input[type="password"]').value;
+    const email = document.getElementById('login-email').value;
+    const password = document.getElementById('login-password').value;
 
-    firebase.auth().signInWithEmailAndPassword(email, password)
-        .then((userCredential) => {
-            // Login bem-sucedido
-            const user = userCredential.user;
-            console.log("Login bem-sucedido:", user);
-            // Redirecionar ou atualizar UI
-        })
-        .catch((error) => {
-            console.error("Erro no login:", error);
-            alert("Erro no login: " + error.message);
-        });
+    // Validação temporária
+    if (email === 'contato.oliveiradebrito@gmail.com' && password === '123456') {
+        console.log("Login bem-sucedido!");
+        window.location.href = 'dashboard.html';
+        return;
+    }
+
+    // Tentativa com Firebase
+    if (typeof firebase !== 'undefined' && firebase.auth) {
+        firebase.auth().signInWithEmailAndPassword(email, password)
+            .then((userCredential) => {
+                const user = userCredential.user;
+                console.log("Login bem-sucedido:", user);
+                window.location.href = 'dashboard.html';
+            })
+            .catch((error) => {
+                console.error("Erro no login:", error);
+                alert("Email ou senha incorretos!");
+            });
+    } else {
+        alert("Email ou senha incorretos!");
+    }
 });
 
 // Registro com email/senha
@@ -46,7 +83,7 @@ registerForm.addEventListener('submit', (e) => {
             // Registro bem-sucedido
             const user = userCredential.user;
             console.log("Registro bem-sucedido:", user);
-            // Redirecionar ou atualizar UI
+            window.location.href = 'dashboard.html';
         })
         .catch((error) => {
             console.error("Erro no registro:", error);
@@ -61,7 +98,7 @@ googleBtn.addEventListener('click', () => {
         .then((result) => {
             const user = result.user;
             console.log("Login Google bem-sucedido:", user);
-            // Redirecionar ou atualizar UI
+            window.location.href = 'dashboard.html';
         })
         .catch((error) => {
             console.error("Erro no login Google:", error);
@@ -76,7 +113,7 @@ facebookBtn.addEventListener('click', () => {
         .then((result) => {
             const user = result.user;
             console.log("Login Facebook bem-sucedido:", user);
-            // Redirecionar ou atualizar UI
+            window.location.href = 'dashboard.html';
         })
         .catch((error) => {
             console.error("Erro no login Facebook:", error);

@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Loja - Portal Cultural RPG</title>
+    <link rel="stylesheet" href="assets/css/dashboard.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-content">
+            <div class="logo">
+                <i class="fas fa-dragon"></i>
+                <span>Portal Cultural</span>
+            </div>
+            <nav class="nav">
+                <a href="dashboard.html" class="nav-link">
+                    <i class="fas fa-scroll"></i>
+                    <span>Missões Diárias</span>
+                </a>
+                <a href="loja.html" class="nav-link active">
+                    <i class="fas fa-store"></i>
+                    <span>Loja</span>
+                </a>
+                <a href="biblioteca.html" class="nav-link">
+                    <i class="fas fa-book"></i>
+                    <span>Biblioteca</span>
+                </a>
+                <a href="tutorial.html" class="nav-link tutorial-link">
+                    <i class="fas fa-question-circle"></i>
+                    <span>Como Funciona</span>
+                </a>
+            </nav>
+            <div class="user-menu">
+                <div class="theme-toggle" onclick="toggleDarkMode()">
+                    <i class="fas fa-moon"></i>
+                </div>
+                <div class="user-avatar" onclick="window.location.href='profile.html'">
+                    <i class="fas fa-user"></i>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main">
+        <!-- Shop Section -->
+        <section class="section">
+            <h2>Loja de Conhecimentos</h2>
+            <div class="shop-info">
+                <p><i class="fas fa-gem"></i> Seus Pontos de Conhecimento: <span class="pc-count">15</span></p>
+            </div>
+            <div class="shop-categories">
+                <!-- Música -->
+                <div class="category">
+                    <h3><i class="fas fa-music"></i> Música Brasileira</h3>
+                    <div class="items-grid">
+                        <div class="shop-item">
+                            <h4>Samba</h4>
+                            <p>Ritmo nascido no Rio de Janeiro</p>
+                            <div class="price">1 PC</div>
+                            <button class="buy-btn">Comprar</button>
+                        </div>
+                        <div class="shop-item">
+                            <h4>Bossa Nova</h4>
+                            <p>Movimento musical dos anos 50/60</p>
+                            <div class="price">1 PC</div>
+                            <button class="buy-btn">Comprar</button>
+                        </div>
+                        <div class="shop-item">
+                            <h4>Forró</h4>
+                            <p>Dança e música nordestina</p>
+                            <div class="price">1 PC</div>
+                            <button class="buy-btn">Comprar</button>
+                        </div>
+                        <div class="shop-item">
+                            <h4>Axé</h4>
+                            <p>Ritmo baiano dos anos 80</p>
+                            <div class="price">1 PC</div>
+                            <button class="buy-btn">Comprar</button>
+                        </div>
+                        <div class="shop-item">
+                            <h4>Funk Carioca</h4>
+                            <p>Movimento cultural urbano</p>
+                            <div class="price">1 PC</div>
+                            <button class="buy-btn">Comprar</button>
+                        </div>
+                        <div class="shop-item">
+                            <h4>MPB</h4>
+                            <p>Música Popular Brasileira</p>
+                            <div class="price">1 PC</div>
+                            <button class="buy-btn">Comprar</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Literatura -->
+                <div class="category">
+                    <h3><i class="fas fa-book"></i> Literatura</h3>
+                    <div class="items-grid">
+                        <div class="shop-item">
+                            <h4>Machado de Assis</h4>
+                            <p>Maior escritor brasileiro</p>
+                            <div class="price">1 PC</div>
+                            <button class="buy-btn">Comprar</button>
+                        </div>
+                        <div class="shop-item">
+                            <h4>Cordel</h4>
+                            <p>Literatura popular nordestina</p>
+                            <div class="price">1 PC</div>
+                            <button class="buy-btn">Comprar</button>
+                        </div>
+                        <div class="shop-item">
+                            <h4>Clarice Lispector</h4>
+                            <p>Mestra da introspecção</p>
+                            <div class="price">1 PC</div>
+                            <button class="buy-btn">Comprar</button>
+                        </div>
+                        <div class="shop-item">
+                            <h4>Jorge Amado</h4>
+                            <p>Cronista da Bahia</p>
+                            <div class="price">1 PC</div>
+                            <button class="buy-btn">Comprar</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Culinária -->
+                <div class="category">
+                    <h3><i class="fas fa-utensils"></i> Culinária</h3>
+                    <div class="items-grid">
+                        <div class="shop-item">
+                            <h4>Feijoada</h4>
+                            <p>Prato nacional brasileiro</p>
+                            <div class="price">1 PC</div>
+                            <button class="buy-btn">Comprar</button>
+                        </div>
+                        <div class="shop-item">
+                            <h4>Açaí</h4>
+                            <p>Superfruto amazônico</p>
+                            <div class="price">1 PC</div>
+                            <button class="buy-btn">Comprar</button>
+                        </div>
+                        <div class="shop-item">
+                            <h4>Pão de Açúcar</h4>
+                            <p>Doce tradicional mineiro</p>
+                            <div class="price">1 PC</div>
+                            <button class="buy-btn">Comprar</button>
+                        </div>
+                        <div class="shop-item">
+                            <h4>Acarajé</h4>
+                            <p>Iguaria baiana de origem africana</p>
+                            <div class="price">1 PC</div>
+                            <button class="buy-btn">Comprar</button>
+                        </div>
+                        <div class="shop-item">
+                            <h4>Brigadeiro</h4>
+                            <p>Doce brasileiro clássico</p>
+                            <div class="price">1 PC</div>
+                            <button class="buy-btn">Comprar</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Folclore -->
+                <div class="category">
+                    <h3><i class="fas fa-theater-masks"></i> Folclore</h3>
+                    <div class="items-grid">
+                        <div class="shop-item">
+                            <h4>Curupira</h4>
+                            <p>Protetor das florestas</p>
+                            <div class="price">1 PC</div>
+                            <button class="buy-btn">Comprar</button>
+                        </div>
+                        <div class="shop-item">
+                            <h4>Saci-Pererê</h4>
+                            <p>Travesso de uma perna só</p>
+                            <div class="price">1 PC</div>
+                            <button class="buy-btn">Comprar</button>
+                        </div>
+                        <div class="shop-item">
+                            <h4>Iara</h4>
+                            <p>Sereia dos rios brasileiros</p>
+                            <div class="price">1 PC</div>
+                            <button class="buy-btn">Comprar</button>
+                        </div>
+                        <div class="shop-item">
+                            <h4>Boitatá</h4>
+                            <p>Serpente de fogo protetora</p>
+                            <div class="price">1 PC</div>
+                            <button class="buy-btn">Comprar</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Artes Marciais -->
+                <div class="category">
+                    <h3><i class="fas fa-fist-raised"></i> Artes Marciais</h3>
+                    <div class="items-grid">
+                        <div class="shop-item">
+                            <h4>Capoeira</h4>
+                            <p>Arte marcial afro-brasileira</p>
+                            <div class="price">1 PC</div>
+                            <button class="buy-btn">Comprar</button>
+                        </div>
+                        <div class="shop-item">
+                            <h4>Jiu-Jitsu Brasileiro</h4>
+                            <p>Arte suave adaptada no Brasil</p>
+                            <div class="price">1 PC</div>
+                            <button class="buy-btn">Comprar</button>
+                        </div>
+                        <div class="shop-item">
+                            <h4>Huka-Huka</h4>
+                            <p>Luta indígena tradicional</p>
+                            <div class="price">1 PC</div>
+                            <button class="buy-btn">Comprar</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Festas Populares -->
+                <div class="category">
+                    <h3><i class="fas fa-calendar-alt"></i> Festas Populares</h3>
+                    <div class="items-grid">
+                        <div class="shop-item">
+                            <h4>Carnaval</h4>
+                            <p>Maior festa popular do Brasil</p>
+                            <div class="price">1 PC</div>
+                            <button class="buy-btn">Comprar</button>
+                        </div>
+                        <div class="shop-item">
+                            <h4>Festa Junina</h4>
+                            <p>Celebração dos santos juninos</p>
+                            <div class="price">1 PC</div>
+                            <button class="buy-btn">Comprar</button>
+                        </div>
+                        <div class="shop-item">
+                            <h4>Bumba Meu Boi</h4>
+                            <p>Auto popular nordestino</p>
+                            <div class="price">1 PC</div>
+                            <button class="buy-btn">Comprar</button>
+                        </div>
+                        <div class="shop-item">
+                            <h4>Festival de Parintins</h4>
+                            <p>Disputa dos bois Garantido e Caprichoso</p>
+                            <div class="price">1 PC</div>
+                            <button class="buy-btn">Comprar</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script src="assets/js/loja.js"></script>
+</body>
+</html>

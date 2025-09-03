@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Biblioteca - Portal Cultural RPG</title>
+    <link rel="stylesheet" href="assets/css/dashboard.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-content">
+            <div class="logo">
+                <i class="fas fa-dragon"></i>
+                <span>Portal Cultural</span>
+            </div>
+            <nav class="nav">
+                <a href="dashboard.html" class="nav-link">
+                    <i class="fas fa-scroll"></i>
+                    <span>Missões Diárias</span>
+                </a>
+                <a href="loja.html" class="nav-link">
+                    <i class="fas fa-store"></i>
+                    <span>Loja</span>
+                </a>
+                <a href="biblioteca.html" class="nav-link active">
+                    <i class="fas fa-book"></i>
+                    <span>Biblioteca</span>
+                </a>
+                <a href="tutorial.html" class="nav-link tutorial-link">
+                    <i class="fas fa-question-circle"></i>
+                    <span>Como Funciona</span>
+                </a>
+            </nav>
+            <div class="user-menu">
+                <div class="theme-toggle" onclick="toggleDarkMode()">
+                    <i class="fas fa-moon"></i>
+                </div>
+                <div class="user-avatar" onclick="window.location.href='profile.html'">
+                    <i class="fas fa-user"></i>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main">
+        <!-- Library Section -->
+        <section class="section">
+            <h2>Minha Biblioteca</h2>
+            <div class="library-info">
+                <p><i class="fas fa-info-circle"></i> Aqui estão os conhecimentos que você já adquiriu na loja</p>
+            </div>
+            <div class="owned-knowledge" id="owned-knowledge">
+                <div class="empty-library" id="empty-library">
+                    <i class="fas fa-shopping-cart"></i>
+                    <p>Compre conhecimentos na <a href="loja.html">Loja</a> para começar sua biblioteca!</p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script src="assets/js/biblioteca.js"></script>
+</body>
+</html>

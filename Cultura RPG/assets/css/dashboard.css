@@ -1,0 +1,689 @@
+/* Paleta Raízes da Amazônia */
+:root {
+    --primary: #2A5333;
+    --secondary: #A34A39;
+    --accent: #EBD677;
+    --text: #F5F5F5;
+    --bg-dark: #1a1a1a;
+    --bg-card: rgba(42, 83, 51, 0.3);
+    --border: rgba(235, 214, 119, 0.4);
+    --gradient: linear-gradient(135deg, #1a1a1a, #2A5333, #A34A39);
+}
+
+.dark-mode {
+    --primary: #1a2e1f;
+    --secondary: #2d1a17;
+    --accent: #d4c066;
+    --text: #666666;
+    --bg-card: rgba(26, 46, 31, 0.4);
+    --border: rgba(212, 192, 102, 0.4);
+    --gradient: linear-gradient(135deg, #0f0f0f, #1a2e1f, #2d1a17);
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', sans-serif;
+    background: var(--gradient);
+    color: var(--text);
+    min-height: 100vh;
+}
+
+/* Header */
+.header {
+    background: var(--bg-card);
+    backdrop-filter: blur(20px);
+    border-bottom: 1px solid var(--border);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+.header-content {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 1rem 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: var(--accent);
+}
+
+.nav {
+    display: flex;
+    gap: 2rem;
+}
+
+.nav-link {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--text);
+    text-decoration: none;
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+}
+
+.nav-link:hover,
+.nav-link.active {
+    background: var(--bg-card);
+    color: var(--accent);
+}
+
+.tutorial-link {
+    border: 1px solid var(--accent);
+    border-radius: 8px;
+}
+
+.tutorial-link:hover {
+    background: var(--accent);
+    color: var(--bg-dark);
+}
+
+.user-menu {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.theme-toggle,
+.user-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: var(--bg-card);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.theme-toggle:hover,
+.user-avatar:hover {
+    background: var(--accent);
+    color: var(--bg-dark);
+}
+
+/* Main Content */
+.main {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem;
+}
+
+/* Hero Section */
+.hero {
+    text-align: center;
+    padding: 3rem 0;
+    margin-bottom: 3rem;
+}
+
+.hero h1 {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+    color: var(--accent);
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+    font-weight: bold;
+}
+
+.hero p {
+    font-size: 1.2rem;
+    margin-bottom: 2rem;
+    opacity: 0.8;
+}
+
+.stats {
+    display: flex;
+    justify-content: center;
+    gap: 3rem;
+}
+
+.stat {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.stat i {
+    font-size: 2rem;
+    color: var(--accent);
+}
+
+.stat-value {
+    font-size: 2rem;
+    font-weight: bold;
+}
+
+.stat-label {
+    opacity: 0.7;
+}
+
+/* Sections */
+.section {
+    margin-bottom: 3rem;
+}
+
+.section.hidden {
+    display: none;
+}
+
+.section h2 {
+    font-size: 2rem;
+    margin-bottom: 2rem;
+    text-align: center;
+}
+
+/* Quest Grid */
+.quest-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 2rem;
+}
+
+.quest-card {
+    background: var(--bg-card);
+    backdrop-filter: blur(20px);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 2rem;
+    text-align: center;
+    transition: all 0.3s ease;
+}
+
+.quest-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+}
+
+.quest-icon {
+    font-size: 3rem;
+    color: var(--accent);
+    margin-bottom: 1rem;
+}
+
+.quest-card h3 {
+    margin-bottom: 1rem;
+}
+
+.quest-card p {
+    opacity: 0.8;
+    margin-bottom: 1.5rem;
+}
+
+.quest-progress {
+    margin-bottom: 1.5rem;
+}
+
+.progress-bar {
+    width: 100%;
+    height: 8px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 4px;
+    overflow: hidden;
+    margin-bottom: 0.5rem;
+}
+
+.progress-fill {
+    height: 100%;
+    background: var(--gradient);
+    transition: width 0.3s ease;
+}
+
+.quest-btn {
+    background: var(--gradient);
+    border: none;
+    color: var(--text);
+    padding: 0.8rem 2rem;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: all 0.3s ease;
+}
+
+.quest-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+}
+
+/* Library Grid */
+.library-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 2rem;
+}
+
+.book-card {
+    background: var(--bg-card);
+    backdrop-filter: blur(20px);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 2rem;
+    text-align: center;
+    transition: all 0.3s ease;
+}
+
+.book-card:hover {
+    transform: translateY(-5px);
+}
+
+.book-card i {
+    font-size: 3rem;
+    color: var(--accent);
+    margin-bottom: 1rem;
+}
+
+/* Profile */
+.profile-content {
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+    gap: 2rem;
+}
+
+.profile-card {
+    background: var(--bg-card);
+    backdrop-filter: blur(20px);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 2rem;
+    text-align: center;
+}
+
+.profile-avatar i {
+    font-size: 4rem;
+    color: var(--accent);
+    margin-bottom: 1rem;
+}
+
+.level-info {
+    margin-top: 1rem;
+}
+
+.xp-bar {
+    width: 100%;
+    height: 10px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 5px;
+    margin: 0.5rem 0;
+    overflow: hidden;
+}
+
+.xp-fill {
+    height: 100%;
+    background: var(--gradient);
+    transition: width 0.3s ease;
+}
+
+.achievements {
+    background: var(--bg-card);
+    backdrop-filter: blur(20px);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 2rem;
+}
+
+/* Daily Info */
+.daily-info {
+    background: rgba(235, 214, 119, 0.1);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1rem;
+    margin-bottom: 2rem;
+    text-align: center;
+}
+
+/* Shop Styles */
+.shop-info {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1rem;
+    margin-bottom: 2rem;
+    text-align: center;
+}
+
+.pc-count {
+    color: var(--accent);
+    font-weight: bold;
+    font-size: 1.2rem;
+}
+
+.shop-categories {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+}
+
+.category {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 1.5rem;
+}
+
+.category h3 {
+    color: var(--accent);
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.items-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1rem;
+}
+
+.shop-item {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1rem;
+    text-align: center;
+    transition: all 0.3s ease;
+}
+
+.shop-item:hover {
+    transform: translateY(-3px);
+    background: rgba(235, 214, 119, 0.1);
+}
+
+.shop-item h4 {
+    color: var(--accent);
+    margin-bottom: 0.5rem;
+}
+
+.shop-item p {
+    opacity: 0.8;
+    margin-bottom: 1rem;
+    font-size: 0.9rem;
+}
+
+.price {
+    background: var(--accent);
+    color: var(--primary);
+    padding: 0.25rem 0.5rem;
+    border-radius: 8px;
+    font-weight: bold;
+    margin-bottom: 1rem;
+    display: inline-block;
+}
+
+.buy-btn {
+    background: var(--secondary);
+    color: var(--text);
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-weight: bold;
+}
+
+.buy-btn:hover {
+    background: var(--accent);
+    color: var(--primary);
+    transform: translateY(-2px);
+}
+
+/* Library Styles */
+.library-info {
+    background: rgba(42, 83, 51, 0.2);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1rem;
+    margin-bottom: 2rem;
+    text-align: center;
+}
+
+.owned-knowledge {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.knowledge-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.knowledge-card i {
+    font-size: 2rem;
+    color: var(--accent);
+    align-self: flex-start;
+}
+
+.knowledge-card h3 {
+    color: var(--accent);
+    margin: 0;
+}
+
+.knowledge-card p {
+    opacity: 0.9;
+    line-height: 1.6;
+}
+
+.progress-bar {
+    width: 100%;
+    height: 8px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.progress {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent), var(--secondary));
+    transition: width 0.3s ease;
+}
+
+.level-info {
+    color: var(--accent);
+    font-weight: bold;
+    font-size: 0.9rem;
+}
+
+.empty-library {
+    text-align: center;
+    padding: 2rem;
+    opacity: 0.7;
+}
+
+.empty-library i {
+    font-size: 3rem;
+    color: var(--accent);
+    margin-bottom: 1rem;
+}
+
+.empty-library a {
+    color: var(--accent);
+    text-decoration: none;
+    font-weight: bold;
+}
+
+.empty-library a:hover {
+    text-decoration: underline;
+}
+
+/* Knowledge Controls */
+.knowledge-controls {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 1rem;
+}
+
+.level-selector-btn {
+    background: var(--accent);
+    color: var(--primary);
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: all 0.3s ease;
+}
+
+.level-selector-btn i {
+    color: var(--primary) !important;
+    font-size: 1rem;
+}
+
+.level-selector-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+/* Level Modal */
+.level-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2000;
+}
+
+.level-modal-content {
+    background: var(--bg-card);
+    backdrop-filter: blur(20px);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 2rem;
+    max-width: 400px;
+    width: 90%;
+    max-height: 80vh;
+    overflow-y: auto;
+}
+
+.level-modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--border);
+}
+
+.level-modal-header h3 {
+    color: var(--accent);
+    margin: 0;
+}
+
+.close-modal {
+    background: none;
+    border: none;
+    color: var(--text);
+    font-size: 1.2rem;
+    cursor: pointer;
+    padding: 0.5rem;
+    border-radius: 50%;
+    transition: all 0.3s ease;
+}
+
+.close-modal:hover {
+    background: var(--accent);
+    color: var(--primary);
+}
+
+.level-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.level-item {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 1rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    transition: all 0.3s ease;
+    color: var(--text);
+}
+
+.level-item:hover {
+    background: rgba(235, 214, 119, 0.1);
+    border-color: var(--accent);
+    transform: translateX(5px);
+}
+
+.level-number {
+    background: var(--accent);
+    color: var(--primary);
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    flex-shrink: 0;
+}
+
+.level-name {
+    font-weight: bold;
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+    .header-content {
+        padding: 1rem;
+        flex-direction: column;
+        gap: 1rem;
+    }
+
+    .nav {
+        gap: 1rem;
+    }
+
+    .hero h1 {
+        font-size: 2rem;
+    }
+
+    .stats {
+        gap: 1.5rem;
+    }
+
+    .profile-content {
+        grid-template-columns: 1fr;
+    }
+
+    .main {
+        padding: 1rem;
+    }
+
+    .items-grid {
+        grid-template-columns: 1fr;
+    }
+}

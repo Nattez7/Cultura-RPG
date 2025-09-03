@@ -1,12 +1,23 @@
-/* Variáveis de cores e efeitos */
+/* Paleta Raízes da Amazônia */
 :root {
-    --primary: #7e22ce;      /* Roxo mais vibrante */
-    --secondary: #2563eb;    /* Azul elétrico */
-    --accent: #22d3ee;       /* Ciano brilhante */
-    --text: #ffffff;         /* Texto branco */
-    --glass: rgba(255, 255, 255, 0.15);  /* Vidro mais visível */
-    --border: rgba(255, 255, 255, 0.3);  /* Borda mais visível */
-    --gradient: linear-gradient(135deg, var(--primary), var(--secondary));
+    --primary: #2A5333;      /* Verde Escuro - mata densa */
+    --secondary: #A34A39;    /* Terracota - terra vermelha */
+    --accent: #EBD677;       /* Amarelo Ouro - sol e luz */
+    --text: #F5F5F5;         /* Texto claro */
+    --glass: rgba(42, 83, 51, 0.3);  /* Vidro verde místico */
+    --border: rgba(235, 214, 119, 0.4);  /* Borda dourada */
+    --gradient: linear-gradient(135deg, #1a1a1a, #2A5333, #A34A39);
+}
+
+/* Modo escuro */
+.dark-mode {
+    --primary: #1a2e1f;
+    --secondary: #2d1a17;
+    --accent: #d4c066;
+    --text: #666666;
+    --glass: rgba(26, 46, 31, 0.4);
+    --border: rgba(212, 192, 102, 0.4);
+    --gradient: linear-gradient(135deg, #0f0f0f, #1a2e1f, #2d1a17);
 }
 
 /* Reset e estilos base */
@@ -47,6 +58,26 @@ body {
     font-size: 3rem;
     color: var(--accent);
     margin-bottom: 1rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.logo:hover {
+    transform: scale(1.1);
+}
+
+.logo.wing-flap {
+    animation: wingFlap 0.8s ease-in-out;
+}
+
+@keyframes wingFlap {
+    0% { transform: scaleX(1) scaleY(1) rotateZ(0deg); }
+    15% { transform: scaleX(0.8) scaleY(1.2) rotateZ(-3deg); }
+    30% { transform: scaleX(1.3) scaleY(0.9) rotateZ(0deg); }
+    45% { transform: scaleX(0.8) scaleY(1.2) rotateZ(3deg); }
+    60% { transform: scaleX(1.3) scaleY(0.9) rotateZ(0deg); }
+    75% { transform: scaleX(0.8) scaleY(1.2) rotateZ(-2deg); }
+    100% { transform: scaleX(1) scaleY(1) rotateZ(0deg); }
 }
 
 .form-header h1 {
@@ -160,7 +191,7 @@ body {
 }
 
 .input-icon input:focus + label,
-.input-icon input:valid + label {
+.input-icon input:not(:placeholder-shown) + label {
     top: 0;
     left: 1rem;
     font-size: 0.8rem;
@@ -168,6 +199,21 @@ body {
     background: var(--gradient);
     border-radius: 4px;
     color: var(--text);
+}
+
+.input-icon input {
+    width: 100%;
+    padding: 1rem 1rem 1rem 3rem;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    color: var(--text);
+    font-size: 1rem;
+    transition: all 0.3s ease;
+}
+
+.input-icon input::placeholder {
+    color: transparent;
 }
 
 /* Opções do formulário */
@@ -236,10 +282,20 @@ body {
 /* Estados dos formulários */
 .form {
     display: none;
+    opacity: 0;
+    transform: translateY(20px);
+    transition: all 0.4s ease;
 }
 
 .form.active {
     display: block;
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.form.fade-out {
+    opacity: 0;
+    transform: translateY(-20px);
 }
 
 /* Responsividade */
