@@ -14,46 +14,257 @@ function toggleDarkMode() {
     }
 }
 
-// Simulação de progresso das missões
+// Sistema de Quiz das Missões
+const questData = {
+    0: { // Civilizações Antigas
+        title: 'Civilizações Antigas',
+        questions: [
+            {
+                question: 'Qual civilização construiu as pirâmides de Gizé?',
+                options: ['Mesopotâmia', 'Egito Antigo', 'Grécia', 'Roma'],
+                correct: 1
+            },
+            {
+                question: 'Em que rio se desenvolveu a civilização egípcia?',
+                options: ['Tigre', 'Eufrates', 'Nilo', 'Indo'],
+                correct: 2
+            },
+            {
+                question: 'Qual era a escrita utilizada no Egito Antigo?',
+                options: ['Cuneiforme', 'Hieróglifos', 'Alfabeto', 'Ideogramas'],
+                correct: 1
+            },
+            {
+                question: 'Quem foi o faraó que construiu a Grande Pirâmide?',
+                options: ['Tutancâmon', 'Ramsés II', 'Quéops', 'Cleópatra'],
+                correct: 2
+            },
+            {
+                question: 'O que significa a palavra "faraó"?',
+                options: ['Rei dos reis', 'Casa grande', 'Filho do sol', 'Deus vivo'],
+                correct: 1
+            }
+        ]
+    },
+    1: { // Arte Renascentista
+        title: 'Arte Renascentista',
+        questions: [
+            {
+                question: 'Quem pintou a Mona Lisa?',
+                options: ['Michelangelo', 'Leonardo da Vinci', 'Rafael', 'Donatello'],
+                correct: 1
+            },
+            {
+                question: 'Em que século ocorreu o Renascimento?',
+                options: ['XIV-XV', 'XV-XVI', 'XVI-XVII', 'XIII-XIV'],
+                correct: 1
+            },
+            {
+                question: 'Qual cidade foi o berço do Renascimento?',
+                options: ['Roma', 'Veneza', 'Florença', 'Milão'],
+                correct: 2
+            },
+            {
+                question: 'Quem esculpiu a estátua de Davi?',
+                options: ['Leonardo', 'Rafael', 'Michelangelo', 'Bernini'],
+                correct: 2
+            }
+        ]
+    },
+    2: { // Música Mundial
+        title: 'Música Mundial',
+        questions: [
+            {
+                question: 'Qual é o ritmo musical típico da Argentina?',
+                options: ['Samba', 'Tango', 'Flamenco', 'Salsa'],
+                correct: 1
+            },
+            {
+                question: 'De que país é originário o reggae?',
+                options: ['Brasil', 'Cuba', 'Jamaica', 'México'],
+                correct: 2
+            },
+            {
+                question: 'Qual instrumento é símbolo da música irlandesa?',
+                options: ['Violino', 'Gaita de foles', 'Harpa', 'Flauta'],
+                correct: 2
+            },
+            {
+                question: 'Que gênero musical nasceu em Nova Orleans?',
+                options: ['Blues', 'Jazz', 'Rock', 'Country'],
+                correct: 1
+            },
+            {
+                question: 'Qual país é famoso pelo flamenco?',
+                options: ['Portugal', 'Espanha', 'Itália', 'França'],
+                correct: 1
+            },
+            {
+                question: 'Que instrumento é típico da música indiana?',
+                options: ['Violão', 'Piano', 'Sitar', 'Saxofone'],
+                correct: 2
+            }
+        ]
+    }
+};
+
+let currentQuest = null;
+let currentQuestion = 0;
+let questProgress = {};
+
+// Inicializar progresso das missões
+function initQuestProgress() {
+    questProgress = {
+        0: { completed: 0, total: 5 },
+        1: { completed: 0, total: 4 },
+        2: { completed: 0, total: 6 }
+    };
+}
+
+// Sistema de Quiz das Missões
 const questButtons = document.querySelectorAll('.quest-btn');
 
 questButtons.forEach((btn, index) => {
     btn.addEventListener('click', () => {
-        const card = btn.closest('.quest-card');
-        const progressFill = card.querySelector('.progress-fill');
-        const progressText = card.querySelector('.quest-progress span');
-        
-        // Simula progresso aleatório
-        const progress = Math.floor(Math.random() * 100);
-        progressFill.style.width = progress + '%';
-        
-        // Atualiza texto baseado no progresso
-        const maxSteps = index === 0 ? 5 : index === 1 ? 4 : 6;
-        const currentSteps = Math.floor((progress / 100) * maxSteps);
-        progressText.textContent = `${currentSteps}/${maxSteps} completo`;
-        
-        // Atualiza botão se completo
-        if (progress === 100) {
-            btn.textContent = 'Concluído!';
-            btn.style.background = '#22c55e';
-        } else {
-            btn.textContent = 'Continuar';
-        }
-        
-        // Atualiza estatísticas
-        updateStats();
+        startQuest(index);
     });
 });
 
+function startQuest(questIndex) {
+    currentQuest = questIndex;
+    currentQuestion = 0;
+    showQuizModal();
+}
+
+function showQuizModal() {
+    const quest = questData[currentQuest];
+    const question = quest.questions[currentQuestion];
+    
+    const modal = document.createElement('div');
+    modal.className = 'quiz-modal';
+    modal.innerHTML = `
+        <div class="quiz-modal-content">
+            <div class="quiz-header">
+                <h3>${quest.title}</h3>
+                <div class="quiz-progress">
+                    <span>Pergunta ${currentQuestion + 1} de ${quest.questions.length}</span>
+                    <div class="quiz-progress-bar">
+                        <div class="quiz-progress-fill" style="width: ${((currentQuestion) / quest.questions.length) * 100}%"></div>
+                    </div>
+                </div>
+                <button class="close-quiz" onclick="closeQuiz()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="quiz-content">
+                <h4>${question.question}</h4>
+                <div class="quiz-options">
+                    ${question.options.map((option, index) => `
+                        <button class="quiz-option" onclick="selectAnswer(${index})">
+                            ${option}
+                        </button>
+                    `).join('')}
+                </div>
+            </div>
+        </div>
+    `;
+    
+    document.body.appendChild(modal);
+}
+
+function selectAnswer(selectedIndex) {
+    const quest = questData[currentQuest];
+    const question = quest.questions[currentQuestion];
+    const options = document.querySelectorAll('.quiz-option');
+    
+    // Desabilita todas as opções
+    options.forEach(option => option.disabled = true);
+    
+    // Marca a resposta correta e incorreta
+    options[question.correct].classList.add('correct');
+    if (selectedIndex !== question.correct) {
+        options[selectedIndex].classList.add('incorrect');
+    }
+    
+    // Atualiza progresso se acertou
+    if (selectedIndex === question.correct) {
+        questProgress[currentQuest].completed++;
+        updateQuestProgress(currentQuest);
+    }
+    
+    // Próxima pergunta após 2 segundos
+    setTimeout(() => {
+        currentQuestion++;
+        if (currentQuestion < quest.questions.length) {
+            showQuizModal();
+        } else {
+            completeQuest();
+        }
+    }, 2000);
+}
+
+function completeQuest() {
+    const quest = questData[currentQuest];
+    const score = questProgress[currentQuest].completed;
+    const total = quest.questions.length;
+    
+    const modal = document.createElement('div');
+    modal.className = 'quiz-modal';
+    modal.innerHTML = `
+        <div class="quiz-modal-content">
+            <div class="quiz-complete">
+                <i class="fas fa-trophy"></i>
+                <h3>Missão Concluída!</h3>
+                <p>Você acertou ${score} de ${total} perguntas</p>
+                <div class="reward">
+                    <i class="fas fa-gem"></i>
+                    <span>+${score} Pontos de Conhecimento</span>
+                </div>
+                <button class="continue-btn" onclick="closeQuiz()">Continuar</button>
+            </div>
+        </div>
+    `;
+    
+    document.body.appendChild(modal);
+    
+    // Atualiza estatísticas
+    updateStats(score);
+}
+
+function updateQuestProgress(questIndex) {
+    const cards = document.querySelectorAll('.quest-card');
+    const card = cards[questIndex];
+    const progressFill = card.querySelector('.progress-fill');
+    const progressText = card.querySelector('.quest-progress span');
+    const btn = card.querySelector('.quest-btn');
+    
+    const progress = questProgress[questIndex];
+    const percentage = (progress.completed / progress.total) * 100;
+    
+    progressFill.style.width = percentage + '%';
+    progressText.textContent = `${progress.completed}/${progress.total} completo`;
+    
+    if (progress.completed >= progress.total) {
+        btn.textContent = 'Concluído!';
+        btn.style.background = '#22c55e';
+        btn.disabled = true;
+    }
+}
+
+function closeQuiz() {
+    const modals = document.querySelectorAll('.quiz-modal');
+    modals.forEach(modal => modal.remove());
+}
+
 // Atualizar estatísticas
-function updateStats() {
+function updateStats(score = 1) {
     const achievements = document.querySelector('.stat-value');
     const xp = document.querySelectorAll('.stat-value')[1];
     const missions = document.querySelectorAll('.stat-value')[2];
     
-    // Incrementa valores aleatoriamente
-    achievements.textContent = parseInt(achievements.textContent) + Math.floor(Math.random() * 3);
-    xp.textContent = parseInt(xp.textContent) + Math.floor(Math.random() * 50) + 10;
+    // Incrementa valores baseado no desempenho
+    achievements.textContent = parseInt(achievements.textContent) + (score >= 3 ? 1 : 0);
+    xp.textContent = parseInt(xp.textContent) + (score * 10);
     missions.textContent = parseInt(missions.textContent) + 1;
 }
 
@@ -560,6 +771,7 @@ function updateLibrary() {
 
 // Inicialização quando DOM estiver pronto
 document.addEventListener('DOMContentLoaded', function() {
+    initQuestProgress();
     
     // Sistema de compra na loja
     const buyButtons = document.querySelectorAll('.buy-btn');

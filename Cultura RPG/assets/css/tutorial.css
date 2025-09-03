@@ -219,6 +219,47 @@ body {
     text-align: center;
 }
 
+/* RPG Features */
+.rpg-features {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    margin-top: 1.5rem;
+}
+
+.rpg-feature {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+    background: rgba(42, 83, 51, 0.2);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1.5rem;
+    transition: all 0.3s ease;
+}
+
+.rpg-feature:hover {
+    background: rgba(42, 83, 51, 0.4);
+    transform: translateX(10px);
+}
+
+.rpg-feature i {
+    color: var(--accent);
+    font-size: 1.5rem;
+    margin-top: 0.2rem;
+    flex-shrink: 0;
+}
+
+.rpg-feature ul {
+    margin-top: 0.5rem;
+    margin-left: 1rem;
+}
+
+.rpg-feature li {
+    margin-bottom: 0.3rem;
+    opacity: 0.9;
+}
+
 /* Brazil Pride */
 .brazil-pride {
     background: linear-gradient(135deg, var(--brazil-green), var(--brazil-yellow));
@@ -322,5 +363,15 @@ body {
     .cta-buttons {
         flex-direction: column;
         align-items: center;
+    }
+
+    .rpg-feature {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .rpg-feature ul {
+        margin-left: 0;
+        text-align: left;
     }
 }

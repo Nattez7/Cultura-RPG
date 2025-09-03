@@ -28,6 +28,10 @@
                     <i class="fas fa-book"></i>
                     <span>Biblioteca</span>
                 </a>
+                <a href="#" onclick="showRPGProfile(); return false;" class="nav-link">
+                    <i class="fas fa-user-circle"></i>
+                    <span>Perfil RPG</span>
+                </a>
                 <a href="tutorial.html" class="nav-link tutorial-link">
                     <i class="fas fa-question-circle"></i>
                     <span>Como Funciona</span>
@@ -37,7 +41,7 @@
                 <div class="theme-toggle" onclick="toggleDarkMode()">
                     <i class="fas fa-moon"></i>
                 </div>
-                <div class="user-avatar" onclick="window.location.href='profile.html'">
+                <div class="user-avatar" onclick="showRPGProfile()">
                     <i class="fas fa-user"></i>
                 </div>
             </div>
@@ -194,66 +198,13 @@
                         </div>
                     </div>
                 </div>
-
-                <!-- Artes Marciais -->
-                <div class="category">
-                    <h3><i class="fas fa-fist-raised"></i> Artes Marciais</h3>
-                    <div class="items-grid">
-                        <div class="shop-item">
-                            <h4>Capoeira</h4>
-                            <p>Arte marcial afro-brasileira</p>
-                            <div class="price">1 PC</div>
-                            <button class="buy-btn">Comprar</button>
-                        </div>
-                        <div class="shop-item">
-                            <h4>Jiu-Jitsu Brasileiro</h4>
-                            <p>Arte suave adaptada no Brasil</p>
-                            <div class="price">1 PC</div>
-                            <button class="buy-btn">Comprar</button>
-                        </div>
-                        <div class="shop-item">
-                            <h4>Huka-Huka</h4>
-                            <p>Luta indígena tradicional</p>
-                            <div class="price">1 PC</div>
-                            <button class="buy-btn">Comprar</button>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Festas Populares -->
-                <div class="category">
-                    <h3><i class="fas fa-calendar-alt"></i> Festas Populares</h3>
-                    <div class="items-grid">
-                        <div class="shop-item">
-                            <h4>Carnaval</h4>
-                            <p>Maior festa popular do Brasil</p>
-                            <div class="price">1 PC</div>
-                            <button class="buy-btn">Comprar</button>
-                        </div>
-                        <div class="shop-item">
-                            <h4>Festa Junina</h4>
-                            <p>Celebração dos santos juninos</p>
-                            <div class="price">1 PC</div>
-                            <button class="buy-btn">Comprar</button>
-                        </div>
-                        <div class="shop-item">
-                            <h4>Bumba Meu Boi</h4>
-                            <p>Auto popular nordestino</p>
-                            <div class="price">1 PC</div>
-                            <button class="buy-btn">Comprar</button>
-                        </div>
-                        <div class="shop-item">
-                            <h4>Festival de Parintins</h4>
-                            <p>Disputa dos bois Garantido e Caprichoso</p>
-                            <div class="price">1 PC</div>
-                            <button class="buy-btn">Comprar</button>
-                        </div>
-                    </div>
-                </div>
             </div>
         </section>
     </main>
 
-    <script src="assets/js/loja.js"></script>
+    <script src="assets/js/theme.js"></script>
+    <script src="assets/js/rpg-system.js"></script>
+    <script src="assets/js/rpg-profile.js"></script>
+    <script src="assets/js/shop-rpg.js"></script>
 </body>
 </html>
