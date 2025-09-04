@@ -45,7 +45,14 @@ loginForm.addEventListener('submit', (e) => {
     // Validação temporária
     if (email === 'contato.oliveiradebrito@gmail.com' && password === '123456') {
         console.log("Login bem-sucedido!");
-        window.location.href = 'dashboard.html';
+        
+        // Verificar se é usuário novo
+        const hasCharacter = localStorage.getItem('character_created');
+        if (!hasCharacter) {
+            window.location.href = 'character-creation.html';
+        } else {
+            window.location.href = 'dashboard.html';
+        }
         return;
     }
 
@@ -55,7 +62,13 @@ loginForm.addEventListener('submit', (e) => {
             .then((userCredential) => {
                 const user = userCredential.user;
                 console.log("Login bem-sucedido:", user);
-                window.location.href = 'dashboard.html';
+                
+                const hasCharacter = localStorage.getItem('character_created');
+                if (!hasCharacter) {
+                    window.location.href = 'character-creation.html';
+                } else {
+                    window.location.href = 'dashboard.html';
+                }
             })
             .catch((error) => {
                 console.error("Erro no login:", error);
@@ -182,3 +195,23 @@ document.getElementById('register-form').addEventListener('submit', function(e) 
     
     // Aqui você pode adicionar a lógica do Firebase para criar a conta
 });
+// Função para resetar todos os dados
+function resetAllData() {
+    if (confirm('Tem certeza que deseja resetar TODOS os dados? Esta ação não pode ser desfeita!')) {
+        // Limpar localStorage
+        localStorage.clear();
+        
+        // Limpar sessionStorage
+        sessionStorage.clear();
+        
+        // Limpar cookies (se houver)
+        document.cookie.split(";").forEach(function(c) { 
+            document.cookie = c.replace(/^ +/, "").replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/"); 
+        });
+        
+        alert('✅ Todos os dados foram resetados! A página será recarregada.');
+        
+        // Recarregar página
+        window.location.reload();
+    }
+}

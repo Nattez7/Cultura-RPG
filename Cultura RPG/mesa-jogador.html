@@ -1,0 +1,773 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mesa RPG - Jogador</title>
+    <link rel="stylesheet" href="assets/css/dashboard.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            background: #1a1a1a;
+            color: white;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            overflow: hidden;
+        }
+        
+        .rpg-interface {
+            display: grid;
+            grid-template-areas: 
+                "toolbar toolbar toolbar"
+                "sidebar canvas chat";
+            grid-template-columns: 300px 1fr 350px;
+            grid-template-rows: 60px 1fr;
+            height: 100vh;
+        }
+        
+        .sidebar {
+            grid-area: sidebar;
+            background: #2d2d2d;
+            border-right: 1px solid #444;
+            overflow-y: auto;
+            padding: 1rem;
+        }
+        
+        .toolbar {
+            grid-area: toolbar;
+            background: #2d2d2d;
+            border-bottom: 1px solid #444;
+            display: flex;
+            align-items: center;
+            padding: 0 1rem;
+            gap: 1rem;
+        }
+        
+        .canvas-container {
+            grid-area: canvas;
+            background: #1a1a1a;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .canvas {
+            width: 200%;
+            height: 200%;
+            position: relative;
+            cursor: grab;
+            min-width: 2000px;
+            min-height: 2000px;
+        }
+        
+        .canvas.dragging {
+            cursor: grabbing;
+        }
+        
+        .map-layer {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-size: cover;
+            background-repeat: no-repeat;
+            background-position: center;
+        }
+        
+        .grid-layer {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                linear-gradient(rgba(255,255,255,0.3) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255,255,255,0.3) 1px, transparent 1px);
+            background-size: 50px 50px;
+            pointer-events: none;
+            z-index: 5;
+        }
+        
+        .grid-layer.hidden {
+            display: none;
+        }
+        
+        .token {
+            position: absolute;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            border: 3px solid var(--accent);
+            background-size: cover;
+            background-position: center;
+            cursor: move;
+            transition: transform 0.1s;
+            z-index: 10;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: white;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
+        }
+        
+        .token:hover {
+            transform: scale(1.1);
+            z-index: 20;
+        }
+        
+        .token.selected {
+            border-color: #ff6b6b;
+            box-shadow: 0 0 20px rgba(255, 107, 107, 0.5);
+        }
+        
+        .chat-panel {
+            grid-area: chat;
+            background: #2d2d2d;
+            border-left: 1px solid #444;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .chat-header {
+            padding: 1rem;
+            border-bottom: 1px solid #444;
+            font-weight: bold;
+        }
+        
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 1rem;
+        }
+        
+        .chat-message {
+            margin-bottom: 1rem;
+            padding: 0.5rem;
+            border-radius: 8px;
+            background: rgba(255,255,255,0.05);
+        }
+        
+        .chat-input-area {
+            padding: 1rem;
+            border-top: 1px solid #444;
+        }
+        
+        .chat-input {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #555;
+            border-radius: 6px;
+            background: #1a1a1a;
+            color: white;
+        }
+        
+        .player-info {
+            background: rgba(235,214,119,0.1);
+            border: 1px solid var(--accent);
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+        }
+        
+        .dice-section {
+            background: rgba(235,214,119,0.1);
+            border: 1px solid var(--accent);
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+        }
+        
+        .dice-result {
+            background: rgba(0,0,0,0.3);
+            padding: 0.5rem;
+            border-radius: 6px;
+            text-align: center;
+            font-weight: bold;
+        }
+        
+        .zoom-controls {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            z-index: 100;
+        }
+        
+        .zoom-btn {
+            background: #2d2d2d;
+            border: 1px solid #555;
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 6px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .coordinates {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            background: rgba(0,0,0,0.7);
+            padding: 0.5rem;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            z-index: 100;
+        }
+        
+        .tool-btn {
+            background: transparent;
+            border: 1px solid #555;
+            color: white;
+            padding: 0.5rem;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .tool-btn:hover {
+            background: #444;
+            border-color: var(--accent);
+        }
+        
+        .tool-btn.active {
+            background: var(--accent);
+            color: #000;
+        }
+    </style>
+</head>
+<body>
+    <div class="rpg-interface">
+        <!-- Toolbar -->
+        <div class="toolbar">
+            <button class="tool-btn" title="Mostrar/Ocultar Grid" onclick="toggleGrid()">
+                <i class="fas fa-th"></i>
+            </button>
+            
+            <div style="margin-left: auto; display: flex; align-items: center; gap: 1rem;">
+                <span>Mesa: Lendas do Folclore (Jogador)</span>
+            </div>
+        </div>
+        
+        <!-- Sidebar Esquerda - Ficha do Personagem -->
+        <div class="sidebar">
+            <div id="character-sheet" style="display: none;">
+                <h3 style="color: var(--accent); margin-bottom: 1rem; text-align: center;">
+                    <i class="fas fa-scroll"></i> Ficha do Personagem
+                </h3>
+                
+                <!-- Avatar e Nome -->
+                <div style="text-align: center; margin-bottom: 2rem;">
+                    <div id="char-avatar" style="
+                        width: 80px; height: 80px; border-radius: 50%; background: var(--gradient);
+                        display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem;
+                        overflow: hidden; border: 2px solid var(--accent);
+                    ">
+                        <i class="fas fa-user" style="font-size: 2rem; color: var(--text);"></i>
+                    </div>
+                    <h4 id="sheet-char-name" style="color: var(--text); margin: 0 0 0.5rem;">-</h4>
+                    <p id="sheet-char-level" style="color: var(--accent); margin: 0; font-weight: bold;">Nível 1</p>
+                </div>
+                
+                <!-- Informações Básicas -->
+                <div style="background: rgba(255,255,255,0.05); border-radius: 8px; padding: 1rem; margin-bottom: 1rem;">
+                    <h5 style="color: var(--accent); margin-bottom: 0.5rem;">Informações</h5>
+                    <div style="display: grid; gap: 0.3rem; font-size: 0.9rem;">
+                        <div><strong>Idade:</strong> <span id="sheet-age">-</span> anos</div>
+                        <div><strong>Altura:</strong> <span id="sheet-height">-</span>m</div>
+                        <div><strong>Gênero:</strong> <span id="sheet-gender">-</span></div>
+                        <div><strong>Aparência:</strong> <span id="sheet-appearance">-</span></div>
+                    </div>
+                </div>
+                
+                <!-- Atributos -->
+                <div style="background: rgba(255,255,255,0.05); border-radius: 8px; padding: 1rem; margin-bottom: 1rem;">
+                    <h5 style="color: var(--accent); margin-bottom: 0.5rem;">Atributos</h5>
+                    <div id="sheet-stats" style="display: grid; gap: 0.5rem;"></div>
+                </div>
+                
+                <!-- XP -->
+                <div style="background: rgba(255,255,255,0.05); border-radius: 8px; padding: 1rem; margin-bottom: 1rem;">
+                    <h5 style="color: var(--accent); margin-bottom: 0.5rem;">Experiência</h5>
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem; font-size: 0.9rem;">
+                        <span>XP:</span>
+                        <span><span id="sheet-xp">0</span>/<span id="sheet-xp-next">100</span></span>
+                    </div>
+                    <div style="width: 100%; height: 8px; background: rgba(255,255,255,0.1); border-radius: 4px; overflow: hidden;">
+                        <div id="sheet-xp-bar" style="height: 100%; background: var(--gradient); width: 0%; transition: width 0.3s ease;"></div>
+                    </div>
+                </div>
+                
+                <!-- Conhecimentos -->
+                <div style="background: rgba(255,255,255,0.05); border-radius: 8px; padding: 1rem; margin-bottom: 1rem;">
+                    <h5 style="color: var(--accent); margin-bottom: 0.5rem;">Conhecimentos</h5>
+                    <div id="sheet-knowledge" style="display: grid; gap: 0.3rem; font-size: 0.85rem;">
+                        <div style="opacity: 0.7; font-style: italic;">Nenhum conhecimento adquirido</div>
+                    </div>
+                </div>
+                
+                <!-- PC -->
+                <div style="background: rgba(235,214,119,0.1); border: 1px solid var(--accent); border-radius: 8px; padding: 1rem; text-align: center; margin-bottom: 1rem;">
+                    <h5 style="color: var(--accent); margin-bottom: 0.5rem;">Pontos de Conhecimento</h5>
+                    <div style="font-size: 1.5rem; font-weight: bold; color: var(--accent);" id="sheet-pc">0</div>
+                </div>
+                
+                <!-- Rolador de Dados -->
+                <div class="dice-section">
+                    <h5 style="margin-bottom: 0.5rem; color: var(--accent);">Seus Dados</h5>
+                    <input type="text" id="dice-input" placeholder="Ex: 3d6, 2d10, 1d20" 
+                        style="width: 100%; padding: 0.5rem; border: 1px solid #555; border-radius: 6px; 
+                               background: #1a1a1a; color: white; margin-bottom: 0.5rem;">
+                    <button onclick="rollCustomDice()" style="background: var(--accent); color: #000; 
+                            border: none; padding: 0.5rem 1rem; border-radius: 6px; cursor: pointer; 
+                            font-weight: bold; width: 100%; margin-bottom: 1rem;">
+                        Rolar
+                    </button>
+                    <div class="dice-result" id="dice-result">Digite os dados e clique em Rolar</div>
+                    <div style="font-size: 0.8rem; opacity: 0.7; margin-top: 0.5rem;">
+                        Exemplos: 3d6, 2d10+5, 1d20-2
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Botão Adicionar Personagem -->
+            <div id="add-character-section">
+                <button id="add-character-btn" onclick="addCharacterToTable()" 
+                    style="background: var(--accent); color: #000; border: none; padding: 1rem; 
+                           border-radius: 8px; cursor: pointer; font-weight: bold; width: 100%;">
+                    <i class="fas fa-plus"></i> Adicionar Meu Personagem na Mesa
+                </button>
+            </div>
+        </div>
+        
+        <!-- Canvas -->
+        <div class="canvas-container">
+            <div class="canvas" id="canvas">
+                <div class="map-layer" id="map-layer"></div>
+                <div class="grid-layer" id="grid-layer"></div>
+            </div>
+            
+            <div class="coordinates" id="coordinates">X: 0, Y: 0</div>
+            
+            <div class="zoom-controls">
+                <button class="zoom-btn" onclick="zoomIn()">
+                    <i class="fas fa-plus"></i>
+                </button>
+                <button class="zoom-btn" onclick="zoomOut()">
+                    <i class="fas fa-minus"></i>
+                </button>
+                <button class="zoom-btn" onclick="resetZoom()">
+                    <i class="fas fa-expand-arrows-alt"></i>
+                </button>
+                <button class="zoom-btn" onclick="centerMap()">
+                    <i class="fas fa-crosshairs"></i>
+                </button>
+            </div>
+        </div>
+        
+        <!-- Chat e Controles -->
+        <div class="chat-panel">
+            <div class="chat-header">
+                <i class="fas fa-comments"></i> Chat da Mesa
+            </div>
+            
+
+            
+            <div class="chat-messages" id="chat-messages">
+                <div class="chat-message">
+                    <strong style="color: #FFD700;">Mestre:</strong> Bem-vindos à floresta amazônica! Vocês podem ouvir sons estranhos ao longe...
+                </div>
+                <div class="chat-message">
+                    <strong style="color: #4CAF50;">Maria:</strong> Vou investigar os sons com cuidado
+                </div>
+                <div class="chat-message">
+                    <strong style="color: #2196F3;">Pedro:</strong> Rolo Intelecto para identificar os sons
+                </div>
+                <div class="chat-message">
+                    <strong style="color: var(--accent);">Sistema:</strong> Pedro rolou 3d6: [5, 4, 6] = 2 sucessos!
+                </div>
+            </div>
+            
+            <div class="chat-input-area">
+                <div style="display: flex; gap: 0.5rem;">
+                    <input type="text" class="chat-input" id="chat-input" placeholder="Digite sua mensagem..." style="flex: 1;">
+                    <button onclick="sendChatMessage()" style="background: var(--accent); color: #000; border: none; padding: 0.75rem; border-radius: 6px; cursor: pointer;">
+                        <i class="fas fa-paper-plane"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        let zoom = 1;
+        let panX = 0;
+        let panY = 0;
+        let isDragging = false;
+        let dragStart = { x: 0, y: 0 };
+        
+        const canvas = document.getElementById('canvas');
+        const mapLayer = document.getElementById('map-layer');
+        
+        // Pan do mapa
+        canvas.addEventListener('mousedown', (e) => {
+            isDragging = true;
+            dragStart.x = e.clientX - panX;
+            dragStart.y = e.clientY - panY;
+            canvas.classList.add('dragging');
+        });
+        
+        canvas.addEventListener('mousemove', (e) => {
+            // Atualizar coordenadas
+            const rect = canvas.getBoundingClientRect();
+            const x = Math.floor((e.clientX - rect.left) / zoom);
+            const y = Math.floor((e.clientY - rect.top) / zoom);
+            document.getElementById('coordinates').textContent = `X: ${x}, Y: ${y}`;
+            
+            if (isDragging) {
+                panX = e.clientX - dragStart.x;
+                panY = e.clientY - dragStart.y;
+                updateTransform();
+            }
+        });
+        
+        canvas.addEventListener('mouseup', () => {
+            isDragging = false;
+            canvas.classList.remove('dragging');
+        });
+        
+        // Zoom
+        canvas.addEventListener('wheel', (e) => {
+            e.preventDefault();
+            const delta = e.deltaY > 0 ? 0.9 : 1.1;
+            zoom *= delta;
+            zoom = Math.max(0.1, Math.min(5, zoom));
+            updateTransform();
+        });
+        
+        function zoomIn() {
+            zoom *= 1.2;
+            zoom = Math.min(5, zoom);
+            updateTransform();
+        }
+        
+        function zoomOut() {
+            zoom *= 0.8;
+            zoom = Math.max(0.1, zoom);
+            updateTransform();
+        }
+        
+        function resetZoom() {
+            zoom = 1;
+            panX = 0;
+            panY = 0;
+            updateTransform();
+        }
+        
+        function centerMap() {
+            const containerRect = document.querySelector('.canvas-container').getBoundingClientRect();
+            const canvasRect = canvas.getBoundingClientRect();
+            
+            panX = (containerRect.width - canvasRect.width * zoom) / 2;
+            panY = (containerRect.height - canvasRect.height * zoom) / 2;
+            updateTransform();
+        }
+        
+        function updateTransform() {
+            canvas.style.transform = `translate(${panX}px, ${panY}px) scale(${zoom})`;
+        }
+        
+        // Grid
+        function toggleGrid() {
+            const gridLayer = document.getElementById('grid-layer');
+            gridLayer.classList.toggle('hidden');
+        }
+        
+        // Dados personalizados
+        function rollCustomDice() {
+            const input = document.getElementById('dice-input').value.trim();
+            if (!input) return;
+            
+            try {
+                const result = parseDiceRoll(input);
+                document.getElementById('dice-result').textContent = result.display;
+                addChatMessage('Você', `Rolou ${result.display}`);
+            } catch (error) {
+                document.getElementById('dice-result').textContent = 'Formato inválido';
+            }
+        }
+        
+        function parseDiceRoll(input) {
+            input = input.replace(/\s/g, '').toLowerCase();
+            
+            const match = input.match(/(\d+)d(\d+)([+-]\d+)?/);
+            if (!match) throw new Error('Formato inválido');
+            
+            const count = parseInt(match[1]);
+            const sides = parseInt(match[2]);
+            const modifier = match[3] ? parseInt(match[3]) : 0;
+            
+            if (count > 20 || sides > 100) throw new Error('Muitos dados');
+            
+            const rolls = [];
+            let total = 0;
+            
+            for (let i = 0; i < count; i++) {
+                const roll = Math.floor(Math.random() * sides) + 1;
+                rolls.push(roll);
+                total += roll;
+            }
+            
+            total += modifier;
+            
+            let display = `${count}d${sides}`;
+            if (modifier !== 0) {
+                display += (modifier > 0 ? '+' : '') + modifier;
+            }
+            display += `: [${rolls.join(', ')}]`;
+            if (modifier !== 0) {
+                display += ` ${modifier > 0 ? '+' : ''}${modifier}`;
+            }
+            display += ` = ${total}`;
+            
+            return { display, total, rolls };
+        }
+        
+        let playerToken = null;
+        
+        // Adicionar personagem na mesa
+        function addCharacterToTable() {
+            const playerData = JSON.parse(localStorage.getItem('cultura_rpg_player'));
+            if (!playerData || !playerData.characterCreated) {
+                alert('Você precisa criar um personagem primeiro!');
+                return;
+            }
+            
+            // Criar token do personagem no mapa
+            const x = 200 + Math.random() * 100;
+            const y = 200 + Math.random() * 100;
+            
+            if (playerData.photo) {
+                playerToken = createToken(playerData.photo, x, y, playerData.name);
+            } else {
+                // Token padrão se não tiver foto
+                playerToken = document.createElement('div');
+                playerToken.className = 'token';
+                playerToken.style.left = x + 'px';
+                playerToken.style.top = y + 'px';
+                playerToken.style.background = '#4CAF50';
+                playerToken.textContent = playerData.name.charAt(0).toUpperCase();
+                playerToken.title = playerData.name;
+                
+                // Adicionar eventos de drag
+                playerToken.addEventListener('mousedown', (e) => {
+                    e.stopPropagation();
+                    startTokenDrag(e, playerToken);
+                });
+                
+                canvas.appendChild(playerToken);
+            }
+            
+            // Atualizar ficha do personagem
+            updateCharacterSheet(playerData);
+            
+            // Ocultar botão e mostrar ficha
+            document.getElementById('add-character-section').style.display = 'none';
+            document.getElementById('character-sheet').style.display = 'block';
+            
+            addChatMessage('Sistema', `${playerData.name} entrou na mesa!`);
+        }
+        
+        // Atualizar ficha do personagem
+        function updateCharacterSheet(playerData) {
+            // Avatar
+            const avatar = document.getElementById('char-avatar');
+            if (playerData.photo) {
+                avatar.innerHTML = `<img src="${playerData.photo}" style="width: 100%; height: 100%; object-fit: cover;">`;
+            }
+            
+            // Informações básicas
+            document.getElementById('sheet-char-name').textContent = playerData.name;
+            document.getElementById('sheet-char-level').textContent = `Nível ${playerData.level}`;
+            document.getElementById('sheet-age').textContent = playerData.age;
+            document.getElementById('sheet-height').textContent = playerData.height;
+            document.getElementById('sheet-gender').textContent = playerData.gender;
+            document.getElementById('sheet-appearance').textContent = playerData.appearance;
+            
+            // Atributos
+            const statsContainer = document.getElementById('sheet-stats');
+            const statIcons = { intelecto: 'brain', fisico: 'fist-raised', criativo: 'palette', social: 'users' };
+            
+            statsContainer.innerHTML = Object.entries(playerData.stats).map(([stat, value]) => `
+                <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.5rem; background: rgba(255,255,255,0.05); border-radius: 4px;">
+                    <div style="display: flex; align-items: center; gap: 0.5rem;">
+                        <i class="fas fa-${statIcons[stat]}" style="color: var(--accent); width: 16px;"></i>
+                        <span style="text-transform: capitalize; font-size: 0.9rem;">${stat}</span>
+                    </div>
+                    <span style="color: var(--accent); font-weight: bold;">${value}d6</span>
+                </div>
+            `).join('');
+            
+            // XP
+            document.getElementById('sheet-xp').textContent = playerData.xp;
+            document.getElementById('sheet-xp-next').textContent = playerData.xpToNext;
+            const xpPercent = (playerData.xp / playerData.xpToNext) * 100;
+            document.getElementById('sheet-xp-bar').style.width = xpPercent + '%';
+            
+            // Conhecimentos
+            const knowledgeContainer = document.getElementById('sheet-knowledge');
+            const knowledgeList = {
+                'samba': '🎵 Samba',
+                'bossa-nova': '🎶 Bossa Nova', 
+                'forro': '🪗 Forró',
+                'mpb': '🎤 MPB',
+                'capoeira': '🥋 Capoeira',
+                'jiu-jitsu': '🥊 Jiu-Jitsu',
+                'machado-assis': '📚 Machado de Assis',
+                'cordel': '📜 Literatura de Cordel',
+                'clarice-lispector': '✍️ Clarice Lispector',
+                'saci': '👹 Saci-Pererê',
+                'curupira': '🌳 Curupira',
+                'iara': '🧜‍♀️ Iara',
+                'boitata': '🐍 Boitatá',
+                'feijoada': '🍲 Feijoada',
+                'acai': '🫐 Açaí',
+                'brigadeiro': '🍫 Brigadeiro',
+                'acaraje': '🥟 Acarajé',
+                'carnaval': '🎭 Carnaval',
+                'festa-junina': '🌽 Festa Junina',
+                'bumba-meu-boi': '🐂 Bumba Meu Boi'
+            };
+            
+            if (playerData.knowledge && Object.keys(playerData.knowledge).length > 0) {
+                knowledgeContainer.innerHTML = Object.entries(playerData.knowledge)
+                    .filter(([_, level]) => level > 0)
+                    .map(([knowledge, level]) => {
+                        const displayName = knowledgeList[knowledge] || knowledge;
+                        const stars = '⭐'.repeat(level);
+                        return `
+                            <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.3rem; background: rgba(235,214,119,0.1); border-radius: 4px;">
+                                <span>${displayName}</span>
+                                <span style="color: var(--accent);">${stars}</span>
+                            </div>
+                        `;
+                    }).join('');
+            } else {
+                knowledgeContainer.innerHTML = '<div style="opacity: 0.7; font-style: italic;">Nenhum conhecimento adquirido</div>';
+            }
+            
+            // PC
+            document.getElementById('sheet-pc').textContent = playerData.pc;
+        }
+        
+        // Criar token
+        function createToken(imageSrc, x, y, name) {
+            const token = document.createElement('div');
+            token.className = 'token';
+            token.style.left = x + 'px';
+            token.style.top = y + 'px';
+            token.style.backgroundImage = `url(${imageSrc})`;
+            token.title = name || 'Token';
+            
+            // Eventos do token
+            token.addEventListener('mousedown', (e) => {
+                e.stopPropagation();
+                startTokenDrag(e, token);
+            });
+            
+            canvas.appendChild(token);
+            return token;
+        }
+        
+        // Selecionar token
+        function selectToken(token) {
+            document.querySelectorAll('.token').forEach(t => t.classList.remove('selected'));
+            token.classList.add('selected');
+        }
+        
+        // Arrastar token
+        function startTokenDrag(e, token) {
+            const startX = e.clientX - token.offsetLeft;
+            const startY = e.clientY - token.offsetTop;
+            
+            function onMouseMove(e) {
+                token.style.left = (e.clientX - startX) + 'px';
+                token.style.top = (e.clientY - startY) + 'px';
+            }
+            
+            function onMouseUp() {
+                document.removeEventListener('mousemove', onMouseMove);
+                document.removeEventListener('mouseup', onMouseUp);
+            }
+            
+            document.addEventListener('mousemove', onMouseMove);
+            document.addEventListener('mouseup', onMouseUp);
+        }
+        
+        // Chat
+        function addChatMessage(sender, message) {
+            const chatMessages = document.getElementById('chat-messages');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = 'chat-message';
+            
+            const senderColor = sender === 'Sistema' ? 'var(--accent)' : 
+                               sender === 'Mestre' ? '#FFD700' : '#4CAF50';
+            
+            messageDiv.innerHTML = `<strong style="color: ${senderColor};">${sender}:</strong> ${message}`;
+            chatMessages.appendChild(messageDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+        
+        function sendChatMessage() {
+            const input = document.getElementById('chat-input');
+            const message = input.value.trim();
+            if (message) {
+                addChatMessage('Você', message);
+                input.value = '';
+            }
+        }
+        
+        document.getElementById('chat-input').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                sendChatMessage();
+            }
+        });
+        
+        document.getElementById('dice-input').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                rollCustomDice();
+            }
+        });
+        
+        // Verificar se já tem personagem criado ao carregar
+        window.addEventListener('load', () => {
+            const playerData = JSON.parse(localStorage.getItem('cultura_rpg_player'));
+            if (!playerData || !playerData.characterCreated) {
+                // Não tem personagem
+                document.getElementById('add-character-btn').innerHTML = 
+                    '<i class="fas fa-exclamation-triangle"></i> Crie um personagem primeiro';
+                document.getElementById('add-character-btn').style.background = '#dc3545';
+                document.getElementById('add-character-btn').style.cursor = 'not-allowed';
+                document.getElementById('add-character-btn').onclick = () => {
+                    alert('Você precisa criar um personagem primeiro! Vá para o dashboard e complete a criação.');
+                };
+            }
+        });
+    </script>
+</body>
+</html>

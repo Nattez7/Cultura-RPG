@@ -52,8 +52,8 @@ class CulturaRPG {
 
     // Ganhar XP por completar quiz
     gainXP(category, score, perfect) {
-        let xpGained = score * 10; // 10 XP por acerto
-        if (perfect) xpGained += 20; // Bônus por perfeição
+        let xpGained = score * 5; // 5 XP por acerto
+        if (perfect) xpGained += 10; // Bônus por perfeição
         
         this.player.xp += xpGained;
         this.player.totalQuests++;
@@ -90,13 +90,17 @@ class CulturaRPG {
 
     // Verificar level up
     checkLevelUp() {
-        while (this.player.xp >= this.player.xpToNext) {
+        while (this.player.xp >= this.player.xpToNext && this.player.level < 10) {
             this.player.xp -= this.player.xpToNext;
             this.player.level++;
-            this.player.xpToNext = Math.floor(this.player.xpToNext * 1.2);
             
-            // Ganhar 1 ponto para distribuir a cada 2 níveis
-            if (this.player.level % 2 === 0) {
+            // XP necessário para próximo nível (100, 200, 300, etc.)
+            if (this.player.level < 10) {
+                this.player.xpToNext = this.player.level * 100;
+            }
+            
+            // Ganhar 1 ponto para distribuir a cada 3 níveis
+            if (this.player.level % 3 === 0) {
                 this.player.pointsToDistribute = (this.player.pointsToDistribute || 0) + 1;
             }
             
@@ -273,7 +277,7 @@ class CulturaRPG {
     // Distribuir pontos de atributo
     distributePoint(stat) {
         if (this.player.pointsToDistribute > 0 && this.player.stats[stat] < 5) {
-            // Limite de 2 pontos por atributo na criação inicial
+            // Limite de 2 pontos por atributo apenas na criação inicial
             const isInitialDistribution = this.player.pointsToDistribute === 4 || 
                                         (this.player.pointsToDistribute <= 4 && this.player.level === 1);
             
@@ -283,6 +287,17 @@ class CulturaRPG {
                 this.savePlayer();
                 return true;
             }
+        }
+        return false;
+    }
+
+    // Remover pontos de atributo
+    removePoint(stat) {
+        if (this.player.stats[stat] > 0) {
+            this.player.stats[stat]--;
+            this.player.pointsToDistribute++;
+            this.savePlayer();
+            return true;
         }
         return false;
     }
@@ -389,19 +404,33 @@ class CulturaRPG {
                         <div style="
                             display: flex; justify-content: space-between; align-items: center;
                             padding: 1rem; background: rgba(255,255,255,0.05); border-radius: 8px;
-                        ">
+                            position: relative;
+                        " 
+                        title="${this.getStatDescription(stat)}">
                             <div style="display: flex; align-items: center; gap: 0.5rem;">
                                 <i class="fas fa-${this.getStatIcon(stat)}" style="color: var(--accent);"></i>
                                 <span style="color: var(--text); text-transform: capitalize;">${stat}</span>
+                                <i class="fas fa-info-circle info-icon" style="color: var(--accent); font-size: 0.9rem; margin-left: 0.5rem;"></i>
                             </div>
-                            <div style="display: flex; align-items: center; gap: 1rem;">
-                                <span style="color: var(--accent); font-weight: bold; min-width: 20px;">${value}</span>
+                            <div style="display: flex; align-items: center; gap: 0.5rem;">
+                                <button onclick="window.culturaRPG.removePointFromUI('${stat}')" 
+                                    ${value === 0 ? 'disabled' : ''}
+                                    class="attribute-button"
+                                    title="Remover ponto de ${stat}"
+                                    style="
+                                        background: #dc3545; border: none; color: white;
+                                        width: 30px; height: 30px; border-radius: 50%; cursor: pointer;
+                                        font-weight: bold; ${value === 0 ? 'opacity: 0.3; cursor: not-allowed;' : ''}
+                                    ">-</button>
+                                <span style="color: var(--accent); font-weight: bold; min-width: 20px; text-align: center;">${value}</span>
                                 <button onclick="window.culturaRPG.addPoint('${stat}')" 
                                     ${this.player.pointsToDistribute === 0 || value >= maxPoints ? 'disabled' : ''}
+                                    class="attribute-button"
+                                    title="Adicionar ponto em ${stat}"
                                     style="
                                         background: var(--accent); border: none; color: var(--primary);
                                         width: 30px; height: 30px; border-radius: 50%; cursor: pointer;
-                                        font-weight: bold; ${this.player.pointsToDistribute === 0 || value >= maxPoints ? 'opacity: 0.5;' : ''}
+                                        font-weight: bold; ${this.player.pointsToDistribute === 0 || value >= maxPoints ? 'opacity: 0.5; cursor: not-allowed;' : ''}
                                     ">+</button>
                             </div>
                         </div>
@@ -433,6 +462,14 @@ class CulturaRPG {
         }
     }
 
+    // Remover ponto (chamado pelo botão)
+    removePointFromUI(stat) {
+        if (this.removePoint(stat)) {
+            const modal = document.querySelector('.rpg-modal');
+            if (modal) this.updateAttributeModal(modal);
+        }
+    }
+
     // Obter ícone do atributo
     getStatIcon(stat) {
         const icons = {
@@ -442,6 +479,17 @@ class CulturaRPG {
             social: 'users'
         };
         return icons[stat] || 'star';
+    }
+
+    // Obter descrição do atributo
+    getStatDescription(stat) {
+        const descriptions = {
+            intelecto: 'Conhecimento, sabedoria e capacidade de aprendizado. Usado para literatura, história e questões acadêmicas.',
+            fisico: 'Força, resistência e habilidades corporais. Usado para artes marciais, capoeira e atividades físicas.',
+            criativo: 'Imaginação, expressão artística e inovação. Usado para música, arte, dança e manifestações culturais.',
+            social: 'Carisma, comunicação e habilidades interpessoais. Usado para festas, culinária, tradições e interações sociais.'
+        };
+        return descriptions[stat] || 'Atributo do personagem';
     }
 
     // Obter informações do jogador
@@ -457,3 +505,10 @@ class CulturaRPG {
 
 // Instância global do sistema RPG
 window.culturaRPG = new CulturaRPG();
+// Função para forçar modal de criação (para testes)
+function forceCharacterCreation() {
+    if (window.culturaRPG) {
+        window.culturaRPG.player.characterCreated = false;
+        window.culturaRPG.showCharacterCreation();
+    }
+}

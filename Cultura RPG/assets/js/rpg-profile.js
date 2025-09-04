@@ -33,23 +33,39 @@ function showRPGProfile() {
                 <div style="
                     width: 80px; height: 80px; border-radius: 50%; background: var(--gradient);
                     display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem;
+                    overflow: hidden; border: 2px solid var(--accent);
                 ">
-                    <i class="fas fa-user" style="font-size: 2rem; color: var(--text);"></i>
+                    ${player.photo ? 
+                        `<img src="${player.photo}" style="width: 100%; height: 100%; object-fit: cover;">` : 
+                        `<i class="fas fa-user" style="font-size: 2rem; color: var(--text);"></i>`
+                    }
                 </div>
                 <h3 style="color: var(--text); margin: 0 0 0.5rem;">${player.name}</h3>
                 <p style="color: var(--accent); margin: 0; font-weight: bold;">Nível ${player.level}</p>
                 ${player.titles.length > 0 ? `<p style="color: var(--text); opacity: 0.8; margin: 0.5rem 0 0; font-style: italic;">${player.titles[player.titles.length - 1]}</p>` : ''}
+                
+                ${player.characterCreated ? `
+                    <div style="margin-top: 1rem; padding: 1rem; background: rgba(255,255,255,0.05); border-radius: 8px; text-align: left;">
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; font-size: 0.9rem;">
+                            <div><strong>Idade:</strong> ${player.age} anos</div>
+                            <div><strong>Altura:</strong> ${player.height}m</div>
+                            <div><strong>Gênero:</strong> ${player.gender}</div>
+                            <div style="grid-column: 1 / -1;"><strong>Aparência:</strong> ${player.appearance}</div>
+                        </div>
+                    </div>
+                ` : ''}
             </div>
             
             <!-- Barra de XP -->
             <div style="margin-bottom: 2rem;">
                 <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
-                    <span style="color: var(--text); font-size: 0.9rem;">Experiência</span>
-                    <span style="color: var(--text); font-size: 0.9rem;">${player.xp}/${player.xpToNext} XP</span>
+                    <span style="color: var(--text); font-size: 0.9rem;">Experiência (Máx. Nível 10)</span>
+                    <span style="color: var(--text); font-size: 0.9rem;">${player.level >= 10 ? 'Nível Máximo!' : `${player.xp}/${player.xpToNext} XP`}</span>
                 </div>
                 <div style="width: 100%; height: 12px; background: rgba(255,255,255,0.1); border-radius: 6px; overflow: hidden;">
-                    <div style="height: 100%; background: var(--gradient); width: ${player.progressPercent}%; transition: width 0.3s ease;"></div>
+                    <div style="height: 100%; background: var(--gradient); width: ${player.level >= 10 ? 100 : player.progressPercent}%; transition: width 0.3s ease;"></div>
                 </div>
+                ${player.level >= 10 ? '<p style="color: var(--accent); text-align: center; margin-top: 0.5rem; font-size: 0.9rem; font-weight: bold;">🏆 Nível Máximo Atingido!</p>' : ''}
             </div>
             
             <!-- Atributos -->
@@ -60,10 +76,13 @@ function showRPGProfile() {
                         <div style="
                             display: flex; justify-content: space-between; align-items: center;
                             padding: 1rem; background: rgba(255,255,255,0.05); border-radius: 8px;
-                        ">
+                            cursor: help;
+                        " 
+                        title="${window.culturaRPG.getStatDescription(stat)}">
                             <div style="display: flex; align-items: center; gap: 0.5rem;">
                                 <i class="fas fa-${getStatIcon(stat)}" style="color: var(--accent); width: 20px;"></i>
                                 <span style="color: var(--text); text-transform: capitalize;">${stat}</span>
+                                <i class="fas fa-info-circle" style="color: var(--accent); opacity: 0.6; font-size: 0.8rem;"></i>
                             </div>
                             <div style="display: flex; align-items: center; gap: 1rem;">
                                 <div style="display: flex; gap: 2px;">
@@ -347,4 +366,12 @@ function testWithTopic(stat) {
     `;
     
     document.body.appendChild(modal);
+}
+
+// Função para resetar personagem (para testes)
+function resetCharacter() {
+    if (window.culturaRPG) {
+        window.culturaRPG.resetCharacter();
+        location.reload();
+    }
 }

@@ -903,6 +903,102 @@ body {
     }
 }
 
+/* Tooltips personalizados */
+[title] {
+    position: relative;
+    cursor: help;
+}
+
+[title]:hover::after {
+    content: attr(title);
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--bg-dark);
+    color: var(--text);
+    padding: 0.8rem 1rem;
+    border-radius: 8px;
+    border: 1px solid var(--accent);
+    font-size: 0.85rem;
+    line-height: 1.4;
+    white-space: normal;
+    width: 280px;
+    max-width: 90vw;
+    z-index: 1000;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+    animation: tooltipFadeIn 0.2s ease;
+}
+
+[title]:hover::before {
+    content: '';
+    position: absolute;
+    bottom: calc(100% - 8px);
+    left: 50%;
+    transform: translateX(-50%);
+    border: 8px solid transparent;
+    border-top-color: var(--accent);
+    z-index: 1001;
+}
+
+@keyframes tooltipFadeIn {
+    from {
+        opacity: 0;
+        transform: translateX(-50%) translateY(5px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(-50%) translateY(0);
+    }
+}
+
+/* Estilos específicos para botões de atributos */
+.attribute-button {
+    transition: all 0.2s ease;
+    position: relative;
+}
+
+.attribute-button:hover {
+    transform: scale(1.1);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.attribute-button:disabled:hover {
+    transform: none;
+    box-shadow: none;
+}
+
+/* Info icon styling */
+.info-icon {
+    opacity: 0.6;
+    transition: opacity 0.2s ease;
+}
+
+.info-icon:hover {
+    opacity: 1;
+}
+
+/* Character creation form */
+#character-form input,
+#character-form select {
+    transition: all 0.3s ease;
+}
+
+#character-form input:focus,
+#character-form select:focus {
+    outline: none;
+    border-color: var(--accent);
+    box-shadow: 0 0 0 2px rgba(235, 214, 119, 0.2);
+}
+
+#character-form input:invalid {
+    border-color: #dc3545;
+}
+
+#character-form input:valid {
+    border-color: #28a745;
+}
+
 /* Responsividade */
 @media (max-width: 768px) {
     .header-content {
