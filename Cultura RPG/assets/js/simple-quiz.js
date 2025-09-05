@@ -464,8 +464,6 @@ function updateAllStatus() {
             timer.style.display = 'none';
             btn.disabled = false;
             btn.textContent = 'Iniciar Missão';
-            btn.style.background = '';
-            btn.style.opacity = '';
         } else if (hasActiveQuest && cat === startedCategory) {
             status.textContent = 'Em Andamento';
             status.style.color = '#EBD677';
@@ -475,8 +473,6 @@ function updateAllStatus() {
             timer.textContent = `Progresso: ${currentQuestion}/5 perguntas - ${currentScore} acertos`;
             btn.disabled = false;
             btn.textContent = 'Continuar Missão';
-            btn.style.background = '#EBD677';
-            btn.style.opacity = '1';
         } else if (hasActiveQuest) {
             status.textContent = 'Bloqueada';
             status.style.color = '#666';
@@ -484,16 +480,12 @@ function updateAllStatus() {
             timer.textContent = 'Outra missão em andamento';
             btn.disabled = true;
             btn.textContent = 'Bloqueada';
-            btn.style.background = '#666';
-            btn.style.opacity = '0.5';
         } else {
             status.textContent = 'Concluída';
             status.style.color = '#666';
             timer.style.display = 'block';
             btn.disabled = true;
             btn.textContent = 'Aguarde';
-            btn.style.background = '#666';
-            btn.style.opacity = '0.5';
             
             const timeLeft = 24 * 60 * 60 * 1000 - (Date.now() - parseInt(lastCompleted));
             const hours = Math.floor(timeLeft / (1000 * 60 * 60));

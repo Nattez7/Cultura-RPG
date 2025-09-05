@@ -1,0 +1,146 @@
+/* Importar estilos base do dashboard */
+@import url('./dashboard.css');
+
+/* Estilos específicos para biblioteca */
+.library-info {
+    background: rgba(235,214,119,0.1);
+    border: 1px solid var(--accent);
+    border-radius: 12px;
+    padding: 1rem;
+    margin-bottom: 2rem;
+}
+
+.library-info p {
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.library-info i {
+    color: var(--accent);
+}
+
+.library-info a {
+    color: var(--accent);
+    text-decoration: none;
+    font-weight: bold;
+}
+
+.library-info a:hover {
+    text-decoration: underline;
+}
+
+.owned-knowledge {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1.5rem;
+}
+
+.knowledge-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1.5rem;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.knowledge-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+}
+
+.knowledge-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.knowledge-icon {
+    font-size: 2rem;
+    color: var(--accent);
+}
+
+.knowledge-title {
+    color: var(--accent);
+    font-size: 1.2rem;
+    font-weight: bold;
+    margin: 0;
+}
+
+.knowledge-level {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+}
+
+.level-stars {
+    color: var(--accent);
+    font-size: 1.1rem;
+}
+
+.level-text {
+    color: var(--text);
+    font-weight: bold;
+}
+
+.knowledge-description {
+    color: var(--text);
+    opacity: 0.8;
+    line-height: 1.5;
+    margin-bottom: 1rem;
+}
+
+.knowledge-bonus {
+    background: rgba(235,214,119,0.1);
+    border: 1px solid var(--accent);
+    border-radius: 8px;
+    padding: 0.75rem;
+    text-align: center;
+}
+
+.bonus-text {
+    color: var(--accent);
+    font-weight: bold;
+    font-size: 0.9rem;
+}
+
+.empty-library {
+    text-align: center;
+    padding: 3rem;
+    color: var(--text);
+    opacity: 0.7;
+}
+
+.empty-library i {
+    font-size: 3rem;
+    color: var(--accent);
+    margin-bottom: 1rem;
+    display: block;
+}
+
+.empty-library p {
+    font-size: 1.1rem;
+    margin: 0;
+}
+
+.category-section {
+    margin-bottom: 3rem;
+}
+
+.category-title {
+    color: var(--accent);
+    font-size: 1.5rem;
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.category-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 1.5rem;
+}

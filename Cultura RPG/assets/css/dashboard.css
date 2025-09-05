@@ -1,23 +1,23 @@
-/* Paleta Raízes da Amazônia */
+/* Paleta Roxo, Verde e Preto */
 :root {
-    --primary: #2A5333;
-    --secondary: #A34A39;
-    --accent: #EBD677;
-    --text: #F5F5F5;
-    --bg-dark: #1a1a1a;
-    --bg-card: rgba(42, 83, 51, 0.3);
-    --border: rgba(235, 214, 119, 0.4);
-    --gradient: linear-gradient(135deg, #1a1a1a, #2A5333, #A34A39);
+    --primary: #000000;
+    --secondary: #22c55e;
+    --accent: #8b5cf6;
+    --text: #ffffff;
+    --bg-dark: #000000;
+    --bg-card: rgba(139, 92, 246, 0.2);
+    --border: rgba(139, 92, 246, 0.4);
+    --gradient: linear-gradient(135deg, #000000, #8b5cf6, #22c55e);
 }
 
 .dark-mode {
-    --primary: #1a2e1f;
-    --secondary: #2d1a17;
-    --accent: #d4c066;
-    --text: #666666;
-    --bg-card: rgba(26, 46, 31, 0.4);
-    --border: rgba(212, 192, 102, 0.4);
-    --gradient: linear-gradient(135deg, #0f0f0f, #1a2e1f, #2d1a17);
+    --primary: #1a1a1a;
+    --secondary: #16a34a;
+    --accent: #7c3aed;
+    --text: #e5e5e5;
+    --bg-card: rgba(124, 58, 237, 0.15);
+    --border: rgba(124, 58, 237, 0.3);
+    --gradient: linear-gradient(135deg, #1a1a1a, #7c3aed, #16a34a);
 }
 
 * {
@@ -80,7 +80,7 @@ body {
 .nav-link:hover,
 .nav-link.active {
     background: var(--bg-card);
-    color: var(--accent);
+    color: white;
 }
 
 .tutorial-link {
@@ -161,7 +161,7 @@ body {
 
 .stat i {
     font-size: 2rem;
-    color: var(--accent);
+    color: #ffd700;
 }
 
 .stat-value {
@@ -210,6 +210,7 @@ body {
     padding: 2rem;
     text-align: center;
     transition: all 0.3s ease;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
 }
 
 .quest-card:hover {
@@ -219,12 +220,13 @@ body {
 
 .quest-icon {
     font-size: 3rem;
-    color: var(--accent);
+    color: #ffd700;
     margin-bottom: 1rem;
 }
 
 .quest-card h3 {
     margin-bottom: 1rem;
+    color: white;
 }
 
 .quest-card p {
@@ -252,9 +254,9 @@ body {
 }
 
 .quest-btn {
-    background: var(--gradient);
+    background: #22c55e !important;
     border: none;
-    color: var(--text);
+    color: white !important;
     padding: 0.8rem 2rem;
     border-radius: 8px;
     cursor: pointer;
@@ -263,14 +265,35 @@ body {
 }
 
 .quest-btn:hover {
+    background: #16a34a !important;
     transform: translateY(-2px);
     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
 }
 
 .quest-btn:disabled {
-    opacity: 0.5;
+    background: #6b7280 !important;
+    opacity: 0.7;
     cursor: not-allowed;
     transform: none;
+}
+
+/* Garantir que todos os botões de quest tenham a mesma cor */
+.quest-btn:not(:disabled) {
+    background: #22c55e !important;
+    color: white !important;
+}
+
+.quest-btn:not(:disabled):hover {
+    background: #16a34a !important;
+}
+
+/* Estilos específicos para diferentes estados */
+.quest-btn[style*="background"] {
+    background: #22c55e !important;
+}
+
+.quest-btn[style*="opacity"] {
+    background: #22c55e !important;
 }
 
 .quest-status {
@@ -312,7 +335,7 @@ body {
 
 .book-card i {
     font-size: 3rem;
-    color: var(--accent);
+    color: #ffd700;
     margin-bottom: 1rem;
 }
 
@@ -367,7 +390,7 @@ body {
 
 /* Daily Info */
 .daily-info {
-    background: rgba(235, 214, 119, 0.1);
+    background: rgba(139, 92, 246, 0.1);
     border: 1px solid var(--border);
     border-radius: 12px;
     padding: 1rem;
@@ -429,7 +452,7 @@ body {
 
 .shop-item:hover {
     transform: translateY(-3px);
-    background: rgba(235, 214, 119, 0.1);
+    background: rgba(139, 92, 246, 0.1);
 }
 
 .shop-item h4 {
@@ -445,7 +468,7 @@ body {
 
 .price {
     background: var(--accent);
-    color: var(--primary);
+    color: white;
     padding: 0.25rem 0.5rem;
     border-radius: 8px;
     font-weight: bold;
@@ -472,7 +495,7 @@ body {
 
 /* Library Styles */
 .library-info {
-    background: rgba(42, 83, 51, 0.2);
+    background: rgba(139, 92, 246, 0.1);
     border: 1px solid var(--border);
     border-radius: 12px;
     padding: 1rem;
@@ -494,16 +517,17 @@ body {
     display: flex;
     flex-direction: column;
     gap: 1rem;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
 }
 
 .knowledge-card i {
     font-size: 2rem;
-    color: var(--accent);
+    color: #ffd700;
     align-self: flex-start;
 }
 
 .knowledge-card h3 {
-    color: var(--accent);
+    color: white;
     margin: 0;
 }
 
@@ -540,7 +564,7 @@ body {
 
 .empty-library i {
     font-size: 3rem;
-    color: var(--accent);
+    color: #ffd700;
     margin-bottom: 1rem;
 }
 
@@ -563,8 +587,8 @@ body {
 }
 
 .level-selector-btn {
-    background: var(--accent);
-    color: var(--primary);
+    background: #22c55e;
+    color: white;
     border: none;
     padding: 0.5rem 1rem;
     border-radius: 8px;
@@ -577,11 +601,12 @@ body {
 }
 
 .level-selector-btn i {
-    color: var(--primary) !important;
+    color: white !important;
     font-size: 1rem;
 }
 
 .level-selector-btn:hover {
+    background: #16a34a;
     transform: translateY(-2px);
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
 }
@@ -662,14 +687,14 @@ body {
 }
 
 .level-item:hover {
-    background: rgba(235, 214, 119, 0.1);
+    background: rgba(139, 92, 246, 0.1);
     border-color: var(--accent);
     transform: translateX(5px);
 }
 
 .level-number {
-    background: var(--accent);
-    color: var(--primary);
+    background: #22c55e;
+    color: white;
     width: 30px;
     height: 30px;
     border-radius: 50%;
@@ -796,7 +821,7 @@ body {
 }
 
 .quiz-option:hover {
-    background: rgba(235, 214, 119, 0.1);
+    background: rgba(139, 92, 246, 0.1);
     border-color: var(--accent);
     transform: translateX(5px);
 }
@@ -853,7 +878,7 @@ body {
 }
 
 .reward {
-    background: rgba(235, 214, 119, 0.1);
+    background: rgba(139, 92, 246, 0.1);
     border: 1px solid var(--accent);
     border-radius: 12px;
     padding: 1rem;

@@ -1,5 +1,14 @@
 // Sistema de biblioteca
-let ownedKnowledge = JSON.parse(localStorage.getItem('ownedKnowledge')) || {};
+let ownedKnowledge = {};
+
+// Carregar conhecimentos do sistema RPG
+function loadOwnedKnowledge() {
+    const playerData = JSON.parse(localStorage.getItem('cultura_rpg_player'));
+    if (playerData && playerData.knowledge) {
+        ownedKnowledge = playerData.knowledge;
+    }
+    return ownedKnowledge;
+}
 
 // Dados dos conhecimentos com descrições por nível
 const knowledgeData = {
@@ -57,6 +66,9 @@ function getLevelName(level) {
 
 // Função para atualizar biblioteca
 function updateLibrary() {
+    // Carregar conhecimentos atualizados
+    loadOwnedKnowledge();
+    
     const ownedKnowledgeContainer = document.getElementById('owned-knowledge');
     const emptyLibrary = document.getElementById('empty-library');
     
@@ -135,10 +147,10 @@ function showLevelDescription(knowledgeName, level) {
     const data = knowledgeData[knowledgeName];
     if (!data) return;
     
-    const description = data.descriptions[level] || 'Descrição não disponível.';
+    const description = data.descriptions[level];
     const levelName = getLevelName(level);
     
-    // Atualiza a descrição na biblioteca
+    // Atualizar descrição na biblioteca
     const knowledgeCards = document.querySelectorAll('.knowledge-card');
     knowledgeCards.forEach(card => {
         const title = card.querySelector('h3').textContent;
@@ -146,8 +158,8 @@ function showLevelDescription(knowledgeName, level) {
             const descriptionElement = card.querySelector('.knowledge-description');
             descriptionElement.textContent = description;
             
-            // Atualiza o título para mostrar o nível selecionado
-            const currentLevel = ownedKnowledge[knowledgeName];
+            // Atualizar o título para mostrar o nível selecionado
+            const currentLevel = ownedKnowledge[knowledgeName.toLowerCase()];
             card.querySelector('h3').textContent = `${knowledgeName} - Nível ${level} (${levelName})`;
             
             // Se não for o nível atual, adiciona indicação
@@ -161,7 +173,10 @@ function showLevelDescription(knowledgeName, level) {
     document.querySelector('.level-modal').remove();
 }
 
-// Inicialização
+// Inicializar biblioteca quando DOM carregar
 document.addEventListener('DOMContentLoaded', function() {
     updateLibrary();
+    
+    // Atualizar biblioteca a cada 2 segundos para pegar compras da loja
+    setInterval(updateLibrary, 2000);
 });

@@ -1,14 +1,13 @@
-/* Paleta Raízes da Amazônia */
+/* Paleta Roxo, Verde e Preto */
 :root {
-    --primary: #2A5333;
-    --secondary: #A34A39;
-    --accent: #EBD677;
-    --text: #F5F5F5;
-    --bg-card: rgba(42, 83, 51, 0.3);
-    --border: rgba(235, 214, 119, 0.4);
-    --gradient: linear-gradient(135deg, #1a1a1a, #2A5333, #A34A39);
-    --brazil-green: #228B22;
-    --brazil-yellow: #EBD677;
+    --primary: #000000;
+    --secondary: #22c55e;
+    --accent: #8b5cf6;
+    --text: #ffffff;
+    --bg-dark: #000000;
+    --bg-card: rgba(139, 92, 246, 0.2);
+    --border: rgba(139, 92, 246, 0.4);
+    --gradient: linear-gradient(135deg, #000000, #8b5cf6, #22c55e);
 }
 
 * {
@@ -75,6 +74,7 @@ body {
     border-radius: 20px;
     padding: 2.5rem;
     transition: all 0.3s ease;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
 }
 
 .step:hover {
@@ -96,7 +96,7 @@ body {
 }
 
 .step-content h2 {
-    color: var(--accent);
+    color: white;
     margin-bottom: 1rem;
     font-size: 1.8rem;
 }
@@ -104,6 +104,7 @@ body {
 .step-content p {
     margin-bottom: 1.5rem;
     font-size: 1.1rem;
+    color: white;
 }
 
 /* Highlight Box */
@@ -133,10 +134,11 @@ body {
     align-items: center;
     gap: 1rem;
     margin-top: 1rem;
+    color: white;
 }
 
 .reward i {
-    color: var(--accent);
+    color: white;
     font-size: 1.2rem;
 }
 
@@ -155,16 +157,18 @@ body {
     padding: 1rem;
     text-align: center;
     transition: all 0.3s ease;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+    color: white;
 }
 
 .knowledge-item:hover {
-    background: rgba(255, 215, 0, 0.1);
+    background: rgba(139, 92, 246, 0.2);
     transform: scale(1.05);
 }
 
 .knowledge-item i {
     font-size: 1.5rem;
-    color: var(--accent);
+    color: #ffd700;
     margin-bottom: 0.5rem;
     display: block;
 }
@@ -204,9 +208,9 @@ body {
 }
 
 .evolution-level.active {
-    background: var(--accent);
-    border-color: var(--accent);
-    color: var(--primary);
+    background: #22c55e !important;
+    border-color: #22c55e !important;
+    color: white !important;
 }
 
 .level-number {
@@ -231,15 +235,16 @@ body {
     display: flex;
     align-items: flex-start;
     gap: 1rem;
-    background: rgba(42, 83, 51, 0.2);
+    background: var(--bg-card);
     border: 1px solid var(--border);
     border-radius: 12px;
     padding: 1.5rem;
     transition: all 0.3s ease;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
 }
 
 .rpg-feature:hover {
-    background: rgba(42, 83, 51, 0.4);
+    background: var(--bg-card);
     transform: translateX(10px);
 }
 
@@ -257,7 +262,8 @@ body {
 
 .rpg-feature li {
     margin-bottom: 0.3rem;
-    opacity: 0.9;
+    opacity: 1;
+    color: white;
 }
 
 /* Brazil Pride */
@@ -288,10 +294,11 @@ body {
     border: 1px solid var(--border);
     border-radius: 20px;
     padding: 3rem;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
 }
 
 .cta-section h3 {
-    color: var(--accent);
+    color: white;
     font-size: 2rem;
     margin-bottom: 1rem;
 }
@@ -299,7 +306,8 @@ body {
 .cta-section p {
     font-size: 1.2rem;
     margin-bottom: 2rem;
-    opacity: 0.9;
+    opacity: 1;
+    color: white;
 }
 
 .cta-buttons {
@@ -324,18 +332,25 @@ body {
 }
 
 .btn-primary {
-    background: var(--accent);
-    color: var(--primary);
+    background: #22c55e !important;
+    color: white !important;
 }
 
 .btn-secondary {
-    background: transparent;
-    color: var(--accent);
-    border: 2px solid var(--accent);
+    background: transparent !important;
+    color: #22c55e !important;
+    border: 2px solid #22c55e !important;
 }
 
-.btn-primary:hover,
+.btn-primary:hover {
+    background: #16a34a !important;
+    transform: translateY(-3px);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+}
+
 .btn-secondary:hover {
+    background: #22c55e !important;
+    color: white !important;
     transform: translateY(-3px);
     box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
 }
@@ -374,4 +389,22 @@ body {
         margin-left: 0;
         text-align: left;
     }
+}
+
+/* Forçar cor verde nos círculos de evolução */
+.tutorial-steps .evolution-level.active {
+    background: #22c55e !important;
+    border-color: #22c55e !important;
+    color: white !important;
+}
+
+.tutorial-steps .evolution-level {
+    color: white !important;
+}
+
+/* Regra ainda mais específica */
+.step .evolution-track .evolution-level.active {
+    background: #22c55e !important;
+    border-color: #22c55e !important;
+    color: white !important;
 }

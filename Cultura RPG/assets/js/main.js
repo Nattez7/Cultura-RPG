@@ -158,6 +158,20 @@ document.getElementById('register-birthdate').addEventListener('change', functio
     }
     
     document.getElementById('register-age').value = age;
+    
+    // Garantir que as labels permaneçam fixas
+    setTimeout(() => {
+        const dateLabel = document.querySelector('.date-label');
+        const staticLabel = document.querySelector('.static-label');
+        
+        if (dateLabel) {
+            dateLabel.style.cssText = 'position: absolute !important; top: 0 !important; left: 1rem !important; transform: translateY(-50%) !important; font-size: 0.8rem !important; background: #8b5cf6 !important; padding: 0 0.5rem !important; border-radius: 4px !important; color: white !important; pointer-events: none !important;';
+        }
+        
+        if (staticLabel) {
+            staticLabel.style.cssText = 'position: absolute !important; top: 0 !important; left: 1rem !important; transform: translateY(-50%) !important; font-size: 0.8rem !important; background: #8b5cf6 !important; padding: 0 0.5rem !important; border-radius: 4px !important; color: white !important; pointer-events: none !important;';
+        }
+    }, 10);
 });
 
 // Máscara para telefone
@@ -196,6 +210,22 @@ document.getElementById('register-form').addEventListener('submit', function(e) 
     // Aqui você pode adicionar a lógica do Firebase para criar a conta
 });
 // Função para resetar todos os dados
+// Corrigir labels especiais no carregamento
+document.addEventListener('DOMContentLoaded', function() {
+    setTimeout(() => {
+        const dateLabel = document.querySelector('.date-label');
+        const staticLabel = document.querySelector('.static-label');
+        
+        if (dateLabel) {
+            dateLabel.style.cssText = 'position: absolute !important; top: 0 !important; left: 1rem !important; transform: translateY(-50%) !important; font-size: 0.8rem !important; background: #8b5cf6 !important; padding: 0 0.5rem !important; border-radius: 4px !important; color: white !important; pointer-events: none !important;';
+        }
+        
+        if (staticLabel) {
+            staticLabel.style.cssText = 'position: absolute !important; top: 0 !important; left: 1rem !important; transform: translateY(-50%) !important; font-size: 0.8rem !important; background: #8b5cf6 !important; padding: 0 0.5rem !important; border-radius: 4px !important; color: white !important; pointer-events: none !important;';
+        }
+    }, 100);
+});
+
 function resetAllData() {
     if (confirm('Tem certeza que deseja resetar TODOS os dados? Esta ação não pode ser desfeita!')) {
         // Limpar localStorage
