@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Criar Personagem - Portal Cultural RPG</title>
+    <link rel="stylesheet" href="assets/css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="container">
+        <form id="character-form" class="form active">
+            <div class="form-header">
+                <div class="logo">
+                    <i class="fas fa-user-shield"></i>
+                </div>
+                <h1>Criar Personagem</h1>
+                <p class="subtitle">Crie seu aventureiro cultural</p>
+            </div>
+
+            <!-- Nome do Personagem -->
+            <div class="form-group">
+                <div class="input-icon">
+                    <i class="fas fa-user-ninja"></i>
+                    <input type="text" id="char-name" placeholder=" " required maxlength="30">
+                    <label>Nome do Personagem</label>
+                </div>
+            </div>
+
+            <!-- Aparência -->
+            <div class="form-group">
+                <div class="input-icon">
+                    <i class="fas fa-eye"></i>
+                    <input type="text" id="char-appearance" placeholder=" " required maxlength="100">
+                    <label>Aparência</label>
+                </div>
+                <small style="color: rgba(255,255,255,0.7); font-size: 0.8rem; margin-top: 0.25rem;">
+                    Ex: Cabelos castanhos, olhos escuros, pele morena
+                </small>
+            </div>
+
+            <!-- Idade e Altura -->
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                <div class="form-group">
+                    <div class="input-icon">
+                        <i class="fas fa-birthday-cake"></i>
+                        <input type="number" id="char-age" placeholder=" " required min="16" max="80">
+                        <label>Idade</label>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="input-icon">
+                        <i class="fas fa-ruler-vertical"></i>
+                        <input type="text" id="char-height" placeholder=" " required>
+                        <label>Altura (m)</label>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Gênero -->
+            <div class="form-group">
+                <div class="input-icon">
+                    <i class="fas fa-venus-mars"></i>
+                    <select id="char-gender" required>
+                        <option value="">Selecione o gênero</option>
+                        <option value="Masculino">Masculino</option>
+                        <option value="Feminino">Feminino</option>
+                        <option value="Não-binário">Não-binário</option>
+                        <option value="Prefiro não informar">Prefiro não informar</option>
+                    </select>
+                    <label class="select-label">Gênero</label>
+                </div>
+            </div>
+
+            <button type="submit" class="submit-btn">
+                <span>Criar Personagem
+                <i class="fas fa-arrow-right"></i>
+            </button>
+        </form>
+
+        <!-- Loading Spinner -->
+        <div id="loading" class="loading-spinner" style="display: none;">
+            <i class="fas fa-spinner fa-spin"></i>
+        </div>
+    </div>
+
+    <!-- Firebase Scripts -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+    <script src="assets/js/firebase-config.js"></script>
+    <script src="assets/js/auth.js"></script>
+    <script src="assets/js/data-manager.js"></script>
+
+    <script>
+        // Verificar se usuário está logado
+        auth.onAuthStateChanged((user) => {
+            if (!user) {
+                window.location.href = 'index.html';
+            }
+        });
+
+        // Submit do formulário
+        document.getElementById('character-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const loading = document.getElementById('loading');
+            loading.style.display = 'block';
+            
+            try {
+                const characterData = {
+                    name: document.getElementById('char-name').value.trim(),
+                    appearance: document.getElementById('char-appearance').value.trim(),
+                    age: parseInt(document.getElementById('char-age').value),
+                    height: document.getElementById('char-height').value.trim(),
+                    gender: document.getElementById('char-gender').value
+                };
+
+                // Criar personagem usando dataManager
+                if (dataManager && dataManager.currentUser) {
+                    await dataManager.createCharacter(characterData);
+                } else {
+                    // Fallback para localStorage
+                    const playerData = {
+                        ...characterData,
+                        level: 1,
+                        xp: 0,
+                        xpToNext: 100,
+                        pc: 15,
+                        stats: {
+                            intelecto: 0,
+                            fisico: 0,
+                            criativo: 0,
+                            social: 0
+                        },
+                        knowledge: {},
+                        pointsToDistribute: 4,
+                        titles: [],
+                        achievements: [],
+                        streak: 0,
+                        totalQuests: 0,
+                        characterCreated: true
+                    };
+                    
+                    localStorage.setItem('cultura_rpg_player', JSON.stringify(playerData));
+                    localStorage.setItem('pc_count', '15');
+                }
+                
+                // Redirecionar para distribuição de atributos
+                window.location.href = 'distribute-attributes.html';
+                
+            } catch (error) {
+                console.error('Erro ao criar personagem:', error);
+                alert('Erro ao criar personagem. Tente novamente.');
+            } finally {
+                loading.style.display = 'none';
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Distribuir Atributos - Portal Cultural RPG</title>
+    <link rel="stylesheet" href="assets/css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="container">
+        <div class="form active" style="max-width: 600px;">
+            <div class="form-header">
+                <div class="logo">
+                    <i class="fas fa-dice-d6"></i>
+                </div>
+                <h1>Distribua seus Atributos</h1>
+                <p class="subtitle">Pontos restantes: <strong id="points-left">4</strong></p>
+                <p style="font-size: 0.9rem; opacity: 0.8; margin-top: 0.5rem;">Máximo 2 pontos por atributo</p>
+            </div>
+
+            <!-- Atributos -->
+            <div style="display: grid; gap: 1.5rem; margin-bottom: 2rem;">
+                <!-- Intelecto -->
+                <div class="attribute-row" title="Conhecimento, sabedoria e capacidade de aprendizado. Usado para literatura, história e questões acadêmicas.">
+                    <div class="attribute-info">
+                        <i class="fas fa-brain"></i>
+                        <div>
+                            <h3>Intelecto</h3>
+                            <p>Conhecimento e sabedoria</p>
+                        </div>
+                        <i class="fas fa-info-circle info-icon"></i>
+                    </div>
+                    <div class="attribute-controls">
+                        <button type="button" class="attr-btn minus" onclick="removePoint('intelecto')">-</button>
+                        <span class="attr-value" id="intelecto-value">0</span>
+                        <button type="button" class="attr-btn plus" onclick="addPoint('intelecto')">+</button>
+                    </div>
+                </div>
+
+                <!-- Físico -->
+                <div class="attribute-row" title="Força, resistência e habilidades corporais. Usado para artes marciais, capoeira e atividades físicas.">
+                    <div class="attribute-info">
+                        <i class="fas fa-fist-raised"></i>
+                        <div>
+                            <h3>Físico</h3>
+                            <p>Força e resistência</p>
+                        </div>
+                        <i class="fas fa-info-circle info-icon"></i>
+                    </div>
+                    <div class="attribute-controls">
+                        <button type="button" class="attr-btn minus" onclick="removePoint('fisico')">-</button>
+                        <span class="attr-value" id="fisico-value">0</span>
+                        <button type="button" class="attr-btn plus" onclick="addPoint('fisico')">+</button>
+                    </div>
+                </div>
+
+                <!-- Criativo -->
+                <div class="attribute-row" title="Imaginação, expressão artística e inovação. Usado para música, arte, dança e manifestações culturais.">
+                    <div class="attribute-info">
+                        <i class="fas fa-palette"></i>
+                        <div>
+                            <h3>Criativo</h3>
+                            <p>Arte e imaginação</p>
+                        </div>
+                        <i class="fas fa-info-circle info-icon"></i>
+                    </div>
+                    <div class="attribute-controls">
+                        <button type="button" class="attr-btn minus" onclick="removePoint('criativo')">-</button>
+                        <span class="attr-value" id="criativo-value">0</span>
+                        <button type="button" class="attr-btn plus" onclick="addPoint('criativo')">+</button>
+                    </div>
+                </div>
+
+                <!-- Social -->
+                <div class="attribute-row" title="Carisma, comunicação e habilidades interpessoais. Usado para festas, culinária, tradições e interações sociais.">
+                    <div class="attribute-info">
+                        <i class="fas fa-users"></i>
+                        <div>
+                            <h3>Social</h3>
+                            <p>Carisma e comunicação</p>
+                        </div>
+                        <i class="fas fa-info-circle info-icon"></i>
+                    </div>
+                    <div class="attribute-controls">
+                        <button type="button" class="attr-btn minus" onclick="removePoint('social')">-</button>
+                        <span class="attr-value" id="social-value">0</span>
+                        <button type="button" class="attr-btn plus" onclick="addPoint('social')">+</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Info sobre sistema -->
+            <div style="background: rgba(235,214,119,0.1); border: 1px solid var(--accent); border-radius: 12px; padding: 1.5rem; margin-bottom: 2rem; text-align: center;">
+                <h4 style="color: var(--accent); margin-bottom: 0.5rem;">Como funciona:</h4>
+                <p style="margin: 0; font-size: 0.9rem;">Cada ponto = 1 dado d6 • Resultado 5+ = sucesso!</p>
+            </div>
+
+            <button id="finish-btn" class="submit-btn" onclick="finishCharacterCreation()" disabled style="opacity: 0.5;">
+                <span>Finalizar Criação
+                <i class="fas fa-check"></i>
+            </button>
+        </div>
+
+        <!-- Loading Spinner -->
+        <div id="loading" class="loading-spinner" style="display: none;">
+            <i class="fas fa-spinner fa-spin"></i>
+        </div>
+    </div>
+
+    <!-- Firebase Scripts -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+    <script src="assets/js/firebase-config.js"></script>
+    <script src="assets/js/auth.js"></script>
+    <script src="assets/js/data-manager.js"></script>
+
+    <style>
+        .attribute-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.5rem;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            transition: all 0.3s ease;
+        }
+
+        .attribute-row:hover {
+            background: rgba(255,255,255,0.08);
+            border-color: var(--accent);
+        }
+
+        .attribute-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            flex: 1;
+        }
+
+        .attribute-info i:first-child {
+            color: var(--accent);
+            font-size: 1.5rem;
+            width: 30px;
+        }
+
+        .attribute-info h3 {
+            color: var(--text);
+            margin: 0 0 0.25rem 0;
+            font-size: 1.1rem;
+        }
+
+        .attribute-info p {
+            color: var(--text);
+            opacity: 0.7;
+            margin: 0;
+            font-size: 0.9rem;
+        }
+
+        .info-icon {
+            color: var(--accent);
+            opacity: 0.6;
+            font-size: 0.9rem !important;
+            width: auto !important;
+        }
+
+        .attribute-controls {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .attr-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border: none;
+            font-weight: bold;
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .attr-btn.minus {
+            background: #dc3545;
+            color: white;
+        }
+
+        .attr-btn.plus {
+            background: var(--accent);
+            color: var(--primary);
+        }
+
+        .attr-btn:hover {
+            transform: scale(1.1);
+        }
+
+        .attr-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .attr-value {
+            color: var(--accent);
+            font-weight: bold;
+            font-size: 1.3rem;
+            min-width: 30px;
+            text-align: center;
+        }
+    </style>
+
+    <script>
+        let pointsLeft = 4;
+        let attributes = {
+            intelecto: 0,
+            fisico: 0,
+            criativo: 0,
+            social: 0
+        };
+
+        function addPoint(attr) {
+            if (pointsLeft > 0 && attributes[attr] < 2) {
+                attributes[attr]++;
+                pointsLeft--;
+                updateDisplay();
+            }
+        }
+
+        function removePoint(attr) {
+            if (attributes[attr] > 0) {
+                attributes[attr]--;
+                pointsLeft++;
+                updateDisplay();
+            }
+        }
+
+        function updateDisplay() {
+            document.getElementById('points-left').textContent = pointsLeft;
+            
+            Object.keys(attributes).forEach(attr => {
+                document.getElementById(attr + '-value').textContent = attributes[attr];
+            });
+
+            const finishBtn = document.getElementById('finish-btn');
+            if (pointsLeft === 0) {
+                finishBtn.disabled = false;
+                finishBtn.style.opacity = '1';
+            } else {
+                finishBtn.disabled = true;
+                finishBtn.style.opacity = '0.5';
+            }
+        }
+
+        async function finishCharacterCreation() {
+            const loading = document.getElementById('loading');
+            loading.style.display = 'block';
+
+            try {
+                // Obter dados do personagem do localStorage ou dataManager
+                let playerData = JSON.parse(localStorage.getItem('cultura_rpg_player') || '{}');
+                
+                // Atualizar atributos
+                playerData.stats = attributes;
+                playerData.pointsToDistribute = 0;
+                
+                // Salvar no localStorage
+                localStorage.setItem('cultura_rpg_player', JSON.stringify(playerData));
+                
+                // Salvar no dataManager se disponível
+                if (dataManager && dataManager.currentUser) {
+                    await dataManager.updateGameData({
+                        character: playerData,
+                        characterCreated: true
+                    });
+                }
+
+                // Redirecionar para dashboard
+                window.location.href = 'dashboard.html#profile';
+                
+            } catch (error) {
+                console.error('Erro ao finalizar criação:', error);
+                alert('Erro ao salvar atributos. Tente novamente.');
+            } finally {
+                loading.style.display = 'none';
+            }
+        }
+
+        // Verificar se usuário está logado
+        auth.onAuthStateChanged((user) => {
+            if (!user) {
+                window.location.href = 'index.html';
+            }
+        });
+    </script>
+</body>
+</html>

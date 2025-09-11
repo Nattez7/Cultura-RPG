@@ -66,27 +66,85 @@ function getLevelName(level) {
 
 // Função para atualizar biblioteca
 function updateLibrary() {
-    // Carregar conhecimentos atualizados
-    loadOwnedKnowledge();
+    console.log('🔄 Atualizando biblioteca...');
+    
+    // Forçar reload dos dados do dataManager
+    if (dataManager.currentUser) {
+        dataManager.loadFromLocalStorage();
+    }
+    
+    const gameData = dataManager.getGameData();
+    const ownedKnowledge = gameData.ownedKnowledge || {};
+    
+    console.log('📚 Conhecimentos encontrados:', ownedKnowledge);
+    console.log('📊 Total de conhecimentos:', Object.keys(ownedKnowledge).length);
     
     const ownedKnowledgeContainer = document.getElementById('owned-knowledge');
     const emptyLibrary = document.getElementById('empty-library');
+    
+    if (!ownedKnowledgeContainer || !emptyLibrary) {
+        console.error('❌ Elementos da biblioteca não encontrados');
+        return;
+    }
     
     // Limpa conteúdo atual (exceto mensagem vazia)
     const knowledgeCards = ownedKnowledgeContainer.querySelectorAll('.knowledge-card');
     knowledgeCards.forEach(card => card.remove());
     
     if (Object.keys(ownedKnowledge).length === 0) {
+        console.log('📭 Nenhum conhecimento encontrado - mostrando biblioteca vazia');
         emptyLibrary.style.display = 'block';
         return;
     }
     
+    console.log('✅ Conhecimentos encontrados - ocultando biblioteca vazia');
     emptyLibrary.style.display = 'none';
     
     // Adiciona cada conhecimento adquirido
     Object.entries(ownedKnowledge).forEach(([name, level]) => {
-        const data = knowledgeData[name];
-        if (!data) return;
+        console.log('Processando conhecimento:', name, 'Nível:', level);
+        
+        // Tentar encontrar o conhecimento nos dados do Firestore
+        let data = null;
+        const searchName = name.charAt(0).toUpperCase() + name.slice(1);
+        
+        // Primeiro, tentar buscar nos dados carregados do Firestore
+        if (knowledgeLoader && knowledgeLoader.isLoaded()) {
+            data = knowledgeLoader.searchKnowledge(name);
+            if (data) {
+                console.log('Conhecimento encontrado no Firestore:', data.name);
+            }
+        }
+        
+        // Se não encontrou no Firestore, procurar nos dados locais
+        if (!data) {
+            for (const [key, value] of Object.entries(knowledgeData)) {
+                if (key.toLowerCase() === name.toLowerCase() || 
+                    key.toLowerCase().includes(name.toLowerCase()) ||
+                    name.toLowerCase().includes(key.toLowerCase())) {
+                    data = value;
+                    console.log('Conhecimento encontrado localmente:', key);
+                    break;
+                }
+            }
+        }
+        
+        // Se ainda não encontrou, criar dados genéricos
+        if (!data) {
+            console.log('Criando dados genéricos para:', searchName);
+            data = {
+                name: searchName,
+                icon: 'fas fa-book',
+                category: 'Cultura Brasileira',
+                descriptions: {
+                    1: `Conhecimento básico sobre ${searchName}`,
+                    2: `Conhecimento intermediário sobre ${searchName}`,
+                    3: `Conhecimento avançado sobre ${searchName}`,
+                    4: `Conhecimento especializado sobre ${searchName}`,
+                    5: `Conhecimento completo sobre ${searchName}`
+                }
+            };
+        }
         
         // Obtém a descrição do nível atual
         const description = data.descriptions[level] || data.descriptions[1] || 'Conhecimento adquirido na loja.';
@@ -95,14 +153,14 @@ function updateLibrary() {
         knowledgeCard.className = 'knowledge-card';
         knowledgeCard.innerHTML = `
             <i class="${data.icon}"></i>
-            <h3>${name} - Nível ${level}</h3>
+            <h3>${searchName} - Nível ${level}</h3>
             <p class="knowledge-description">${description}</p>
             <div class="progress-bar">
                 <div class="progress" style="width: ${(level / 5) * 100}%"></div>
             </div>
             <div class="knowledge-controls">
                 <span class="level-info">${level}/5 - ${getLevelName(level)}</span>
-                <button class="level-selector-btn" onclick="openLevelSelector('${name}', ${level})">
+                <button class="level-selector-btn" onclick="openLevelSelector('${searchName}', ${level}, '${name}')">
                     <i class="fas fa-book-open"></i> Ver Níveis
                 </button>
             </div>
@@ -113,7 +171,7 @@ function updateLibrary() {
 }
 
 // Função para abrir seletor de níveis
-function openLevelSelector(knowledgeName, maxLevel) {
+function openLevelSelector(knowledgeName, maxLevel, originalKey) {
     const modal = document.createElement('div');
     modal.className = 'level-modal';
     modal.innerHTML = `
@@ -129,7 +187,7 @@ function openLevelSelector(knowledgeName, maxLevel) {
                     const level = i + 1;
                     const levelName = getLevelName(level);
                     return `
-                        <button class="level-item" onclick="showLevelDescription('${knowledgeName}', ${level})">
+                        <button class="level-item" onclick="showLevelDescription('${knowledgeName}', ${level}, '${originalKey || knowledgeName}')">
                             <span class="level-number">${level}</span>
                             <span class="level-name">${levelName}</span>
                         </button>
@@ -143,11 +201,31 @@ function openLevelSelector(knowledgeName, maxLevel) {
 }
 
 // Função para mostrar descrição de nível específico
-function showLevelDescription(knowledgeName, level) {
-    const data = knowledgeData[knowledgeName];
-    if (!data) return;
+function showLevelDescription(knowledgeName, level, originalKey) {
+    // Buscar dados do conhecimento
+    let data = null;
+    for (const [key, value] of Object.entries(knowledgeData)) {
+        if (key.toLowerCase() === knowledgeName.toLowerCase() || 
+            key.toLowerCase().includes(knowledgeName.toLowerCase()) ||
+            knowledgeName.toLowerCase().includes(key.toLowerCase())) {
+            data = value;
+            break;
+        }
+    }
     
-    const description = data.descriptions[level];
+    if (!data) {
+        data = {
+            descriptions: {
+                1: `Conhecimento básico sobre ${knowledgeName}`,
+                2: `Conhecimento intermediário sobre ${knowledgeName}`,
+                3: `Conhecimento avançado sobre ${knowledgeName}`,
+                4: `Conhecimento especializado sobre ${knowledgeName}`,
+                5: `Conhecimento completo sobre ${knowledgeName}`
+            }
+        };
+    }
+    
+    const description = data.descriptions[level] || `Nível ${level} de ${knowledgeName}`;
     const levelName = getLevelName(level);
     
     // Atualizar descrição na biblioteca
@@ -158,8 +236,12 @@ function showLevelDescription(knowledgeName, level) {
             const descriptionElement = card.querySelector('.knowledge-description');
             descriptionElement.textContent = description;
             
+            // Obter nível atual do usuário
+            const gameData = dataManager.getGameData();
+            const ownedKnowledge = gameData.ownedKnowledge || {};
+            const currentLevel = ownedKnowledge[originalKey || knowledgeName.toLowerCase()];
+            
             // Atualizar o título para mostrar o nível selecionado
-            const currentLevel = ownedKnowledge[knowledgeName.toLowerCase()];
             card.querySelector('h3').textContent = `${knowledgeName} - Nível ${level} (${levelName})`;
             
             // Se não for o nível atual, adiciona indicação
@@ -176,7 +258,48 @@ function showLevelDescription(knowledgeName, level) {
 // Inicializar biblioteca quando DOM carregar
 document.addEventListener('DOMContentLoaded', function() {
     updateLibrary();
-    
-    // Atualizar biblioteca a cada 2 segundos para pegar compras da loja
-    setInterval(updateLibrary, 2000);
 });
+
+// Atualizar quando dados do usuário carregarem
+window.addEventListener('userDataLoaded', () => {
+    updateLibrary();
+});
+
+// Atualizar quando comprar conhecimento
+window.addEventListener('knowledgePurchased', () => {
+    console.log('Evento knowledgePurchased recebido');
+    setTimeout(updateLibrary, 500);
+});
+
+// Novo evento mais direto
+window.addEventListener('knowledgeUpdated', (event) => {
+    console.log('Evento knowledgeUpdated recebido:', event.detail);
+    setTimeout(updateLibrary, 100);
+});
+
+// Atualizar biblioteca a cada 5 segundos para pegar compras da loja
+setInterval(updateLibrary, 5000);
+
+// Função para forçar atualização manual
+function forceUpdateLibrary() {
+    console.log('🔄 Forçando atualização da biblioteca...');
+    
+    // Recarregar dados do localStorage
+    if (dataManager.currentUser) {
+        dataManager.loadFromLocalStorage();
+    }
+    
+    // Atualizar biblioteca
+    updateLibrary();
+    
+    // Feedback visual
+    const btn = event.target;
+    const originalText = btn.innerHTML;
+    btn.innerHTML = '<i class="fas fa-check"></i> Atualizado!';
+    btn.style.background = '#28a745';
+    
+    setTimeout(() => {
+        btn.innerHTML = originalText;
+        btn.style.background = '#8b5cf6';
+    }, 2000);
+}

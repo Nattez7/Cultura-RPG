@@ -37,112 +37,100 @@ dragonLogo.addEventListener('click', () => {
 });
 
 // Login com email/senha
-loginForm.addEventListener('submit', (e) => {
+loginForm.addEventListener('submit', async (e) => {
     e.preventDefault();
     const email = document.getElementById('login-email').value;
     const password = document.getElementById('login-password').value;
-
-    // Validação temporária
-    if (email === 'contato.oliveiradebrito@gmail.com' && password === '123456') {
-        console.log("Login bem-sucedido!");
-        
-        // Verificar se é usuário novo
-        const hasCharacter = localStorage.getItem('character_created');
-        if (!hasCharacter) {
-            window.location.href = 'character-creation.html';
-        } else {
-            window.location.href = 'dashboard.html';
-        }
-        return;
-    }
-
-    // Tentativa com Firebase
-    if (typeof firebase !== 'undefined' && firebase.auth) {
-        firebase.auth().signInWithEmailAndPassword(email, password)
-            .then((userCredential) => {
-                const user = userCredential.user;
-                console.log("Login bem-sucedido:", user);
-                
-                const hasCharacter = localStorage.getItem('character_created');
-                if (!hasCharacter) {
-                    window.location.href = 'character-creation.html';
-                } else {
-                    window.location.href = 'dashboard.html';
-                }
-            })
-            .catch((error) => {
-                console.error("Erro no login:", error);
-                alert("Email ou senha incorretos!");
-            });
-    } else {
-        alert("Email ou senha incorretos!");
+    
+    showLoading(true);
+    
+    try {
+        await authManager.loginWithEmail(email, password);
+        // Redirect handled by auth state observer
+    } catch (error) {
+        showLoading(false);
+        alert(error);
     }
 });
 
 // Registro com email/senha
-registerForm.addEventListener('submit', (e) => {
+registerForm.addEventListener('submit', async (e) => {
     e.preventDefault();
-    const email = registerForm.querySelector('input[type="email"]').value;
-    const password = registerForm.querySelector('input[type="password"]').value;
-    const confirmPassword = registerForm.querySelectorAll('input[type="password"]')[1].value;
-
-    if (password !== confirmPassword) {
-        alert("As senhas não coincidem!");
+    
+    const userData = {
+        fullName: document.getElementById('register-fullname').value,
+        username: document.getElementById('register-username').value,
+        email: document.getElementById('register-email').value,
+        birthdate: document.getElementById('register-birthdate').value,
+        age: parseInt(document.getElementById('register-age').value),
+        phone: document.getElementById('register-phone').value,
+        password: document.getElementById('register-password').value
+    };
+    
+    const confirmPassword = document.getElementById('register-confirm-password').value;
+    
+    if (userData.password !== confirmPassword) {
+        alert('As senhas não coincidem!');
         return;
     }
-
-    firebase.auth().createUserWithEmailAndPassword(email, password)
-        .then((userCredential) => {
-            // Registro bem-sucedido
-            const user = userCredential.user;
-            console.log("Registro bem-sucedido:", user);
-            window.location.href = 'dashboard.html';
-        })
-        .catch((error) => {
-            console.error("Erro no registro:", error);
-            alert("Erro no registro: " + error.message);
-        });
+    
+    if (userData.age < 13) {
+        alert('Você precisa ter pelo menos 13 anos para se cadastrar.');
+        return;
+    }
+    
+    showLoading(true);
+    
+    try {
+        await authManager.registerWithEmail(userData);
+        // Redirect handled by auth state observer
+    } catch (error) {
+        showLoading(false);
+        alert(error);
+    }
 });
 
 // Login com Google
-googleBtn.addEventListener('click', () => {
-    const provider = new firebase.auth.GoogleAuthProvider();
-    firebase.auth().signInWithPopup(provider)
-        .then((result) => {
-            const user = result.user;
-            console.log("Login Google bem-sucedido:", user);
-            window.location.href = 'dashboard.html';
-        })
-        .catch((error) => {
-            console.error("Erro no login Google:", error);
-            alert("Erro no login Google: " + error.message);
-        });
+googleBtn.addEventListener('click', async () => {
+    showLoading(true);
+    
+    try {
+        await authManager.loginWithGoogle();
+        // Redirect handled by auth state observer
+    } catch (error) {
+        showLoading(false);
+        if (error !== 'Login cancelado pelo usuário') {
+            alert(error);
+        }
+    }
 });
 
-// Login com Facebook
-facebookBtn.addEventListener('click', () => {
-    const provider = new firebase.auth.FacebookAuthProvider();
-    firebase.auth().signInWithPopup(provider)
-        .then((result) => {
-            const user = result.user;
-            console.log("Login Facebook bem-sucedido:", user);
-            window.location.href = 'dashboard.html';
-        })
-        .catch((error) => {
-            console.error("Erro no login Facebook:", error);
-            alert("Erro no login Facebook: " + error.message);
-        });
-});
+// Remove Facebook login (not requested)
+facebookBtn.style.display = 'none';
 
-// Observador de estado de autenticação
-firebase.auth().onAuthStateChanged((user) => {
-    if (user) {
-        // Usuário está logado
-        console.log("Usuário logado:", user);
-        // Redirecionar para página principal ou atualizar UI
-    } else {
-        // Usuário está deslogado
-        console.log("Usuário deslogado");
+// Loading spinner
+function showLoading(show) {
+    const loading = document.getElementById('loading');
+    if (loading) {
+        loading.style.display = show ? 'flex' : 'none';
+    }
+}
+
+// Forgot password
+document.querySelector('.forgot-password').addEventListener('click', async (e) => {
+    e.preventDefault();
+    const email = document.getElementById('login-email').value;
+    
+    if (!email) {
+        alert('Digite seu email primeiro');
+        return;
+    }
+    
+    try {
+        await authManager.resetPassword(email);
+        alert('Email de recuperação enviado!');
+    } catch (error) {
+        alert(error);
     }
 });
 
@@ -189,26 +177,7 @@ document.getElementById('register-phone').addEventListener('input', function(e) 
     e.target.value = value;
 });
 
-// Validação do formulário
-document.getElementById('register-form').addEventListener('submit', function(e) {
-    e.preventDefault();
-    
-    const password = document.getElementById('register-password').value;
-    const confirmPassword = document.getElementById('register-confirm-password').value;
-    const age = parseInt(document.getElementById('register-age').value);
-    
-    if (password !== confirmPassword) {
-        alert('As senhas não coincidem!');
-        return;
-    }
-    
-    if (age < 13) {
-        alert('Você precisa ter pelo menos 13 anos para se cadastrar.');
-        return;
-    }
-    
-    // Aqui você pode adicionar a lógica do Firebase para criar a conta
-});
+
 // Função para resetar todos os dados
 // Corrigir labels especiais no carregamento
 document.addEventListener('DOMContentLoaded', function() {

@@ -45,8 +45,16 @@
                 <div class="theme-toggle" onclick="toggleDarkMode()">
                     <i class="fas fa-moon"></i>
                 </div>
-                <div class="user-avatar" onclick="showRPGProfile()">
+                <div class="user-avatar" onclick="showUserMenu()">
                     <i class="fas fa-user"></i>
+                </div>
+                <div id="user-menu" class="user-dropdown" style="display: none;">
+                    <div class="user-info">
+                        <span id="user-email">Carregando...</span>
+                    </div>
+                    <button onclick="showRPGProfile()"><i class="fas fa-user-circle"></i> Perfil RPG</button>
+                    <button onclick="window.location.href='profile.html'"><i class="fas fa-cog"></i> Configurações</button>
+                    <button onclick="logout()"><i class="fas fa-sign-out-alt"></i> Sair</button>
                 </div>
             </div>
         </div>
@@ -59,12 +67,6 @@
             <h2>Missões Diárias</h2>
             <div class="daily-info">
                 <p><i class="fas fa-calendar-day"></i> Complete <strong>1 missão por dia</strong> para ganhar 1 Ponto de Conhecimento! Após completar qualquer missão, todas ficam bloqueadas por 24h.</p>
-                <button onclick="testCharacterModal()" style="background: #dc3545; color: white; border: none; padding: 0.5rem 1rem; border-radius: 4px; cursor: pointer; margin-top: 1rem; margin-right: 1rem;">
-                    <i class="fas fa-user-plus"></i> Testar Modal
-                </button>
-                <button onclick="checkSavedData()" style="background: #28a745; color: white; border: none; padding: 0.5rem 1rem; border-radius: 4px; cursor: pointer; margin-top: 1rem;">
-                    <i class="fas fa-search"></i> Ver Dados Salvos
-                </button>
             </div>
             <div class="quest-grid">
                 <div class="quest-card" data-category="musica">
@@ -136,9 +138,46 @@
         </section>
     </main>
 
+    <!-- Firebase Scripts -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+    <script src="assets/js/firebase-config.js"></script>
+    <script src="assets/js/auth.js"></script>
+    <script src="assets/js/knowledge-loader.js"></script>
+    <script src="assets/js/data-manager.js"></script>
+    
     <script src="assets/js/rpg-system.js"></script>
     <script src="assets/js/rpg-profile.js"></script>
     <script src="assets/js/simple-quiz.js"></script>
+    
+    <script>
+    // User menu functions
+    function showUserMenu() {
+        const menu = document.getElementById('user-menu');
+        menu.style.display = menu.style.display === 'none' ? 'block' : 'none';
+    }
+    
+    async function logout() {
+        if (confirm('Deseja realmente sair?')) {
+            await authManager.logout();
+        }
+    }
+    
+    // Update user info when auth state changes
+    auth.onAuthStateChanged((user) => {
+        if (user) {
+            document.getElementById('user-email').textContent = user.email;
+        }
+    });
+    
+    // Close user menu when clicking outside
+    document.addEventListener('click', (e) => {
+        if (!e.target.closest('.user-avatar') && !e.target.closest('#user-menu')) {
+            document.getElementById('user-menu').style.display = 'none';
+        }
+    });
+    </script>
     
     <script>
     // Verificar se veio da criação de personagem

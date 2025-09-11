@@ -17,13 +17,44 @@
             </div>
             <nav class="nav">
                 <a href="dashboard.html" class="nav-link">
-                    <i class="fas fa-arrow-left"></i>
-                    <span>Voltar</span>
+                    <i class="fas fa-scroll"></i>
+                    <span>Missões Diárias</span>
+                </a>
+                <a href="loja.html" class="nav-link">
+                    <i class="fas fa-store"></i>
+                    <span>Loja</span>
+                </a>
+                <a href="biblioteca.html" class="nav-link">
+                    <i class="fas fa-book"></i>
+                    <span>Biblioteca</span>
+                </a>
+                <a href="rpg.html" class="nav-link">
+                    <i class="fas fa-dice-d20"></i>
+                    <span>RPG</span>
+                </a>
+                <a href="#" onclick="showRPGProfile(); return false;" class="nav-link">
+                    <i class="fas fa-user-circle"></i>
+                    <span>Perfil RPG</span>
+                </a>
+                <a href="tutorial.html" class="nav-link tutorial-link">
+                    <i class="fas fa-question-circle"></i>
+                    <span>Como Funciona</span>
                 </a>
             </nav>
             <div class="user-menu">
                 <div class="theme-toggle" onclick="toggleDarkMode()">
                     <i class="fas fa-moon"></i>
+                </div>
+                <div class="user-avatar" onclick="showUserMenu()">
+                    <i class="fas fa-user"></i>
+                </div>
+                <div id="user-menu" class="user-dropdown" style="display: none;">
+                    <div class="user-info">
+                        <span id="user-email">Carregando...</span>
+                    </div>
+                    <button onclick="showRPGProfile()"><i class="fas fa-user-circle"></i> Perfil RPG</button>
+                    <button onclick="window.location.href='profile.html'"><i class="fas fa-cog"></i> Configurações</button>
+                    <button onclick="logout()"><i class="fas fa-sign-out-alt"></i> Sair</button>
                 </div>
             </div>
         </div>
@@ -260,6 +291,192 @@
         </div>
     </main>
 
+    <!-- Firebase Scripts -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+    <script src="assets/js/firebase-config.js"></script>
+    <script src="assets/js/auth.js"></script>
+    <script src="assets/js/data-manager.js"></script>
+    
+    <script src="assets/js/rpg-system.js"></script>
+    <script src="assets/js/rpg-profile.js"></script>
     <script src="assets/js/profile.js"></script>
+    
+    <script>
+    // User menu functions
+    function showUserMenu() {
+        const menu = document.getElementById('user-menu');
+        menu.style.display = menu.style.display === 'none' ? 'block' : 'none';
+    }
+    
+    async function logout() {
+        if (confirm('Deseja realmente sair?')) {
+            await authManager.logout();
+        }
+    }
+    
+    function toggleDarkMode() {
+        document.body.classList.toggle('dark-mode');
+        const themeIcon = document.querySelector('.theme-toggle i');
+        if (document.body.classList.contains('dark-mode')) {
+            themeIcon.className = 'fas fa-sun';
+        } else {
+            themeIcon.className = 'fas fa-moon';
+        }
+    }
+    
+    // Update user info when auth state changes
+    auth.onAuthStateChanged((user) => {
+        if (user) {
+            document.getElementById('user-email').textContent = user.email;
+        }
+    });
+    
+    // Close user menu when clicking outside
+    document.addEventListener('click', (e) => {
+        if (!e.target.closest('.user-avatar') && !e.target.closest('#user-menu')) {
+            document.getElementById('user-menu').style.display = 'none';
+        }
+    });
+    
+    // Carregar dados do usuário quando disponíveis
+    window.addEventListener('userDataLoaded', (event) => {
+        loadUserProfile(event.detail);
+    });
+    
+    // Se os dados já estão carregados
+    if (dataManager.getUserData()) {
+        loadUserProfile(dataManager.getUserData());
+    }
+    
+    function loadUserProfile(userData) {
+        const profile = userData.profile || {};
+        const gameData = userData.gameData || {};
+        const character = gameData.character || {};
+        
+        // Dados básicos
+        document.getElementById('fullname').value = profile.fullName || userData.displayName || '';
+        document.getElementById('username').value = profile.username || '';
+        document.getElementById('bio').value = profile.bio || '';
+        document.getElementById('age').value = profile.age || '';
+        document.getElementById('email').value = userData.email || '';
+        document.getElementById('instagram').value = profile.instagram || '';
+        document.getElementById('twitter').value = profile.twitter || '';
+        
+        // Configurações
+        document.getElementById('public-profile').checked = profile.publicProfile !== false;
+        document.getElementById('email-notifications').checked = profile.emailNotifications !== false;
+        
+        // Estatísticas do jogo
+        updateGameStats(gameData);
+        
+        // Conhecimentos
+        updateKnowledgeAreas(gameData.ownedKnowledge || {});
+        
+        // Histórico
+        updateActivityHistory(gameData.completedQuests || []);
+    }
+    
+    function updateGameStats(gameData) {
+        const stats = gameData.stats || {};
+        
+        // Atualizar cards de estatísticas
+        const statCards = document.querySelectorAll('.stat-card');
+        if (statCards[0]) statCards[0].querySelector('h3').textContent = gameData.coins || 0;
+        if (statCards[1]) statCards[1].querySelector('h3').textContent = stats.questsCompleted || 0;
+        if (statCards[2]) statCards[2].querySelector('h3').textContent = stats.achievementsUnlocked || 0;
+        if (statCards[3]) statCards[3].querySelector('h3').textContent = stats.daysActive || 0;
+    }
+    
+    function updateKnowledgeAreas(ownedKnowledge) {
+        const knowledgeList = document.querySelector('.knowledge-list');
+        if (!knowledgeList) return;
+        
+        knowledgeList.innerHTML = '';
+        
+        Object.entries(ownedKnowledge).forEach(([name, level]) => {
+            const item = document.createElement('div');
+            item.className = 'knowledge-item';
+            item.innerHTML = `
+                <i class="fas fa-book"></i>
+                <span>${name.charAt(0).toUpperCase() + name.slice(1)}</span>
+                <div class="level-badge">Nível ${level}</div>
+            `;
+            knowledgeList.appendChild(item);
+        });
+        
+        if (Object.keys(ownedKnowledge).length === 0) {
+            knowledgeList.innerHTML = '<p style="opacity: 0.7; text-align: center;">Nenhum conhecimento adquirido ainda</p>';
+        }
+    }
+    
+    function updateActivityHistory(completedQuests) {
+        const historyContainer = document.querySelector('.activity-history');
+        if (!historyContainer) return;
+        
+        historyContainer.innerHTML = '';
+        
+        completedQuests.slice(-5).reverse().forEach(quest => {
+            const item = document.createElement('div');
+            item.className = 'activity-item';
+            item.innerHTML = `
+                <div class="activity-icon">
+                    <i class="fas fa-scroll"></i>
+                </div>
+                <div class="activity-info">
+                    <h4>Missão: ${quest.category || 'Cultura Brasileira'}</h4>
+                    <p>Completada com sucesso</p>
+                    <span class="activity-date">${new Date(quest.completedAt).toLocaleDateString('pt-BR')}</span>
+                </div>
+                <div class="activity-reward">
+                    <i class="fas fa-gem"></i>
+                    <span>+${quest.reward || 1} PC</span>
+                </div>
+            `;
+            historyContainer.appendChild(item);
+        });
+        
+        if (completedQuests.length === 0) {
+            historyContainer.innerHTML = '<p style="opacity: 0.7; text-align: center;">Nenhuma atividade registrada ainda</p>';
+        }
+    }
+    
+    // Função para salvar alterações do perfil
+    async function saveProfileChanges() {
+        const profileData = {
+            fullName: document.getElementById('fullname').value,
+            username: document.getElementById('username').value,
+            bio: document.getElementById('bio').value,
+            age: parseInt(document.getElementById('age').value) || null,
+            state: document.getElementById('state').value,
+            instagram: document.getElementById('instagram').value,
+            twitter: document.getElementById('twitter').value,
+            publicProfile: document.getElementById('public-profile').checked,
+            emailNotifications: document.getElementById('email-notifications').checked
+        };
+        
+        try {
+            await dataManager.updateProfile(profileData);
+            alert('Perfil atualizado com sucesso!');
+        } catch (error) {
+            console.error('Erro ao salvar perfil:', error);
+            alert('Erro ao salvar perfil. Tente novamente.');
+        }
+    }
+    
+    // Adicionar botão de salvar (será adicionado via JavaScript)
+    document.addEventListener('DOMContentLoaded', () => {
+        const profileSection = document.querySelector('.profile-section');
+        if (profileSection) {
+            const saveBtn = document.createElement('button');
+            saveBtn.textContent = 'Salvar Alterações';
+            saveBtn.className = 'action-btn';
+            saveBtn.style.marginTop = '1rem';
+            saveBtn.onclick = saveProfileChanges;
+            profileSection.appendChild(saveBtn);
+        }
+    });
+    </script>
 </body>
 </html>

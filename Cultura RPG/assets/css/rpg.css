@@ -1,6 +1,16 @@
 /* Importar estilos base do dashboard */
 @import url('./dashboard.css');
 
+/* Garantir que todos os textos sejam visíveis */
+body, p, span, div, li, h1, h2, h3, h4, h5, h6 {
+    color: #ffffff !important;
+}
+
+/* Ícones dourados */
+i, .fas, .far, .fab {
+    color: #ffd700 !important;
+}
+
 /* Estilos específicos para RPG */
 .rpg-nav {
     display: grid;
@@ -19,9 +29,21 @@
     transition: all 0.3s ease;
 }
 
+.rpg-nav-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 2rem;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4), 0 0 15px rgba(139, 92, 246, 0.2);
+    transform: translateY(-2px);
+}
+
 .rpg-nav-card:hover {
     transform: translateY(-5px);
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.6), 0 0 25px rgba(139, 92, 246, 0.4);
     border-color: var(--accent);
 }
 
@@ -68,11 +90,13 @@
     border-radius: 16px;
     padding: 1.5rem;
     transition: transform 0.2s, box-shadow 0.2s;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4), 0 0 15px rgba(139, 92, 246, 0.2);
+    transform: translateY(-2px);
 }
 
 .mesa-card:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+    transform: translateY(-5px);
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.6), 0 0 25px rgba(139, 92, 246, 0.4);
 }
 
 .mesa-header {
@@ -172,6 +196,14 @@
     border: 1px solid var(--border);
     border-radius: 12px;
     padding: 1.5rem;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4), 0 0 15px rgba(139, 92, 246, 0.2);
+    transform: translateY(-2px);
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.historico-item:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.6), 0 0 25px rgba(139, 92, 246, 0.4);
 }
 
 .historico-header {
@@ -224,6 +256,14 @@
     border-radius: 16px;
     padding: 2rem;
     text-align: center;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4), 0 0 15px rgba(139, 92, 246, 0.2);
+    transform: translateY(-2px);
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.mestre-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.6), 0 0 25px rgba(139, 92, 246, 0.4);
 }
 
 .mestre-card i {

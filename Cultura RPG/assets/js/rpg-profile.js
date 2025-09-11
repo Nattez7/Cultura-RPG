@@ -121,32 +121,49 @@ function showRPGProfile() {
             </div>
             
             <!-- Conhecimentos -->
-            ${Object.keys(player.knowledge || {}).length > 0 ? `
-                <div style="margin-bottom: 2rem;">
-                    <h4 style="color: var(--accent); margin-bottom: 1rem;">Conhecimentos Especializados</h4>
-                    <div style="display: grid; gap: 0.5rem; max-height: 150px; overflow-y: auto;">
-                        ${Object.entries(player.knowledge || {}).filter(([_, level]) => level > 0).map(([item, level]) => `
-                            <div style="
-                                display: flex; justify-content: space-between; align-items: center;
-                                padding: 0.8rem; background: rgba(255,255,255,0.05); border-radius: 8px;
-                            ">
-                                <span style="color: var(--text); text-transform: capitalize;">${item}</span>
-                                <div style="display: flex; align-items: center; gap: 0.5rem;">
-                                    <div style="display: flex; gap: 2px;">
-                                        ${Array.from({length: 5}, (_, i) => `
-                                            <div style="
-                                                width: 8px; height: 8px; border-radius: 2px;
-                                                background: ${i < level ? '#FFD700' : 'rgba(255,255,255,0.2)'};
-                                            "></div>
-                                        `).join('')}
+            ${(() => {
+                // Obter conhecimentos do dataManager se disponível
+                let knowledge = player.knowledge || {};
+                if (typeof dataManager !== 'undefined' && dataManager.getGameData) {
+                    const gameData = dataManager.getGameData();
+                    knowledge = gameData.ownedKnowledge || player.knowledge || {};
+                }
+                
+                const knowledgeEntries = Object.entries(knowledge).filter(([_, level]) => level > 0);
+                
+                return knowledgeEntries.length > 0 ? `
+                    <div style="margin-bottom: 2rem;">
+                        <h4 style="color: var(--accent); margin-bottom: 1rem;">Conhecimentos Culturais</h4>
+                        <div style="display: grid; gap: 0.5rem; max-height: 150px; overflow-y: auto;">
+                            ${knowledgeEntries.map(([item, level]) => `
+                                <div style="
+                                    display: flex; justify-content: space-between; align-items: center;
+                                    padding: 0.8rem; background: rgba(255,255,255,0.05); border-radius: 8px;
+                                ">
+                                    <span style="color: var(--text); text-transform: capitalize;">${item}</span>
+                                    <div style="display: flex; align-items: center; gap: 0.5rem;">
+                                        <div style="display: flex; gap: 2px;">
+                                            ${Array.from({length: 5}, (_, i) => `
+                                                <div style="
+                                                    width: 8px; height: 8px; border-radius: 2px;
+                                                    background: ${i < level ? '#FFD700' : 'rgba(255,255,255,0.2)'};
+                                                "></div>
+                                            `).join('')}
+                                        </div>
+                                        <span style="color: #FFD700; font-weight: bold; font-size: 0.9rem;">+${level}d6</span>
                                     </div>
-                                    <span style="color: #FFD700; font-weight: bold; font-size: 0.9rem;">+${level}d6</span>
                                 </div>
-                            </div>
-                        `).join('')}
+                            `).join('')}
+                        </div>
                     </div>
-                </div>
-            ` : ''}
+                ` : `
+                    <div style="margin-bottom: 2rem; text-align: center; padding: 1.5rem; background: rgba(255,255,255,0.05); border-radius: 8px;">
+                        <i class="fas fa-book" style="color: var(--accent); font-size: 2rem; margin-bottom: 1rem;"></i>
+                        <p style="color: var(--text); opacity: 0.8; margin: 0;">Nenhum conhecimento adquirido ainda.</p>
+                        <p style="color: var(--accent); font-size: 0.9rem; margin: 0.5rem 0 0;">Visite a loja para comprar conhecimentos culturais!</p>
+                    </div>
+                `;
+            })()}
             
             <!-- Estatísticas -->
             <div style="margin-bottom: 2rem;">
@@ -165,7 +182,14 @@ function showRPGProfile() {
                     <div style="text-align: center; padding: 1rem; background: rgba(255,255,255,0.05); border-radius: 8px;">
                         <i class="fas fa-book" style="color: var(--accent); font-size: 1.5rem; margin-bottom: 0.5rem;"></i>
                         <div style="color: var(--text); font-size: 0.9rem;">Conhecimentos</div>
-                        <div style="color: var(--accent); font-weight: bold; font-size: 1.2rem;">${player.totalKnowledge || 0}</div>
+                        <div style="color: var(--accent); font-weight: bold; font-size: 1.2rem;">${(() => {
+                            let knowledge = player.knowledge || {};
+                            if (typeof dataManager !== 'undefined' && dataManager.getGameData) {
+                                const gameData = dataManager.getGameData();
+                                knowledge = gameData.ownedKnowledge || player.knowledge || {};
+                            }
+                            return Object.keys(knowledge).length;
+                        })()}</div>
                     </div>
                 </div>
             </div>

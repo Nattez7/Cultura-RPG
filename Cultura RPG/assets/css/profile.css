@@ -1,26 +1,28 @@
-/* Paleta Raízes da Amazônia */
-:root {
-    --primary: #2A5333;
-    --secondary: #A34A39;
-    --accent: #EBD677;
-    --text: #F5F5F5;
-    --bg-dark: #1a1a1a;
-    --bg-card: rgba(42, 83, 51, 0.3);
-    --border: rgba(235, 214, 119, 0.4);
-    --gradient: linear-gradient(135deg, #1a1a1a, #2A5333, #A34A39);
-    --success: #228B22;
-    --warning: #EBD677;
-    --danger: #A34A39;
+/* Importar estilos base do dashboard */
+@import url('./dashboard.css');
+
+/* Estilos específicos para profile */
+
+/* Garantir que todos os textos sejam visíveis */
+body, p, span, div, li, h1, h2, h3, h4, h5, h6, label, input, textarea, select {
+    color: #ffffff !important;
 }
 
-.dark-mode {
-    --primary: #1a2e1f;
-    --secondary: #2d1a17;
-    --accent: #d4c066;
-    --text: #666666;
-    --bg-card: rgba(26, 46, 31, 0.4);
-    --border: rgba(212, 192, 102, 0.4);
-    --gradient: linear-gradient(135deg, #0f0f0f, #1a2e1f, #2d1a17);
+/* Ícones dourados */
+i, .fas, .far, .fab {
+    color: #ffd700 !important;
+}
+
+/* Sombras para destacar as boxes */
+.profile-section, .stat-card, .setting-item, .activity-item, .knowledge-item, .achievement-item {
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4), 0 0 15px rgba(139, 92, 246, 0.2) !important;
+    transform: translateY(-2px) !important;
+    transition: transform 0.2s, box-shadow 0.2s !important;
+}
+
+.profile-section:hover, .stat-card:hover, .setting-item:hover, .activity-item:hover {
+    transform: translateY(-5px) !important;
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.6), 0 0 25px rgba(139, 92, 246, 0.4) !important;
 }
 
 * {
