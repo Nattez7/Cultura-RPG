@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Loja - Portal Cultural RPG</title>
+    <link rel="stylesheet" href="assets/css/loja.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-content">
+            <div class="logo">
+                <i class="fas fa-dragon"></i>
+                <span>Portal Cultural</span>
+            </div>
+            <nav class="nav">
+                <a href="dashboard.html" class="nav-link">
+                    <i class="fas fa-scroll"></i>
+                    <span>Missões Diárias</span>
+                </a>
+                <a href="loja.html" class="nav-link active">
+                    <i class="fas fa-store"></i>
+                    <span>Loja</span>
+                </a>
+                <a href="biblioteca.html" class="nav-link">
+                    <i class="fas fa-book"></i>
+                    <span>Biblioteca</span>
+                </a>
+                <a href="rpg.html" class="nav-link">
+                    <i class="fas fa-dice-d20"></i>
+                    <span>RPG</span>
+                </a>
+                <a href="#" onclick="showRPGProfile(); return false;" class="nav-link">
+                    <i class="fas fa-user-circle"></i>
+                    <span>Perfil RPG</span>
+                </a>
+                <a href="tutorial.html" class="nav-link tutorial-link">
+                    <i class="fas fa-question-circle"></i>
+                    <span>Como Funciona</span>
+                </a>
+            </nav>
+            <div class="user-menu">
+                <div class="theme-toggle" onclick="toggleDarkMode()">
+                    <i class="fas fa-moon"></i>
+                </div>
+                <div class="user-avatar" onclick="showUserMenu()">
+                    <i class="fas fa-user"></i>
+                </div>
+                <div id="user-menu" class="user-dropdown" style="display: none;">
+                    <div class="user-info">
+                        <span id="user-email">Carregando...</span>
+                    </div>
+                    <button onclick="showRPGProfile()"><i class="fas fa-user-circle"></i> Perfil RPG</button>
+                    <button onclick="window.location.href='profile.html'"><i class="fas fa-cog"></i> Configurações</button>
+                    <button onclick="logout()"><i class="fas fa-sign-out-alt"></i> Sair</button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main">
+        <!-- Shop Section -->
+        <section class="section">
+            <h2>Loja de Conhecimentos</h2>
+            <div class="shop-info">
+                <p><i class="fas fa-gem"></i> Seus Pontos de Conhecimento: <span class="pc-count" id="pc-display">0</span></p>
+            </div>
+            <div class="shop-categories">
+                <div id="shop-categories-container">
+                    <div class="loading-message" style="text-align: center; padding: 2rem; opacity: 0.7;">
+                        <i class="fas fa-spinner fa-spin" style="font-size: 2rem; margin-bottom: 1rem;"></i>
+                        <p>Carregando conhecimentos...</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Firebase Scripts -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+    <script src="assets/js/firebase-config.js"></script>
+    <script src="assets/js/auth.js"></script>
+    <script src="assets/js/knowledge-loader.js"></script>
+    <script src="assets/js/data-manager.js"></script>
+    
+    <script src="assets/js/theme.js"></script>
+    <script src="assets/js/rpg-system.js"></script>
+    <script src="assets/js/rpg-profile.js"></script>
+    <script src="assets/js/shop-rpg.js"></script>
+    
+    <script>
+    // User menu functions
+    function showUserMenu() {
+        const menu = document.getElementById('user-menu');
+        menu.style.display = menu.style.display === 'none' ? 'block' : 'none';
+    }
+    
+    async function logout() {
+        if (confirm('Deseja realmente sair?')) {
+            await authManager.logout();
+        }
+    }
+    
+    // Update user info when auth state changes
+    auth.onAuthStateChanged((user) => {
+        if (user) {
+            document.getElementById('user-email').textContent = user.email;
+        }
+    });
+    
+    // Close user menu when clicking outside
+    document.addEventListener('click', (e) => {
+        if (!e.target.closest('.user-avatar') && !e.target.closest('#user-menu')) {
+            document.getElementById('user-menu').style.display = 'none';
+        }
+    });
+    
+    // Atualizar PC quando dados carregarem
+    window.addEventListener('userDataLoaded', (event) => {
+        updatePCDisplay(event.detail.gameData.coins || 0);
+    });
+    
+    if (dataManager.getUserData()) {
+        updatePCDisplay(dataManager.getGameData().coins || 0);
+    }
+    
+    function updatePCDisplay(coins) {
+        document.getElementById('pc-display').textContent = coins;
+    }
+    
+    // Carregar loja quando conhecimentos estiverem disponíveis
+    window.addEventListener('knowledgeLoaded', () => {
+        loadShopFromFirestore();
+    });
+    
+    // Se os conhecimentos já foram carregados
+    if (knowledgeLoader.isLoaded()) {
+        loadShopFromFirestore();
+    }
+    
+    function loadShopFromFirestore() {
+        const container = document.getElementById('shop-categories-container');
+        const knowledgeData = knowledgeLoader.getAllKnowledge();
+        
+        if (Object.keys(knowledgeData).length === 0) {
+            container.innerHTML = '<p style="text-align: center; opacity: 0.7;">Nenhum conhecimento disponível no momento.</p>';
+            return;
+        }
+        
+        // Agrupar por categoria
+        const categories = {};
+        Object.entries(knowledgeData).forEach(([name, data]) => {
+            if (!categories[data.category]) {
+                categories[data.category] = [];
+            }
+            categories[data.category].push({ name, ...data });
+        });
+        
+        // Gerar HTML das categorias
+        let html = '';
+        Object.entries(categories).forEach(([categoryName, items]) => {
+            const categoryIcon = items[0]?.icon || 'fas fa-book';
+            
+            html += `
+                <div class="category">
+                    <h3><i class="${categoryIcon}"></i> ${categoryName}</h3>
+                    <div class="items-grid">
+            `;
+            
+            items.forEach(item => {
+                const description = item.descriptions?.[1] || 'Conhecimento sobre cultura brasileira';
+                const shortDesc = description.length > 50 ? description.substring(0, 50) + '...' : description;
+                
+                html += `
+                    <div class="shop-item">
+                        <h4>${item.name}</h4>
+                        <p>${shortDesc}</p>
+                        <div class="price">${item.price || 1} PC</div>
+                        <button class="buy-btn" data-knowledge="${item.name}" data-price="${item.price || 1}">Comprar</button>
+                    </div>
+                `;
+            });
+            
+            html += `
+                    </div>
+                </div>
+            `;
+        });
+        
+        container.innerHTML = html;
+        
+        // Adicionar event listeners para os novos botões
+        setupBuyButtons();
+    }
+    
+    function setupBuyButtons() {
+        document.querySelectorAll('.buy-btn').forEach(btn => {
+            btn.addEventListener('click', async (e) => {
+                const knowledgeName = e.target.dataset.knowledge;
+                const cost = parseInt(e.target.dataset.price) || 1;
+                
+                console.log('Tentando comprar:', knowledgeName);
+                
+                try {
+                    if (!dataManager.currentUser) {
+                        alert('Você precisa estar logado para comprar conhecimentos!');
+                        return;
+                    }
+                    
+                    await dataManager.buyKnowledge(knowledgeName, cost);
+                    updatePCDisplay(dataManager.getGameData().coins);
+                    
+                    // Forçar atualização do localStorage
+                    const currentKnowledge = dataManager.getGameData().ownedKnowledge;
+                    localStorage.setItem('ownedKnowledge', JSON.stringify(currentKnowledge));
+                    console.log('💾 localStorage forçado:', currentKnowledge);
+                    
+                    // Feedback visual
+                    btn.textContent = 'Comprado!';
+                    btn.style.background = '#28a745';
+                    btn.disabled = true;
+                    
+                    // Disparar eventos para atualizar biblioteca
+                    const currentLevel = dataManager.getGameData().ownedKnowledge[knowledgeName.toLowerCase()];
+                    
+                    window.dispatchEvent(new CustomEvent('knowledgePurchased', {
+                        detail: { knowledgeName, level: currentLevel }
+                    }));
+                    
+                    window.dispatchEvent(new CustomEvent('knowledgeUpdated', {
+                        detail: { knowledgeName, level: currentLevel }
+                    }));
+                    
+                    console.log('Eventos disparados para:', knowledgeName, 'Nível:', currentLevel);
+                    
+                    setTimeout(() => {
+                        btn.textContent = 'Comprar';
+                        btn.style.background = '';
+                        btn.disabled = false;
+                    }, 2000);
+                    
+                } catch (error) {
+                    console.error('Erro na compra:', error);
+                    alert(error.message);
+                }
+            });
+        });
+    }
+    </script>
+</body>
+</html>

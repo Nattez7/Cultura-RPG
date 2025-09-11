@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Criação de Personagem - Portal Cultural RPG</title>
+    <link rel="stylesheet" href="assets/css/character-creation.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div style="min-height: 100vh; display: flex; align-items: center; justify-content: center; background: var(--gradient);">
+        <div style="max-width: 600px; width: 90%; padding: 2rem;">
+            <div style="text-align: center; margin-bottom: 3rem;">
+                <div style="font-size: 4rem; color: var(--accent); margin-bottom: 1rem;">
+                    <i class="fas fa-dragon"></i>
+                </div>
+                <h1 style="color: var(--accent); margin-bottom: 1rem; font-size: 2.5rem;">Bem-vindo ao Portal Cultural!</h1>
+                <p style="color: #ffffff; font-size: 1.2rem; opacity: 0.9;">Vamos criar seu personagem para começar esta jornada cultural única</p>
+            </div>
+
+            <!-- Etapa 1: Dados do Personagem -->
+            <div id="step1" class="creation-step">
+                <div style="background: var(--bg-card); border: 1px solid var(--accent); border-radius: 16px; padding: 2rem;">
+                    <h3 style="color: var(--accent); margin-bottom: 2rem; text-align: center; font-size: 1.8rem;">
+                        <i class="fas fa-user-plus" style="margin-right: 0.5rem;"></i>
+                        Criar Personagem
+                    </h3>
+                    
+                    <form id="character-form" style="display: grid; gap: 1.5rem;">
+                        <div style="display: grid; gap: 0.5rem;">
+                            <label style="color: #ffffff; font-weight: bold;">Nome do Personagem</label>
+                            <input type="text" id="char-name" required maxlength="30" 
+                                style="padding: 0.8rem; border: 1px solid var(--border); border-radius: 8px; 
+                                       background: rgba(255,255,255,0.1); color: #ffffff; font-size: 1rem;"
+                                placeholder="Digite o nome do seu personagem">
+                        </div>
+                        
+                        <div style="display: grid; gap: 0.5rem;">
+                            <label style="color: #ffffff; font-weight: bold;">Aparência</label>
+                            <input type="text" id="char-appearance" required maxlength="100" 
+                                style="padding: 0.8rem; border: 1px solid var(--border); border-radius: 8px; 
+                                       background: rgba(255,255,255,0.1); color: #ffffff; font-size: 1rem;"
+                                placeholder="Ex: Cabelos castanhos, olhos escuros, pele morena">
+                        </div>
+                        
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                            <div style="display: grid; gap: 0.5rem;">
+                                <label style="color: #ffffff; font-weight: bold;">Idade</label>
+                                <input type="number" id="char-age" required min="16" max="80" 
+                                    style="padding: 0.8rem; border: 1px solid var(--border); border-radius: 8px; 
+                                           background: rgba(255,255,255,0.1); color: #ffffff; font-size: 1rem;"
+                                    placeholder="Ex: 25">
+                            </div>
+                            
+                            <div style="display: grid; gap: 0.5rem;">
+                                <label style="color: #ffffff; font-weight: bold;">Altura</label>
+                                <input type="text" id="char-height" required 
+                                    style="padding: 0.8rem; border: 1px solid var(--border); border-radius: 8px; 
+                                           background: rgba(255,255,255,0.1); color: #ffffff; font-size: 1rem;"
+                                    placeholder="Ex: 1.75">
+                            </div>
+                        </div>
+                        
+                        <div style="display: grid; gap: 0.5rem;">
+                            <label style="color: #ffffff; font-weight: bold;">Gênero</label>
+                            <select id="char-gender" required 
+                                style="padding: 0.8rem; border: 1px solid var(--border); border-radius: 8px; 
+                                       background: rgba(255,255,255,0.1); color: #ffffff; font-size: 1rem;">
+                                <option value="" style="background: #2a2a2a; color: #ffffff;">Selecione o gênero</option>
+                                <option value="Masculino" style="background: #2a2a2a; color: #ffffff;">Masculino</option>
+                                <option value="Feminino" style="background: #2a2a2a; color: #ffffff;">Feminino</option>
+                                <option value="Não-binário" style="background: #2a2a2a; color: #ffffff;">Não-binário</option>
+                                <option value="Prefiro não informar" style="background: #2a2a2a; color: #ffffff;">Prefiro não informar</option>
+                            </select>
+                        </div>
+                        
+                        <div style="display: grid; gap: 0.5rem;">
+                            <label style="color: #ffffff; font-weight: bold;">Foto do Personagem (Opcional)</label>
+                            <div style="display: flex; flex-direction: column; gap: 1rem;">
+                                <input type="file" id="char-photo" accept="image/*" 
+                                    style="padding: 0.8rem; border: 1px solid var(--border); border-radius: 8px; 
+                                           background: rgba(255,255,255,0.1); color: #ffffff; font-size: 1rem;">
+                                <div id="photo-preview" style="display: none; text-align: center;">
+                                    <img id="preview-img" style="max-width: 150px; max-height: 150px; border-radius: 50%; border: 2px solid var(--accent);">
+                                    <p style="color: #ffffff; margin-top: 0.5rem; font-size: 0.9rem;">Preview da foto</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <button type="submit" style="
+                            background: var(--gradient); border: none; color: var(--text);
+                            padding: 1rem 2rem; border-radius: 12px; cursor: pointer;
+                            font-weight: bold; font-size: 1.1rem; margin-top: 1rem;
+                        ">Próximo: Distribuir Atributos</button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Etapa 2: Distribuição de Atributos -->
+            <div id="step2" class="creation-step" style="display: none;">
+                <div style="background: var(--bg-card); border: 1px solid var(--accent); border-radius: 16px; padding: 2rem;">
+                    <h3 style="color: var(--accent); margin-bottom: 1rem; text-align: center;">
+                        Distribua seus Atributos Iniciais
+                    </h3>
+                    <p style="color: #ffffff; text-align: center; margin-bottom: 2rem; opacity: 0.8;">
+                        Pontos restantes: <strong id="points-left">4</strong>
+                        <br>Máximo 2 pontos por atributo
+                    </p>
+                    
+                    <div style="display: grid; gap: 1rem; margin-bottom: 2rem;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; padding: 1rem; background: rgba(255,255,255,0.05); border-radius: 8px;" title="Conhecimento, sabedoria e capacidade de aprendizado. Usado para literatura, história e questões acadêmicas.">
+                            <div style="display: flex; align-items: center; gap: 0.5rem;">
+                                <i class="fas fa-brain" style="color: var(--accent);"></i>
+                                <span style="color: #ffffff; text-transform: capitalize;">Intelecto</span>
+                                <i class="fas fa-info-circle" style="color: var(--accent); opacity: 0.6; font-size: 0.9rem;"></i>
+                            </div>
+                            <div style="display: flex; align-items: center; gap: 0.5rem;">
+                                <button onclick="removePoint('intelecto')" style="background: #dc3545; border: none; color: white; width: 30px; height: 30px; border-radius: 50%; cursor: pointer; font-weight: bold;">-</button>
+                                <span style="color: var(--accent); font-weight: bold; min-width: 20px; text-align: center;" id="intelecto-value">0</span>
+                                <button onclick="addPoint('intelecto')" style="background: var(--accent); border: none; color: var(--primary); width: 30px; height: 30px; border-radius: 50%; cursor: pointer; font-weight: bold;">+</button>
+                            </div>
+                        </div>
+                        
+                        <div style="display: flex; justify-content: space-between; align-items: center; padding: 1rem; background: rgba(255,255,255,0.05); border-radius: 8px;" title="Força, resistência e habilidades corporais. Usado para artes marciais, capoeira e atividades físicas.">
+                            <div style="display: flex; align-items: center; gap: 0.5rem;">
+                                <i class="fas fa-fist-raised" style="color: var(--accent);"></i>
+                                <span style="color: #ffffff; text-transform: capitalize;">Físico</span>
+                                <i class="fas fa-info-circle" style="color: var(--accent); opacity: 0.6; font-size: 0.9rem;"></i>
+                            </div>
+                            <div style="display: flex; align-items: center; gap: 0.5rem;">
+                                <button onclick="removePoint('fisico')" style="background: #dc3545; border: none; color: white; width: 30px; height: 30px; border-radius: 50%; cursor: pointer; font-weight: bold;">-</button>
+                                <span style="color: var(--accent); font-weight: bold; min-width: 20px; text-align: center;" id="fisico-value">0</span>
+                                <button onclick="addPoint('fisico')" style="background: var(--accent); border: none; color: var(--primary); width: 30px; height: 30px; border-radius: 50%; cursor: pointer; font-weight: bold;">+</button>
+                            </div>
+                        </div>
+                        
+                        <div style="display: flex; justify-content: space-between; align-items: center; padding: 1rem; background: rgba(255,255,255,0.05); border-radius: 8px;" title="Imaginação, expressão artística e inovação. Usado para música, arte, dança e manifestações culturais.">
+                            <div style="display: flex; align-items: center; gap: 0.5rem;">
+                                <i class="fas fa-palette" style="color: var(--accent);"></i>
+                                <span style="color: #ffffff; text-transform: capitalize;">Criativo</span>
+                                <i class="fas fa-info-circle" style="color: var(--accent); opacity: 0.6; font-size: 0.9rem;"></i>
+                            </div>
+                            <div style="display: flex; align-items: center; gap: 0.5rem;">
+                                <button onclick="removePoint('criativo')" style="background: #dc3545; border: none; color: white; width: 30px; height: 30px; border-radius: 50%; cursor: pointer; font-weight: bold;">-</button>
+                                <span style="color: var(--accent); font-weight: bold; min-width: 20px; text-align: center;" id="criativo-value">0</span>
+                                <button onclick="addPoint('criativo')" style="background: var(--accent); border: none; color: var(--primary); width: 30px; height: 30px; border-radius: 50%; cursor: pointer; font-weight: bold;">+</button>
+                            </div>
+                        </div>
+                        
+                        <div style="display: flex; justify-content: space-between; align-items: center; padding: 1rem; background: rgba(255,255,255,0.05); border-radius: 8px;" title="Carisma, comunicação e habilidades interpessoais. Usado para festas, culinária, tradições e interações sociais.">
+                            <div style="display: flex; align-items: center; gap: 0.5rem;">
+                                <i class="fas fa-users" style="color: var(--accent);"></i>
+                                <span style="color: #ffffff; text-transform: capitalize;">Social</span>
+                                <i class="fas fa-info-circle" style="color: var(--accent); opacity: 0.6; font-size: 0.9rem;"></i>
+                            </div>
+                            <div style="display: flex; align-items: center; gap: 0.5rem;">
+                                <button onclick="removePoint('social')" style="background: #dc3545; border: none; color: white; width: 30px; height: 30px; border-radius: 50%; cursor: pointer; font-weight: bold;">-</button>
+                                <span style="color: var(--accent); font-weight: bold; min-width: 20px; text-align: center;" id="social-value">0</span>
+                                <button onclick="addPoint('social')" style="background: var(--accent); border: none; color: var(--primary); width: 30px; height: 30px; border-radius: 50%; cursor: pointer; font-weight: bold;">+</button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div style="text-align: center; padding: 1rem; background: rgba(235,214,119,0.1); border-radius: 8px; margin-bottom: 2rem;">
+                        <p style="color: #ffffff; margin: 0; font-size: 0.9rem;">
+                            <strong>Como funciona:</strong> Cada ponto = 1 dado d6. Resultado 5+ = sucesso!
+                        </p>
+                    </div>
+                    
+                    <button onclick="finishCharacterCreation()" id="finish-btn" style="
+                        background: var(--gradient); border: none; color: var(--text);
+                        padding: 1rem 2rem; border-radius: 12px; cursor: pointer;
+                        font-weight: bold; width: 100%; opacity: 0.5;
+                    " disabled>Finalizar e Ver Perfil RPG</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let playerData = {
+            stats: { intelecto: 0, fisico: 0, criativo: 0, social: 0 },
+            pointsToDistribute: 4
+        };
+
+        // Etapa 1: Criar personagem
+        document.getElementById('character-form').addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            const name = document.getElementById('char-name').value.trim();
+            const appearance = document.getElementById('char-appearance').value.trim();
+            const age = parseInt(document.getElementById('char-age').value);
+            const height = document.getElementById('char-height').value.trim();
+            const gender = document.getElementById('char-gender').value;
+            const photoFile = document.getElementById('char-photo').files[0];
+            
+            if (!name || !appearance || !age || !height || !gender) {
+                alert('Por favor, preencha todos os campos obrigatórios!');
+                return;
+            }
+            
+            // Processar foto se fornecida
+            let photoData = null;
+            if (photoFile) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    photoData = e.target.result;
+                    saveCharacterData();
+                };
+                reader.readAsDataURL(photoFile);
+            } else {
+                saveCharacterData();
+            }
+            
+            function saveCharacterData() {
+            
+                playerData = {
+                    name: name,
+                    appearance: appearance,
+                    age: age,
+                    height: height,
+                    gender: gender,
+                    photo: photoData,
+                    level: 1,
+                    xp: 0,
+                    xpToNext: 100,
+                    pc: 15,
+                    stats: { intelecto: 0, fisico: 0, criativo: 0, social: 0 },
+                    knowledge: {},
+                    pointsToDistribute: 4,
+                    titles: [],
+                    achievements: [],
+                    streak: 0,
+                    totalQuests: 0,
+                    characterCreated: true
+                };
+                
+                document.getElementById('step1').style.display = 'none';
+                document.getElementById('step2').style.display = 'block';
+            }
+        });
+        
+        // Preview da foto
+        document.getElementById('char-photo').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    document.getElementById('preview-img').src = e.target.result;
+                    document.getElementById('photo-preview').style.display = 'block';
+                };
+                reader.readAsDataURL(file);
+            } else {
+                document.getElementById('photo-preview').style.display = 'none';
+            }
+        });
+
+        // Etapa 2: Distribuir atributos
+        function addPoint(stat) {
+            if (playerData.pointsToDistribute > 0 && playerData.stats[stat] < 2) {
+                playerData.stats[stat]++;
+                playerData.pointsToDistribute--;
+                
+                document.getElementById(stat + '-value').textContent = playerData.stats[stat];
+                document.getElementById('points-left').textContent = playerData.pointsToDistribute;
+                updateFinishButton();
+            }
+        }
+        
+        function removePoint(stat) {
+            if (playerData.stats[stat] > 0) {
+                playerData.stats[stat]--;
+                playerData.pointsToDistribute++;
+                
+                document.getElementById(stat + '-value').textContent = playerData.stats[stat];
+                document.getElementById('points-left').textContent = playerData.pointsToDistribute;
+                updateFinishButton();
+            }
+        }
+        
+        function updateFinishButton() {
+            const finishBtn = document.getElementById('finish-btn');
+            
+            if (playerData.pointsToDistribute === 0) {
+                finishBtn.disabled = false;
+                finishBtn.style.opacity = '1';
+            } else {
+                finishBtn.disabled = true;
+                finishBtn.style.opacity = '0.5';
+            }
+        }
+        
+        function finishCharacterCreation() {
+            localStorage.setItem('cultura_rpg_player', JSON.stringify(playerData));
+            localStorage.setItem('pc_count', '15');
+            localStorage.setItem('character_created', 'true');
+            
+            window.location.href = 'dashboard.html#profile';
+        }
+    </script>
+</body>
+</html>

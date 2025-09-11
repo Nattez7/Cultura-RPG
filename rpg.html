@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RPG - Portal Cultural RPG</title>
+    <link rel="stylesheet" href="assets/css/rpg.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-content">
+            <div class="logo">
+                <i class="fas fa-dragon"></i>
+                <span>Portal Cultural</span>
+            </div>
+            <nav class="nav">
+                <a href="dashboard.html" class="nav-link">
+                    <i class="fas fa-scroll"></i>
+                    <span>Missões Diárias</span>
+                </a>
+                <a href="loja.html" class="nav-link">
+                    <i class="fas fa-store"></i>
+                    <span>Loja</span>
+                </a>
+                <a href="biblioteca.html" class="nav-link">
+                    <i class="fas fa-book"></i>
+                    <span>Biblioteca</span>
+                </a>
+                <a href="rpg.html" class="nav-link active">
+                    <i class="fas fa-dice-d20"></i>
+                    <span>RPG</span>
+                </a>
+                <a href="#" onclick="showRPGProfile(); return false;" class="nav-link">
+                    <i class="fas fa-user-circle"></i>
+                    <span>Perfil RPG</span>
+                </a>
+                <a href="tutorial.html" class="nav-link tutorial-link">
+                    <i class="fas fa-question-circle"></i>
+                    <span>Como Funciona</span>
+                </a>
+            </nav>
+            <div class="user-menu">
+                <div class="theme-toggle" onclick="toggleDarkMode()">
+                    <i class="fas fa-moon"></i>
+                </div>
+                <div class="user-avatar" onclick="showUserMenu()">
+                    <i class="fas fa-user"></i>
+                </div>
+                <div id="user-menu" class="user-dropdown" style="display: none;">
+                    <div class="user-info">
+                        <span id="user-email">Carregando...</span>
+                    </div>
+                    <button onclick="showRPGProfile()"><i class="fas fa-user-circle"></i> Perfil RPG</button>
+                    <button onclick="window.location.href='profile.html'"><i class="fas fa-cog"></i> Configurações</button>
+                    <button onclick="logout()"><i class="fas fa-sign-out-alt"></i> Sair</button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main">
+        <!-- RPG Section -->
+        <section class="section">
+            <h2>RPG - Cultura Brasileira</h2>
+            <div class="daily-info">
+                <p><i class="fas fa-dice-d20"></i> Participe de mesas de RPG temáticas sobre cultura brasileira! Jogue com outros aventureiros e explore nossa rica história.</p>
+            </div>
+
+            <!-- RPG Navigation -->
+            <div class="rpg-nav" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 2rem; margin-bottom: 3rem;">
+                <div class="rpg-nav-card" onclick="showSection('mesas')" style="background: var(--bg-card); border: 1px solid var(--border); border-radius: 16px; padding: 2rem; text-align: center; cursor: pointer; transition: all 0.3s ease;">
+                    <i class="fas fa-table" style="font-size: 3rem; color: var(--accent); margin-bottom: 1rem;"></i>
+                    <h3 style="color: var(--accent); margin-bottom: 0.5rem;">Mesas Disponíveis</h3>
+                    <p style="opacity: 0.8;">Encontre mesas abertas para jogar</p>
+                </div>
+
+                <div class="rpg-nav-card" onclick="showSection('historico')" style="background: var(--bg-card); border: 1px solid var(--border); border-radius: 16px; padding: 2rem; text-align: center; cursor: pointer; transition: all 0.3s ease;">
+                    <i class="fas fa-history" style="font-size: 3rem; color: var(--accent); margin-bottom: 1rem;"></i>
+                    <h3 style="color: var(--accent); margin-bottom: 0.5rem;">Histórico</h3>
+                    <p style="opacity: 0.8;">Suas aventuras passadas</p>
+                </div>
+
+                <div class="rpg-nav-card" onclick="showRPGProfile()" style="background: var(--bg-card); border: 1px solid var(--border); border-radius: 16px; padding: 2rem; text-align: center; cursor: pointer; transition: all 0.3s ease;">
+                    <i class="fas fa-user-shield" style="font-size: 3rem; color: var(--accent); margin-bottom: 1rem;"></i>
+                    <h3 style="color: var(--accent); margin-bottom: 0.5rem;">Personagem</h3>
+                    <p style="opacity: 0.8;">Veja seu perfil RPG</p>
+                </div>
+
+                <div class="rpg-nav-card" onclick="showSection('mestre')" style="background: var(--bg-card); border: 1px solid var(--border); border-radius: 16px; padding: 2rem; text-align: center; cursor: pointer; transition: all 0.3s ease;">
+                    <i class="fas fa-crown" style="font-size: 3rem; color: var(--accent); margin-bottom: 1rem;"></i>
+                    <h3 style="color: var(--accent); margin-bottom: 0.5rem;">Quero ser Mestre</h3>
+                    <p style="opacity: 0.8;">Crie e gerencie suas mesas</p>
+                </div>
+            </div>
+
+            <!-- Mesas Disponíveis -->
+            <div id="mesas-section" class="rpg-section" style="display: none;">
+                <h3 style="color: var(--accent); margin-bottom: 2rem;">
+                    <i class="fas fa-table"></i> Mesas Disponíveis
+                </h3>
+                <div class="mesas-grid" style="display: grid; gap: 1.5rem;">
+                    <div class="mesa-card" style="background: var(--bg-card); border: 1px solid var(--border); border-radius: 16px; padding: 1.5rem;">
+                        <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 1rem;">
+                            <div>
+                                <h4 style="color: var(--accent); margin-bottom: 0.5rem;">As Lendas do Folclore</h4>
+                                <p style="opacity: 0.8; font-size: 0.9rem;">Mestre: João Silva</p>
+                            </div>
+                            <span style="background: #28a745; color: white; padding: 0.25rem 0.5rem; border-radius: 4px; font-size: 0.8rem;">Aberta</span>
+                        </div>
+                        <p style="margin-bottom: 1rem;">Uma aventura pelos mitos e lendas do folclore brasileiro. Encontre o Curupira, enfrente o Boitatá e desvende os mistérios da floresta.</p>
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                            <span style="font-size: 0.9rem;"><i class="fas fa-users"></i> 3/5 jogadores</span>
+                            <span style="font-size: 0.9rem;"><i class="fas fa-clock"></i> Sáb 20:00</span>
+                        </div>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem;">
+                            <button onclick="window.open('mesa-jogador.html', '_blank')" style="background: var(--accent); color: var(--primary); border: none; padding: 0.5rem 1rem; border-radius: 8px; cursor: pointer; font-weight: bold;">Entrar como Jogador</button>
+                            <button onclick="window.open('mesa-rpg.html', '_blank')" style="background: var(--secondary); color: white; border: none; padding: 0.5rem 1rem; border-radius: 8px; cursor: pointer; font-weight: bold;">Entrar como Mestre</button>
+                        </div>
+                    </div>
+
+                    <div class="mesa-card" style="background: var(--bg-card); border: 1px solid var(--border); border-radius: 16px; padding: 1.5rem;">
+                        <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 1rem;">
+                            <div>
+                                <h4 style="color: var(--accent); margin-bottom: 0.5rem;">Capoeira e Resistência</h4>
+                                <p style="opacity: 0.8; font-size: 0.9rem;">Mestre: Maria Santos</p>
+                            </div>
+                            <span style="background: #ffc107; color: #000; padding: 0.25rem 0.5rem; border-radius: 4px; font-size: 0.8rem;">Em Andamento</span>
+                        </div>
+                        <p style="margin-bottom: 1rem;">Aventura no Brasil colonial explorando a história da capoeira como forma de resistência cultural e luta pela liberdade.</p>
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                            <span style="font-size: 0.9rem;"><i class="fas fa-users"></i> 4/4 jogadores</span>
+                            <span style="font-size: 0.9rem;"><i class="fas fa-clock"></i> Dom 19:00</span>
+                        </div>
+                        <button disabled style="background: #6c757d; color: white; border: none; padding: 0.5rem 1rem; border-radius: 8px; cursor: not-allowed; width: 100%;">Mesa Cheia</button>
+                    </div>
+
+                    <div class="mesa-card" style="background: var(--bg-card); border: 1px solid var(--border); border-radius: 16px; padding: 1.5rem;">
+                        <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 1rem;">
+                            <div>
+                                <h4 style="color: var(--accent); margin-bottom: 0.5rem;">Festivais do Brasil</h4>
+                                <p style="opacity: 0.8; font-size: 0.9rem;">Mestre: Carlos Lima</p>
+                            </div>
+                            <span style="background: #28a745; color: white; padding: 0.25rem 0.5rem; border-radius: 4px; font-size: 0.8rem;">Aberta</span>
+                        </div>
+                        <p style="margin-bottom: 1rem;">Viaje pelo Brasil descobrindo as tradições do Carnaval, Festa Junina e Bumba Meu Boi em uma aventura cultural única.</p>
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                            <span style="font-size: 0.9rem;"><i class="fas fa-users"></i> 2/6 jogadores</span>
+                            <span style="font-size: 0.9rem;"><i class="fas fa-clock"></i> Sex 21:00</span>
+                        </div>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem;">
+                            <button onclick="window.open('mesa-jogador.html', '_blank')" style="background: var(--accent); color: var(--primary); border: none; padding: 0.5rem 1rem; border-radius: 8px; cursor: pointer; font-weight: bold;">Entrar como Jogador</button>
+                            <button onclick="window.open('mesa-rpg.html', '_blank')" style="background: var(--secondary); color: white; border: none; padding: 0.5rem 1rem; border-radius: 8px; cursor: pointer; font-weight: bold;">Entrar como Mestre</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Histórico -->
+            <div id="historico-section" class="rpg-section" style="display: none;">
+                <h3 style="color: var(--accent); margin-bottom: 2rem;">
+                    <i class="fas fa-history"></i> Histórico de Aventuras
+                </h3>
+                <div class="historico-list" style="display: grid; gap: 1rem;">
+                    <div style="background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; padding: 1.5rem;">
+                        <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 1rem;">
+                            <h4 style="color: var(--accent); margin: 0;">O Mistério do Saci</h4>
+                            <span style="background: #28a745; color: white; padding: 0.25rem 0.5rem; border-radius: 4px; font-size: 0.8rem;">Concluída</span>
+                        </div>
+                        <p style="margin-bottom: 0.5rem; opacity: 0.8;">Mestre: Ana Costa • 15/12/2023</p>
+                        <p style="margin-bottom: 1rem;">Aventura onde você ajudou o Saci a recuperar seu gorro mágico roubado por um fazendeiro ganancioso.</p>
+                        <div style="display: flex; gap: 1rem; font-size: 0.9rem;">
+                            <span><i class="fas fa-star" style="color: #ffc107;"></i> XP Ganho: 35</span>
+                            <span><i class="fas fa-trophy" style="color: var(--accent);"></i> Herói do Folclore</span>
+                        </div>
+                    </div>
+
+                    <div style="background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; padding: 1.5rem;">
+                        <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 1rem;">
+                            <h4 style="color: var(--accent); margin: 0;">Roda de Capoeira</h4>
+                            <span style="background: #dc3545; color: white; padding: 0.25rem 0.5rem; border-radius: 4px; font-size: 0.8rem;">Abandonada</span>
+                        </div>
+                        <p style="margin-bottom: 0.5rem; opacity: 0.8;">Mestre: Pedro Oliveira • 08/12/2023</p>
+                        <p style="margin-bottom: 1rem;">Sessão interrompida durante o torneio de capoeira no quilombo.</p>
+                        <div style="display: flex; gap: 1rem; font-size: 0.9rem;">
+                            <span><i class="fas fa-star" style="color: #ffc107;"></i> XP Ganho: 15</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quero ser Mestre -->
+            <div id="mestre-section" class="rpg-section" style="display: none;">
+                <h3 style="color: var(--accent); margin-bottom: 2rem;">
+                    <i class="fas fa-crown"></i> Área do Mestre
+                </h3>
+                
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem; margin-bottom: 2rem;">
+                    <div style="background: var(--bg-card); border: 1px solid var(--border); border-radius: 16px; padding: 2rem; text-align: center;">
+                        <i class="fas fa-plus-circle" style="font-size: 3rem; color: var(--accent); margin-bottom: 1rem;"></i>
+                        <h4 style="color: var(--accent); margin-bottom: 1rem;">Criar Nova Mesa</h4>
+                        <p style="margin-bottom: 1.5rem; opacity: 0.8;">Configure uma nova aventura cultural para outros jogadores</p>
+                        <button onclick="createMesa()" style="background: var(--accent); color: var(--primary); border: none; padding: 0.8rem 1.5rem; border-radius: 8px; cursor: pointer; font-weight: bold;">Criar Mesa</button>
+                    </div>
+
+                    <div style="background: var(--bg-card); border: 1px solid var(--border); border-radius: 16px; padding: 2rem; text-align: center;">
+                        <i class="fas fa-cogs" style="font-size: 3rem; color: var(--accent); margin-bottom: 1rem;"></i>
+                        <h4 style="color: var(--accent); margin-bottom: 1rem;">Minhas Mesas</h4>
+                        <p style="margin-bottom: 1.5rem; opacity: 0.8;">Gerencie suas mesas ativas e planejadas</p>
+                        <button onclick="manageMesas()" style="background: var(--secondary); color: white; border: none; padding: 0.8rem 1.5rem; border-radius: 8px; cursor: pointer; font-weight: bold;">Gerenciar</button>
+                    </div>
+                </div>
+
+                <div style="background: rgba(235, 214, 119, 0.1); border: 1px solid var(--accent); border-radius: 12px; padding: 1.5rem;">
+                    <h4 style="color: var(--accent); margin-bottom: 1rem;"><i class="fas fa-info-circle"></i> Como ser um Mestre</h4>
+                    <ul style="margin: 0; padding-left: 1.5rem; line-height: 1.6;">
+                        <li>Conheça bem a cultura brasileira e suas histórias</li>
+                        <li>Prepare aventuras educativas e divertidas</li>
+                        <li>Seja paciente e inclusivo com todos os jogadores</li>
+                        <li>Use o sistema de dados d6 para resolver ações</li>
+                        <li>Incentive o aprendizado cultural durante o jogo</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Firebase Scripts -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+    <script src="assets/js/firebase-config.js"></script>
+    <script src="assets/js/auth.js"></script>
+    <script src="assets/js/data-manager.js"></script>
+    
+    <script src="assets/js/rpg-system.js"></script>
+    <script src="assets/js/rpg-profile.js"></script>
+    
+    <script>
+        function showSection(sectionName) {
+            // Esconder todas as seções
+            document.querySelectorAll('.rpg-section').forEach(section => {
+                section.style.display = 'none';
+            });
+            
+            // Mostrar seção selecionada
+            document.getElementById(sectionName + '-section').style.display = 'block';
+        }
+
+        function joinMesa(mesaId) {
+            alert(`Solicitação enviada para participar da mesa ${mesaId}! O mestre será notificado.`);
+        }
+
+        function createMesa() {
+            alert('Funcionalidade em desenvolvimento! Em breve você poderá criar suas próprias mesas.');
+        }
+
+        function manageMesas() {
+            alert('Funcionalidade em desenvolvimento! Em breve você poderá gerenciar suas mesas.');
+        }
+
+        // Efeitos hover nos cards - removido para usar CSS
+
+        // Mostrar mesas por padrão
+        showSection('mesas');
+        
+        // User menu functions
+        function showUserMenu() {
+            const menu = document.getElementById('user-menu');
+            menu.style.display = menu.style.display === 'none' ? 'block' : 'none';
+        }
+        
+        async function logout() {
+            if (confirm('Deseja realmente sair?')) {
+                await authManager.logout();
+            }
+        }
+        
+        // Update user info when auth state changes
+        auth.onAuthStateChanged((user) => {
+            if (user) {
+                document.getElementById('user-email').textContent = user.email;
+            }
+        });
+        
+        // Close user menu when clicking outside
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('.user-avatar') && !e.target.closest('#user-menu')) {
+                document.getElementById('user-menu').style.display = 'none';
+            }
+        });
+    </script>
+</body>
+</html>

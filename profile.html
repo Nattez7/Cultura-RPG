@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Perfil do Aventureiro - Portal Cultural RPG</title>
+    <link rel="stylesheet" href="assets/css/profile.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-content">
+            <div class="logo">
+                <i class="fas fa-dragon"></i>
+                <span>Portal Cultural</span>
+            </div>
+            <nav class="nav">
+                <a href="dashboard.html" class="nav-link">
+                    <i class="fas fa-scroll"></i>
+                    <span>Missões Diárias</span>
+                </a>
+                <a href="loja.html" class="nav-link">
+                    <i class="fas fa-store"></i>
+                    <span>Loja</span>
+                </a>
+                <a href="biblioteca.html" class="nav-link">
+                    <i class="fas fa-book"></i>
+                    <span>Biblioteca</span>
+                </a>
+                <a href="rpg.html" class="nav-link">
+                    <i class="fas fa-dice-d20"></i>
+                    <span>RPG</span>
+                </a>
+                <a href="#" onclick="showRPGProfile(); return false;" class="nav-link">
+                    <i class="fas fa-user-circle"></i>
+                    <span>Perfil RPG</span>
+                </a>
+                <a href="tutorial.html" class="nav-link tutorial-link">
+                    <i class="fas fa-question-circle"></i>
+                    <span>Como Funciona</span>
+                </a>
+            </nav>
+            <div class="user-menu">
+                <div class="theme-toggle" onclick="toggleDarkMode()">
+                    <i class="fas fa-moon"></i>
+                </div>
+                <div class="user-avatar" onclick="showUserMenu()">
+                    <i class="fas fa-user"></i>
+                </div>
+                <div id="user-menu" class="user-dropdown" style="display: none;">
+                    <div class="user-info">
+                        <span id="user-email">Carregando...</span>
+                    </div>
+                    <button onclick="showRPGProfile()"><i class="fas fa-user-circle"></i> Perfil RPG</button>
+                    <button onclick="window.location.href='profile.html'"><i class="fas fa-cog"></i> Configurações</button>
+                    <button onclick="logout()"><i class="fas fa-sign-out-alt"></i> Sair</button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main">
+        <div class="profile-container">
+            <!-- Seção 1: Informações Básicas do Aventureiro -->
+            <section class="profile-section">
+                <h2><i class="fas fa-user-shield"></i> Informações do Aventureiro</h2>
+                <div class="basic-info">
+                    <div class="avatar-section">
+                        <div class="avatar-container">
+                            <img src="https://via.placeholder.com/150/2d1b69/ffd700?text=A" alt="Avatar" id="avatar-img">
+                            <button class="change-avatar-btn">
+                                <i class="fas fa-camera"></i>
+                            </button>
+                        </div>
+                        <input type="file" id="avatar-input" accept="image/*" style="display: none;">
+                    </div>
+                    <div class="info-fields">
+                        <div class="field-group">
+                            <label>Nome Completo</label>
+                            <input type="text" id="fullname" value="Aventureiro Iniciante" readonly>
+                            <button class="edit-btn" onclick="toggleEdit('fullname')">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                        </div>
+                        <div class="field-group">
+                            <label>Nome de Usuário</label>
+                            <input type="text" id="username" value="@aventureiro123" readonly>
+                            <button class="edit-btn" onclick="toggleEdit('username')">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                        </div>
+                        <div class="field-group">
+                            <label>Biografia do Aventureiro</label>
+                            <textarea id="bio" readonly>Explorador da rica cultura brasileira, em busca de conhecimento e sabedoria ancestral.</textarea>
+                            <button class="edit-btn" onclick="toggleEdit('bio')">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                        </div>
+                        <div class="field-row">
+                            <div class="field-group">
+                                <label>Idade</label>
+                                <input type="number" id="age" value="25" readonly>
+                            </div>
+                            <div class="field-group">
+                                <label>Estado</label>
+                                <select id="state" disabled>
+                                    <option value="RJ">Rio de Janeiro</option>
+                                    <option value="SP">São Paulo</option>
+                                    <option value="MG">Minas Gerais</option>
+                                    <!-- Outros estados -->
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Seção 2: Informações de Contato -->
+            <section class="profile-section">
+                <h2><i class="fas fa-address-book"></i> Contato & Redes Sociais</h2>
+                <div class="contact-info">
+                    <div class="field-group">
+                        <label>E-mail</label>
+                        <input type="email" id="email" value="contato.oliveiradebrito@gmail.com" readonly>
+                        <button class="edit-btn" onclick="toggleEdit('email')">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                    </div>
+                    <div class="social-links">
+                        <div class="field-group">
+                            <label><i class="fab fa-instagram"></i> Instagram</label>
+                            <input type="url" id="instagram" placeholder="https://instagram.com/seu_usuario" readonly>
+                            <button class="edit-btn" onclick="toggleEdit('instagram')">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                        </div>
+                        <div class="field-group">
+                            <label><i class="fab fa-twitter"></i> Twitter/X</label>
+                            <input type="url" id="twitter" placeholder="https://twitter.com/seu_usuario" readonly>
+                            <button class="edit-btn" onclick="toggleEdit('twitter')">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Seção 3: Configurações de Segurança -->
+            <section class="profile-section">
+                <h2><i class="fas fa-shield-alt"></i> Segurança & Privacidade</h2>
+                <div class="security-settings">
+                    <div class="setting-item">
+                        <div class="setting-info">
+                            <h4>Alterar Senha</h4>
+                            <p>Mantenha sua conta segura</p>
+                        </div>
+                        <button class="action-btn" onclick="changePassword()">
+                            <i class="fas fa-key"></i>
+                            Alterar
+                        </button>
+                    </div>
+                    <div class="setting-item">
+                        <div class="setting-info">
+                            <h4>Perfil Público</h4>
+                            <p>Outros aventureiros podem ver seu perfil</p>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="public-profile" checked>
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                    <div class="setting-item">
+                        <div class="setting-info">
+                            <h4>Notificações por E-mail</h4>
+                            <p>Receber atualizações sobre missões</p>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="email-notifications" checked>
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Seção 4: Progresso Cultural -->
+            <section class="profile-section">
+                <h2><i class="fas fa-chart-line"></i> Jornada Cultural</h2>
+                <div class="cultural-progress">
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <i class="fas fa-gem"></i>
+                            <h3>15</h3>
+                            <p>Pontos de Conhecimento</p>
+                        </div>
+                        <div class="stat-card">
+                            <i class="fas fa-scroll"></i>
+                            <h3>8</h3>
+                            <p>Missões Completadas</p>
+                        </div>
+                        <div class="stat-card">
+                            <i class="fas fa-trophy"></i>
+                            <h3>3</h3>
+                            <p>Conquistas Desbloqueadas</p>
+                        </div>
+                        <div class="stat-card">
+                            <i class="fas fa-calendar"></i>
+                            <h3>12</h3>
+                            <p>Dias de Aventura</p>
+                        </div>
+                    </div>
+                    
+                    <div class="knowledge-areas">
+                        <h4>Áreas de Conhecimento</h4>
+                        <div class="knowledge-list">
+                            <div class="knowledge-item">
+                                <i class="fas fa-music"></i>
+                                <span>Música Brasileira</span>
+                                <div class="level-badge">Nível 2</div>
+                            </div>
+                            <div class="knowledge-item">
+                                <i class="fas fa-book"></i>
+                                <span>Literatura</span>
+                                <div class="level-badge">Nível 1</div>
+                            </div>
+                            <div class="knowledge-item">
+                                <i class="fas fa-palette"></i>
+                                <span>Artes Visuais</span>
+                                <div class="level-badge">Nível 1</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="achievements">
+                        <h4>Conquistas Recentes</h4>
+                        <div class="achievement-list">
+                            <div class="achievement-item">
+                                <i class="fas fa-medal"></i>
+                                <div class="achievement-info">
+                                    <h5>Primeiro Passo</h5>
+                                    <p>Completou sua primeira missão cultural</p>
+                                </div>
+                            </div>
+                            <div class="achievement-item">
+                                <i class="fas fa-fire"></i>
+                                <div class="achievement-info">
+                                    <h5>Sequência de 7 Dias</h5>
+                                    <p>Completou missões por 7 dias seguidos</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Seção 5: Histórico de Atividades -->
+            <section class="profile-section">
+                <h2><i class="fas fa-history"></i> Histórico de Aventuras</h2>
+                <div class="activity-history">
+                    <div class="activity-item">
+                        <div class="activity-icon">
+                            <i class="fas fa-scroll"></i>
+                        </div>
+                        <div class="activity-info">
+                            <h4>Missão: Folclore Nordestino</h4>
+                            <p>Completada com 85% de acerto</p>
+                            <span class="activity-date">Há 2 dias</span>
+                        </div>
+                        <div class="activity-reward">
+                            <i class="fas fa-gem"></i>
+                            <span>+1 PC</span>
+                        </div>
+                    </div>
+                    <div class="activity-item">
+                        <div class="activity-icon">
+                            <i class="fas fa-shopping-cart"></i>
+                        </div>
+                        <div class="activity-info">
+                            <h4>Compra: Música Brasileira Nível 2</h4>
+                            <p>Evoluiu conhecimento em música</p>
+                            <span class="activity-date">Há 3 dias</span>
+                        </div>
+                        <div class="activity-cost">
+                            <i class="fas fa-gem"></i>
+                            <span>-1 PC</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <!-- Firebase Scripts -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+    <script src="assets/js/firebase-config.js"></script>
+    <script src="assets/js/auth.js"></script>
+    <script src="assets/js/data-manager.js"></script>
+    
+    <script src="assets/js/rpg-system.js"></script>
+    <script src="assets/js/rpg-profile.js"></script>
+    <script src="assets/js/profile.js"></script>
+    
+    <script>
+    // User menu functions
+    function showUserMenu() {
+        const menu = document.getElementById('user-menu');
+        menu.style.display = menu.style.display === 'none' ? 'block' : 'none';
+    }
+    
+    async function logout() {
+        if (confirm('Deseja realmente sair?')) {
+            await authManager.logout();
+        }
+    }
+    
+    function toggleDarkMode() {
+        document.body.classList.toggle('dark-mode');
+        const themeIcon = document.querySelector('.theme-toggle i');
+        if (document.body.classList.contains('dark-mode')) {
+            themeIcon.className = 'fas fa-sun';
+        } else {
+            themeIcon.className = 'fas fa-moon';
+        }
+    }
+    
+    // Update user info when auth state changes
+    auth.onAuthStateChanged((user) => {
+        if (user) {
+            document.getElementById('user-email').textContent = user.email;
+        }
+    });
+    
+    // Close user menu when clicking outside
+    document.addEventListener('click', (e) => {
+        if (!e.target.closest('.user-avatar') && !e.target.closest('#user-menu')) {
+            document.getElementById('user-menu').style.display = 'none';
+        }
+    });
+    
+    // Carregar dados do usuário quando disponíveis
+    window.addEventListener('userDataLoaded', (event) => {
+        loadUserProfile(event.detail);
+    });
+    
+    // Se os dados já estão carregados
+    if (dataManager.getUserData()) {
+        loadUserProfile(dataManager.getUserData());
+    }
+    
+    function loadUserProfile(userData) {
+        const profile = userData.profile || {};
+        const gameData = userData.gameData || {};
+        const character = gameData.character || {};
+        
+        // Dados básicos
+        document.getElementById('fullname').value = profile.fullName || userData.displayName || '';
+        document.getElementById('username').value = profile.username || '';
+        document.getElementById('bio').value = profile.bio || '';
+        document.getElementById('age').value = profile.age || '';
+        document.getElementById('email').value = userData.email || '';
+        document.getElementById('instagram').value = profile.instagram || '';
+        document.getElementById('twitter').value = profile.twitter || '';
+        
+        // Configurações
+        document.getElementById('public-profile').checked = profile.publicProfile !== false;
+        document.getElementById('email-notifications').checked = profile.emailNotifications !== false;
+        
+        // Estatísticas do jogo
+        updateGameStats(gameData);
+        
+        // Conhecimentos
+        updateKnowledgeAreas(gameData.ownedKnowledge || {});
+        
+        // Histórico
+        updateActivityHistory(gameData.completedQuests || []);
+    }
+    
+    function updateGameStats(gameData) {
+        const stats = gameData.stats || {};
+        
+        // Atualizar cards de estatísticas
+        const statCards = document.querySelectorAll('.stat-card');
+        if (statCards[0]) statCards[0].querySelector('h3').textContent = gameData.coins || 0;
+        if (statCards[1]) statCards[1].querySelector('h3').textContent = stats.questsCompleted || 0;
+        if (statCards[2]) statCards[2].querySelector('h3').textContent = stats.achievementsUnlocked || 0;
+        if (statCards[3]) statCards[3].querySelector('h3').textContent = stats.daysActive || 0;
+    }
+    
+    function updateKnowledgeAreas(ownedKnowledge) {
+        const knowledgeList = document.querySelector('.knowledge-list');
+        if (!knowledgeList) return;
+        
+        knowledgeList.innerHTML = '';
+        
+        Object.entries(ownedKnowledge).forEach(([name, level]) => {
+            const item = document.createElement('div');
+            item.className = 'knowledge-item';
+            item.innerHTML = `
+                <i class="fas fa-book"></i>
+                <span>${name.charAt(0).toUpperCase() + name.slice(1)}</span>
+                <div class="level-badge">Nível ${level}</div>
+            `;
+            knowledgeList.appendChild(item);
+        });
+        
+        if (Object.keys(ownedKnowledge).length === 0) {
+            knowledgeList.innerHTML = '<p style="opacity: 0.7; text-align: center;">Nenhum conhecimento adquirido ainda</p>';
+        }
+    }
+    
+    function updateActivityHistory(completedQuests) {
+        const historyContainer = document.querySelector('.activity-history');
+        if (!historyContainer) return;
+        
+        historyContainer.innerHTML = '';
+        
+        completedQuests.slice(-5).reverse().forEach(quest => {
+            const item = document.createElement('div');
+            item.className = 'activity-item';
+            item.innerHTML = `
+                <div class="activity-icon">
+                    <i class="fas fa-scroll"></i>
+                </div>
+                <div class="activity-info">
+                    <h4>Missão: ${quest.category || 'Cultura Brasileira'}</h4>
+                    <p>Completada com sucesso</p>
+                    <span class="activity-date">${new Date(quest.completedAt).toLocaleDateString('pt-BR')}</span>
+                </div>
+                <div class="activity-reward">
+                    <i class="fas fa-gem"></i>
+                    <span>+${quest.reward || 1} PC</span>
+                </div>
+            `;
+            historyContainer.appendChild(item);
+        });
+        
+        if (completedQuests.length === 0) {
+            historyContainer.innerHTML = '<p style="opacity: 0.7; text-align: center;">Nenhuma atividade registrada ainda</p>';
+        }
+    }
+    
+    // Função para salvar alterações do perfil
+    async function saveProfileChanges() {
+        const profileData = {
+            fullName: document.getElementById('fullname').value,
+            username: document.getElementById('username').value,
+            bio: document.getElementById('bio').value,
+            age: parseInt(document.getElementById('age').value) || null,
+            state: document.getElementById('state').value,
+            instagram: document.getElementById('instagram').value,
+            twitter: document.getElementById('twitter').value,
+            publicProfile: document.getElementById('public-profile').checked,
+            emailNotifications: document.getElementById('email-notifications').checked
+        };
+        
+        try {
+            await dataManager.updateProfile(profileData);
+            alert('Perfil atualizado com sucesso!');
+        } catch (error) {
+            console.error('Erro ao salvar perfil:', error);
+            alert('Erro ao salvar perfil. Tente novamente.');
+        }
+    }
+    
+    // Adicionar botão de salvar (será adicionado via JavaScript)
+    document.addEventListener('DOMContentLoaded', () => {
+        const profileSection = document.querySelector('.profile-section');
+        if (profileSection) {
+            const saveBtn = document.createElement('button');
+            saveBtn.textContent = 'Salvar Alterações';
+            saveBtn.className = 'action-btn';
+            saveBtn.style.marginTop = '1rem';
+            saveBtn.onclick = saveProfileChanges;
+            profileSection.appendChild(saveBtn);
+        }
+    });
+    </script>
+</body>
+</html>
