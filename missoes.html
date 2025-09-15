@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Missões - Cultura RPG</title>
+    <link rel="stylesheet" href="css/common.css">
+    <link rel="stylesheet" href="css/missoes.css">
+</head>
+<body>
+    <header>
+        <nav class="navbar">
+            <div class="nav-container">
+                <h1 class="logo">Cultura RPG</h1>
+                <ul class="nav-menu">
+                    <li><a href="index.html">Início</a></li>
+                    <li><a href="personagens.html">Personagens</a></li>
+                    <li><a href="missoes.html" class="active">Missões</a></li>
+                    <li><a href="mesas.html">Mesas</a></li>
+                    <li><a href="sobre.html">Sobre</a></li>
+                </ul>
+                <div class="hamburger">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <main>
+        <section class="page-header">
+            <div class="container">
+                <h1>📚 Missões Culturais</h1>
+                <p>Guias completos para mestres conduzirem aventuras históricas brasileiras</p>
+            </div>
+        </section>
+
+        <section class="missions">
+            <div class="container">
+                <div id="missions-list" class="missions-grid">
+                    <!-- Missões serão carregadas aqui -->
+                </div>
+            </div>
+        </section>
+
+        <!-- Modal de Detalhes da Missão -->
+        <div id="mission-modal" class="modal">
+            <div class="modal-content mission-modal">
+                <span class="close">&times;</span>
+                <div id="mission-details">
+                    <!-- Detalhes da missão serão carregados aqui -->
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-brand">
+                    <h3>🇧🇷 Cultura RPG</h3>
+                    <p>Valorizando a cultura brasileira através do RPG</p>
+                </div>
+                <div class="footer-links">
+                    <div class="footer-section">
+                        <h4>Jogo</h4>
+                        <a href="personagens.html">Personagens</a>
+                        <a href="mesas.html">Mesas</a>
+                    </div>
+                    <div class="footer-section">
+                        <h4>Sobre</h4>
+                        <a href="sobre.html">Como Jogar</a>
+                        <a href="sobre.html">Regras</a>
+                        <a href="sobre.html">Contato</a>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2024 Cultura RPG. Desenvolvido para promover a valorização cultural brasileira através do RPG.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script type="module" src="js/auth.js"></script>
+    <script src="js/common.js"></script>
+    <script type="module" src="js/missoes.js"></script>
+</body>
+</html>

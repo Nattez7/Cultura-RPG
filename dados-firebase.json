@@ -1,0 +1,193 @@
+{
+  "personagens": {
+    "zumbi": {
+      "name": "Zumbi dos Palmares",
+      "description": "Líder quilombola, símbolo da resistência contra a escravidão.",
+      "stats": {
+        "força": 3,
+        "sabedoria": 1,
+        "carisma": 1
+      },
+      "background": "Nascido livre em Palmares, foi capturado ainda criança e educado por um padre português. Retornou ao quilombo aos 15 anos e se tornou um dos maiores líderes da resistência negra no Brasil colonial.",
+      "talents": [
+        "Liderança de Guerra: +1 dado extra em situações de combate e liderança militar",
+        "Resistência Quilombola: Pode rolar novamente falhas em testes de resistência física"
+      ],
+      "image": "https://via.placeholder.com/200x250/8B4513/FFFFFF?text=Zumbi"
+    },
+    "maria": {
+      "name": "Maria Bonita",
+      "description": "Cangaceira corajosa, companheira de Lampião no sertão nordestino.",
+      "stats": {
+        "força": 2,
+        "sabedoria": 1,
+        "carisma": 2
+      },
+      "background": "Maria Déa, conhecida como Maria Bonita, foi a primeira mulher a integrar um grupo de cangaceiros. Corajosa e determinada, quebrou paradigmas sociais de sua época.",
+      "talents": [
+        "Tiro Certeiro: +1 dado extra em ações com armas de fogo",
+        "Charme Sertanejo: Pode usar Carisma no lugar de Força em situações de intimidação"
+      ],
+      "image": "https://via.placeholder.com/200x250/4B0082/FFFFFF?text=Maria+Bonita"
+    },
+    "chico": {
+      "name": "Chico Mendes",
+      "description": "Seringueiro e ambientalista, defensor da Amazônia.",
+      "stats": {
+        "força": 1,
+        "sabedoria": 2,
+        "carisma": 2
+      },
+      "background": "Francisco Alves Mendes Filho foi um seringueiro, sindicalista e ativista ambiental brasileiro. Lutou pela preservação da Amazônia e pelos direitos dos trabalhadores rurais.",
+      "talents": [
+        "Conhecimento da Floresta: +1 dado extra em ações relacionadas à natureza",
+        "Mobilização Popular: Pode rolar novamente falhas em testes de convencimento para causas ambientais"
+      ],
+      "image": "https://via.placeholder.com/200x250/228B22/FFFFFF?text=Chico+Mendes"
+    },
+    "dandara": {
+      "name": "Dandara",
+      "description": "Guerreira quilombola, estrategista militar de Palmares.",
+      "stats": {
+        "força": 2,
+        "sabedoria": 2,
+        "carisma": 1
+      },
+      "background": "Guerreira negra que lutou contra o sistema escravocrata. Companheira de Zumbi, foi uma das principais líderes militares do Quilombo dos Palmares.",
+      "talents": [
+        "Mestre em Combate: +1 dado extra em lutas corpo a corpo",
+        "Táticas de Guerra: Pode usar Sabedoria no lugar de Força em combates estratégicos"
+      ],
+      "image": "https://via.placeholder.com/200x250/DC143C/FFFFFF?text=Dandara"
+    },
+    "santos": {
+      "name": "Santos Dumont",
+      "description": "Pioneiro da aviação, inventor e visionário brasileiro.",
+      "stats": {
+        "força": 1,
+        "sabedoria": 3,
+        "carisma": 1
+      },
+      "background": "Alberto Santos Dumont foi um inventor, aeronauta e pioneiro da aviação. Conhecido mundialmente por seus experimentos com balões dirigíveis e pelo primeiro voo público de um avião.",
+      "talents": [
+        "Genialidade Inventiva: +1 dado extra ao criar ou consertar máquinas",
+        "Visionário: Pode rolar novamente falhas em testes de inovação tecnológica"
+      ],
+      "image": "https://via.placeholder.com/200x250/4169E1/FFFFFF?text=Santos+Dumont"
+    },
+    "machado": {
+      "name": "Machado de Assis",
+      "description": "Maior escritor brasileiro, mestre da literatura nacional.",
+      "stats": {
+        "força": 1,
+        "sabedoria": 2,
+        "carisma": 2
+      },
+      "background": "Joaquim Maria Machado de Assis foi um escritor brasileiro, considerado o maior nome da literatura nacional. Fundador da Academia Brasileira de Letras.",
+      "talents": [
+        "Mestre das Palavras: +1 dado extra em persuasão através da eloquência",
+        "Análise Humana: Pode usar Sabedoria no lugar de Carisma para entender motivações"
+      ],
+      "image": "https://via.placeholder.com/200x250/8B4513/FFFFFF?text=Machado"
+    },
+    "pixinguinha": {
+      "name": "Pixinguinha",
+      "description": "Compositor e instrumentista, pai do choro brasileiro.",
+      "stats": {
+        "força": 1,
+        "sabedoria": 1,
+        "carisma": 3
+      },
+      "background": "Alfredo da Rocha Viana Filho, conhecido como Pixinguinha, foi um compositor, arranjador e instrumentista brasileiro, considerado um dos maiores gênios da música popular brasileira.",
+      "talents": [
+        "Maestria Musical: +1 dado extra em ações envolvendo música",
+        "Alma do Choro: Pode rolar novamente falhas ao tentar conectar pessoas através da música"
+      ],
+      "image": "https://via.placeholder.com/200x250/FFD700/000000?text=Pixinguinha"
+    },
+    "tarsila": {
+      "name": "Tarsila do Amaral",
+      "description": "Pintora modernista, ícone das artes plásticas brasileiras.",
+      "stats": {
+        "força": 1,
+        "sabedoria": 1,
+        "carisma": 3
+      },
+      "background": "Tarsila de Aguiar do Amaral foi uma pintora e desenhista brasileira e uma das figuras centrais da primeira fase do movimento modernista no Brasil.",
+      "talents": [
+        "Visão Artística: +1 dado extra em ações criativas e artísticas",
+        "Inspiração Modernista: Pode usar Carisma no lugar de Sabedoria para resolver problemas de forma inovadora"
+      ],
+      "image": "https://via.placeholder.com/200x250/FF69B4/FFFFFF?text=Tarsila"
+    },
+    "lampiao": {
+      "name": "Lampião",
+      "description": "Rei do Cangaço, lendário líder do sertão nordestino.",
+      "stats": {
+        "força": 2,
+        "sabedoria": 1,
+        "carisma": 2
+      },
+      "background": "Virgulino Ferreira da Silva, conhecido como Lampião, foi o mais famoso líder cangaceiro do Nordeste brasileiro. Símbolo de resistência e justiça sertaneja.",
+      "talents": [
+        "Rei do Sertão: +1 dado extra em ações no ambiente da caatinga",
+        "Liderança Cangaceira: Pode usar Carisma no lugar de Força para intimidar"
+      ],
+      "image": "https://via.placeholder.com/200x250/8B4513/FFFFFF?text=Lampião"
+    }
+  },
+  "missoes": {
+    "carnaval": {
+      "name": "As Origens do Carnaval",
+      "description": "Explore as raízes culturais do Carnaval brasileiro, descobrindo as influências portuguesas, africanas e indígenas que moldaram esta festa única.",
+      "difficulty": "iniciante",
+      "duration": "2-3 horas",
+      "story": "Você se encontra no Rio de Janeiro do século XVIII. As ruas fervilham com preparativos para uma grande celebração. Diferentes culturas se misturam: portugueses com suas tradições europeias, africanos escravizados trazendo seus ritmos e danças, e indígenas com seus rituais ancestrais. Como seu personagem irá navegar por essa rica mistura cultural?",
+      "objectives": [
+        "Descobrir as origens das tradições carnavalescas",
+        "Mediar conflitos entre diferentes grupos culturais",
+        "Preservar tradições autênticas de cada cultura",
+        "Criar uma celebração verdadeiramente inclusiva"
+      ],
+      "characters": [
+        "Todos os personagens",
+        "Foco em diplomacia e cultura"
+      ]
+    },
+    "quilombo": {
+      "name": "A Resistência de Palmares",
+      "description": "Viva a épica resistência do Quilombo dos Palmares, enfrentando desafios de sobrevivência, organização social e defesa da liberdade.",
+      "difficulty": "intermediario",
+      "duration": "3-4 horas",
+      "story": "O ano é 1694. O Quilombo dos Palmares, maior símbolo de resistência negra no Brasil colonial, enfrenta seus momentos mais desafiadores. Expedições militares se aproximam, mas a comunidade permanece unida. Você deve ajudar a organizar a defesa, manter a moral alta e preservar a liberdade conquistada a tanto custo.",
+      "objectives": [
+        "Organizar a defesa do quilombo contra invasores",
+        "Manter a unidade e moral da comunidade",
+        "Estabelecer rotas de fuga seguras",
+        "Preservar a cultura e tradições quilombolas"
+      ],
+      "characters": [
+        "Zumbi dos Palmares",
+        "Dandara",
+        "Foco em liderança e combate"
+      ]
+    },
+    "amazonia": {
+      "name": "Guardiões da Floresta",
+      "description": "Proteja a Amazônia ao lado de Chico Mendes, enfrentando desafios ambientais e sociais na luta pela preservação.",
+      "difficulty": "avancado",
+      "duration": "4-5 horas",
+      "story": "Acre, década de 1980. A floresta amazônica enfrenta uma pressão sem precedentes. Fazendeiros, madeireiros e especuladores avançam sobre terras tradicionalmente ocupadas por seringueiros e povos indígenas. Você deve unir comunidades, sensibilizar autoridades e encontrar formas sustentáveis de desenvolvimento que preservem a maior floresta tropical do mundo.",
+      "objectives": [
+        "Mobilizar comunidades locais para a preservação",
+        "Negociar com autoridades e empresários",
+        "Documentar crimes ambientais",
+        "Desenvolver alternativas sustentáveis de renda"
+      ],
+      "characters": [
+        "Chico Mendes",
+        "Foco em diplomacia e ecologia"
+      ]
+    }
+  }
+}

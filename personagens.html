@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Personagens - Cultura RPG</title>
+    <link rel="stylesheet" href="css/common.css">
+    <link rel="stylesheet" href="css/personagens.css">
+</head>
+<body>
+    <header>
+        <nav class="navbar">
+            <div class="nav-container">
+                <h1 class="logo">Cultura RPG</h1>
+                <ul class="nav-menu">
+                    <li><a href="index.html">Início</a></li>
+                    <li><a href="personagens.html" class="active">Personagens</a></li>
+
+                    <li><a href="mesas.html">Mesas</a></li>
+                    <li><a href="sobre.html">Sobre</a></li>
+                </ul>
+                <div class="hamburger">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <main>
+        <section class="page-header">
+            <div class="container">
+                <h1>Personagens Históricos</h1>
+                <p>Conheça os heróis da cultura brasileira que você pode interpretar</p>
+            </div>
+        </section>
+
+        <section class="characters">
+            <div class="container">
+                <div class="character-grid" id="character-grid">
+                    <!-- Personagens serão carregados aqui -->
+                </div>
+            </div>
+        </section>
+
+        <div id="character-modal" class="modal">
+            <div class="modal-content">
+                <span class="close">&times;</span>
+                <div id="modal-character-content">
+                    <!-- Conteúdo do personagem será carregado aqui -->
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2024 Cultura RPG. Desenvolvido para promover a valorização cultural brasileira através do RPG.</p>
+        </div>
+    </footer>
+
+    <script type="module" src="js/auth.js"></script>
+    <script src="js/common.js"></script>
+    <script type="module" src="js/personagens.js"></script>
+</body>
+</html>

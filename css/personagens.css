@@ -1,0 +1,294 @@
+/* Characters Section */
+.characters {
+    padding: 80px 0;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+}
+
+.character-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 2.5rem;
+    padding: 0 1rem;
+}
+
+.character-card {
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 20px;
+    padding: 0;
+    text-align: center;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    transition: all 0.4s ease;
+    cursor: pointer;
+    overflow: hidden;
+    position: relative;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.character-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, #ff6b6b, #4ecdc4, #45b7d1, #96ceb4);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.character-card:hover::before {
+    opacity: 1;
+}
+
+.character-card:hover {
+    transform: translateY(-10px) scale(1.02);
+    box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+}
+
+.character-image-container {
+    position: relative;
+    overflow: hidden;
+    border-radius: 20px 20px 0 0;
+}
+
+.character-card img {
+    width: 100%;
+    height: 250px;
+    object-fit: cover;
+    transition: transform 0.4s ease;
+}
+
+.character-card:hover img {
+    transform: scale(1.1);
+}
+
+.character-info {
+    padding: 1.5rem;
+}
+
+.character-card h3 {
+    color: #2c3e50;
+    margin-bottom: 0.8rem;
+    font-size: 1.4rem;
+    font-weight: 700;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.1);
+}
+
+.character-card p {
+    color: #5a6c7d;
+    margin-bottom: 1.2rem;
+    font-size: 0.95rem;
+    line-height: 1.5;
+    font-style: italic;
+}
+
+.stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.5rem;
+    margin-top: 1rem;
+}
+
+.stat-item {
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: white;
+    padding: 0.6rem 0.4rem;
+    border-radius: 12px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-align: center;
+    box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+    transition: transform 0.2s ease;
+}
+
+.stat-item:hover {
+    transform: translateY(-2px);
+}
+
+.stat-item.forca {
+    background: linear-gradient(135deg, #ff6b6b, #ee5a52);
+    box-shadow: 0 2px 8px rgba(255, 107, 107, 0.3);
+}
+
+.stat-item.sabedoria {
+    background: linear-gradient(135deg, #4ecdc4, #44a08d);
+    box-shadow: 0 2px 8px rgba(78, 205, 196, 0.3);
+}
+
+.stat-item.carisma {
+    background: linear-gradient(135deg, #45b7d1, #3498db);
+    box-shadow: 0 2px 8px rgba(69, 183, 209, 0.3);
+}
+
+/* Character Modal */
+.character-details {
+    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    border-radius: 20px;
+    padding: 2rem;
+    max-height: 80vh;
+    overflow-y: auto;
+}
+
+.character-details h2 {
+    color: #2c3e50;
+    margin-bottom: 1.5rem;
+    font-size: 2.2rem;
+    text-align: center;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.character-details img {
+    width: 250px;
+    height: 300px;
+    object-fit: cover;
+    border-radius: 15px;
+    display: block;
+    margin: 0 auto 2rem auto;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+    border: 3px solid rgba(255,255,255,0.8);
+}
+
+.character-details .stats-modal {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+    margin: 1.5rem 0;
+    clear: both;
+}
+
+.character-details .stat-item {
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: white;
+    padding: 1rem;
+    border-radius: 15px;
+    font-size: 1rem;
+    font-weight: 600;
+    text-align: center;
+    box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+    transition: transform 0.2s ease;
+}
+
+.character-details .stat-item:hover {
+    transform: translateY(-3px);
+}
+
+.dice-system {
+    background: rgba(255,255,255,0.8);
+    padding: 1.5rem;
+    border-radius: 15px;
+    margin: 1.5rem 0;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+
+.dice-system h4 {
+    color: #2c3e50;
+    margin-bottom: 1rem;
+    font-size: 1.3rem;
+}
+
+.dice-system ul {
+    list-style: none;
+    padding: 0;
+}
+
+.dice-system li {
+    background: linear-gradient(135deg, #ff6b6b, #ee5a52);
+    color: white;
+    padding: 0.8rem;
+    margin: 0.5rem 0;
+    border-radius: 10px;
+    font-weight: 500;
+}
+
+.background {
+    background: rgba(255,255,255,0.8);
+    padding: 1.5rem;
+    border-radius: 15px;
+    margin: 1.5rem 0;
+    line-height: 1.7;
+    color: #2c3e50;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+
+.background h4 {
+    color: #2c3e50;
+    margin-bottom: 1rem;
+    font-size: 1.3rem;
+}
+
+.talents {
+    background: rgba(255,255,255,0.8);
+    padding: 1.5rem;
+    border-radius: 15px;
+    margin: 1.5rem 0;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+
+.talents h4 {
+    color: #2c3e50;
+    margin-bottom: 1rem;
+    font-size: 1.3rem;
+}
+
+.talents ul {
+    list-style: none;
+    padding: 0;
+}
+
+.talents li {
+    background: linear-gradient(135deg, #4ecdc4, #44a08d);
+    color: white;
+    padding: 1rem;
+    margin: 0.8rem 0;
+    border-radius: 12px;
+    font-weight: 500;
+    line-height: 1.4;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .character-grid {
+        grid-template-columns: 1fr;
+        gap: 2rem;
+    }
+    
+    .character-details {
+        padding: 1.5rem;
+    }
+    
+    .character-details img {
+        float: none;
+        display: block;
+        margin: 0 auto 1.5rem auto;
+        width: 200px;
+        height: 250px;
+    }
+    
+    .character-details .stats-modal {
+        grid-template-columns: 1fr;
+    }
+    
+    .stats {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 480px) {
+    .character-info {
+        padding: 1rem;
+    }
+    
+    .character-details h2 {
+        font-size: 1.8rem;
+    }
+    
+    .character-card h3 {
+        font-size: 1.2rem;
+    }
+}

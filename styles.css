@@ -1,0 +1,691 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Arial', sans-serif;
+    line-height: 1.6;
+    color: #333;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+/* Header */
+.navbar {
+    background: rgba(0, 0, 0, 0.9);
+    position: fixed;
+    top: 0;
+    width: 100%;
+    z-index: 1000;
+    backdrop-filter: blur(10px);
+}
+
+.nav-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: 70px;
+}
+
+.logo {
+    color: #fff;
+    font-size: 1.8rem;
+    font-weight: bold;
+    background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.nav-menu {
+    display: flex;
+    list-style: none;
+    gap: 2rem;
+}
+
+.nav-menu a {
+    color: #fff;
+    text-decoration: none;
+    transition: color 0.3s;
+    font-weight: 500;
+}
+
+.nav-menu a:hover {
+    color: #4ecdc4;
+}
+
+.hamburger {
+    display: none;
+    flex-direction: column;
+    cursor: pointer;
+}
+
+.hamburger span {
+    width: 25px;
+    height: 3px;
+    background: #fff;
+    margin: 3px 0;
+    transition: 0.3s;
+}
+
+/* Hero Section */
+.hero {
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    color: white;
+    background: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)), url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 1000"><defs><radialGradient id="a" cx="50%" cy="50%"><stop offset="0%" stop-color="%23ff6b6b"/><stop offset="100%" stop-color="%234ecdc4"/></radialGradient></defs><rect width="100%" height="100%" fill="url(%23a)"/></svg>');
+    background-size: cover;
+}
+
+.hero-content h2 {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+}
+
+.hero-content p {
+    font-size: 1.2rem;
+    margin-bottom: 2rem;
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.cta-button {
+    background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
+    color: white;
+    border: none;
+    padding: 15px 30px;
+    font-size: 1.1rem;
+    border-radius: 50px;
+    cursor: pointer;
+    transition: transform 0.3s, box-shadow 0.3s;
+    font-weight: bold;
+}
+
+.cta-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+}
+
+/* Characters Section */
+.characters {
+    padding: 80px 0;
+    background: #f8f9fa;
+}
+
+.characters h2 {
+    text-align: center;
+    font-size: 2.5rem;
+    margin-bottom: 3rem;
+    color: #333;
+}
+
+.character-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 2rem;
+}
+
+.character-card {
+    background: white;
+    border-radius: 15px;
+    padding: 1.5rem;
+    text-align: center;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    transition: transform 0.3s, box-shadow 0.3s;
+    cursor: pointer;
+}
+
+.character-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 30px rgba(0,0,0,0.2);
+}
+
+.character-card.selected {
+    border: 3px solid #4ecdc4;
+    transform: translateY(-5px);
+}
+
+.character-card img {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+    border-radius: 10px;
+    margin-bottom: 1rem;
+}
+
+.character-card h3 {
+    color: #333;
+    margin-bottom: 0.5rem;
+    font-size: 1.3rem;
+}
+
+.character-card p {
+    color: #666;
+    margin-bottom: 1rem;
+    font-size: 0.9rem;
+}
+
+.stats {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+}
+
+.stats span {
+    background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
+    color: white;
+    padding: 0.3rem 0.8rem;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: bold;
+}
+
+/* Missions Section */
+.missions {
+    padding: 80px 0;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+}
+
+.missions h2 {
+    text-align: center;
+    font-size: 2.5rem;
+    margin-bottom: 3rem;
+}
+
+.mission-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    gap: 2rem;
+}
+
+.mission-card {
+    background: rgba(255,255,255,0.1);
+    backdrop-filter: blur(10px);
+    border-radius: 15px;
+    padding: 2rem;
+    transition: transform 0.3s, background 0.3s;
+    cursor: pointer;
+    border: 2px solid transparent;
+}
+
+.mission-card:hover {
+    transform: translateY(-5px);
+    background: rgba(255,255,255,0.2);
+}
+
+.mission-card.selected {
+    border-color: #4ecdc4;
+    background: rgba(255,255,255,0.2);
+}
+
+.mission-card h3 {
+    font-size: 1.4rem;
+    margin-bottom: 1rem;
+    color: #fff;
+}
+
+.mission-card p {
+    margin-bottom: 1.5rem;
+    line-height: 1.6;
+}
+
+.mission-info {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.mission-info span {
+    background: rgba(255,255,255,0.2);
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    font-weight: bold;
+}
+
+/* Game Section */
+.game-section {
+    padding: 80px 0;
+    background: #f8f9fa;
+}
+
+.game-section h2 {
+    text-align: center;
+    font-size: 2.5rem;
+    margin-bottom: 3rem;
+    color: #333;
+}
+
+.game-tabs {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 2rem;
+    gap: 1rem;
+}
+
+.tab-btn {
+    background: white;
+    border: 2px solid #4ecdc4;
+    color: #4ecdc4;
+    padding: 12px 24px;
+    border-radius: 25px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: all 0.3s;
+}
+
+.tab-btn.active {
+    background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
+    color: white;
+    border-color: transparent;
+}
+
+.tab-btn:hover {
+    transform: translateY(-2px);
+}
+
+.tab-content {
+    display: none;
+}
+
+.tab-content.active {
+    display: block;
+}
+
+.mesas-header {
+    background: white;
+    border-radius: 15px;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+
+.mesas-header h3 {
+    margin-bottom: 1rem;
+    color: #333;
+    border-bottom: 2px solid #4ecdc4;
+    padding-bottom: 0.5rem;
+}
+
+.filters {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.filters select {
+    padding: 8px 12px;
+    border: 2px solid #ddd;
+    border-radius: 10px;
+    background: white;
+    color: #333;
+    font-weight: 500;
+}
+
+.mesas-list {
+    display: grid;
+    gap: 1.5rem;
+}
+
+.mesa-card {
+    background: white;
+    border-radius: 15px;
+    padding: 1.5rem;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    transition: transform 0.3s;
+}
+
+.mesa-card:hover {
+    transform: translateY(-3px);
+}
+
+.mesa-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 1rem;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.mesa-title {
+    font-size: 1.3rem;
+    font-weight: bold;
+    color: #333;
+    margin: 0;
+}
+
+.mesa-status {
+    padding: 0.3rem 0.8rem;
+    border-radius: 15px;
+    font-size: 0.8rem;
+    font-weight: bold;
+    color: white;
+}
+
+.status-aberta {
+    background: #28a745;
+}
+
+.status-cheia {
+    background: #dc3545;
+}
+
+.status-iniciada {
+    background: #ffc107;
+    color: #333;
+}
+
+.mesa-info {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.info-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: #666;
+    font-size: 0.9rem;
+}
+
+.mesa-description {
+    color: #666;
+    line-height: 1.5;
+    margin-bottom: 1rem;
+}
+
+.mesa-actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.players-count {
+    color: #666;
+    font-weight: bold;
+}
+
+.join-btn {
+    background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 20px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: transform 0.3s;
+}
+
+.join-btn:hover {
+    transform: translateY(-2px);
+}
+
+.join-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.criar-mesa {
+    background: white;
+    border-radius: 15px;
+    padding: 2rem;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.criar-mesa h3 {
+    margin-bottom: 2rem;
+    color: #333;
+    text-align: center;
+    border-bottom: 2px solid #4ecdc4;
+    padding-bottom: 1rem;
+}
+
+.form-group {
+    margin-bottom: 1.5rem;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    color: #333;
+    font-weight: bold;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+    width: 100%;
+    padding: 12px;
+    border: 2px solid #ddd;
+    border-radius: 10px;
+    font-size: 1rem;
+    transition: border-color 0.3s;
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+    outline: none;
+    border-color: #4ecdc4;
+}
+
+.form-group textarea {
+    resize: vertical;
+    min-height: 100px;
+}
+
+.game-button {
+    background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
+    color: white;
+    border: none;
+    padding: 12px 25px;
+    margin: 0 10px;
+    border-radius: 25px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: transform 0.3s;
+    width: 100%;
+}
+
+.game-button:hover:not(:disabled) {
+    transform: translateY(-2px);
+}
+
+.game-button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.minhas-mesas {
+    background: white;
+    border-radius: 15px;
+    padding: 2rem;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+
+.minhas-mesas h3 {
+    margin-bottom: 2rem;
+    color: #333;
+    text-align: center;
+    border-bottom: 2px solid #4ecdc4;
+    padding-bottom: 1rem;
+}
+
+/* About Section */
+.about {
+    padding: 80px 0;
+    background: white;
+}
+
+.about h2 {
+    text-align: center;
+    font-size: 2.5rem;
+    margin-bottom: 3rem;
+    color: #333;
+}
+
+.about-content {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.about-text h3 {
+    color: #333;
+    margin: 2rem 0 1rem 0;
+    font-size: 1.4rem;
+}
+
+.about-text ul {
+    margin-left: 2rem;
+    margin-bottom: 1.5rem;
+}
+
+.about-text li {
+    margin-bottom: 0.5rem;
+    color: #666;
+}
+
+.about-text p {
+    color: #666;
+    line-height: 1.8;
+    margin-bottom: 1.5rem;
+}
+
+/* Footer */
+footer {
+    background: #333;
+    color: white;
+    text-align: center;
+    padding: 2rem 0;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .hamburger {
+        display: flex;
+    }
+    
+    .nav-menu {
+        position: fixed;
+        left: -100%;
+        top: 70px;
+        flex-direction: column;
+        background-color: rgba(0, 0, 0, 0.95);
+        width: 100%;
+        text-align: center;
+        transition: 0.3s;
+        padding: 2rem 0;
+    }
+    
+    .nav-menu.active {
+        left: 0;
+    }
+    
+    .hero-content h2 {
+        font-size: 2rem;
+    }
+    
+    .hero-content p {
+        font-size: 1rem;
+    }
+    
+    .character-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .mission-list {
+        grid-template-columns: 1fr;
+    }
+    
+    .game-tabs {
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .tab-btn {
+        width: 200px;
+    }
+    
+    .filters {
+        flex-direction: column;
+    }
+    
+    .filters select {
+        width: 100%;
+    }
+    
+    .mesa-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    
+    .mesa-info {
+        grid-template-columns: 1fr;
+    }
+    
+    .mesa-actions {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .join-btn {
+        width: 100%;
+    }
+    
+    .mission-info {
+        flex-direction: column;
+        align-items: center;
+    }
+}
+
+@media (max-width: 480px) {
+    .container {
+        padding: 0 15px;
+    }
+    
+    .hero-content h2 {
+        font-size: 1.5rem;
+    }
+    
+    .characters h2, .missions h2, .game-section h2, .about h2 {
+        font-size: 2rem;
+    }
+    
+    .character-card, .mission-card {
+        padding: 1rem;
+    }
+    
+    .game-controls {
+        padding: 1rem;
+    }
+    
+    .game-button {
+        padding: 10px 20px;
+        margin: 5px;
+        font-size: 0.9rem;
+    }
+}

@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Meu Perfil - Cultura RPG</title>
+    <link rel="stylesheet" href="css/common.css">
+    <link rel="stylesheet" href="css/perfil.css">
+</head>
+<body>
+    <header>
+        <nav class="navbar">
+            <div class="nav-container">
+                <h1 class="logo">Cultura RPG</h1>
+                <ul class="nav-menu">
+                    <li><a href="index.html">Início</a></li>
+                    <li><a href="personagens.html">Personagens</a></li>
+
+                    <li><a href="mesas.html">Mesas</a></li>
+                    <li><a href="sobre.html">Sobre</a></li>
+                </ul>
+                <div class="hamburger">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <main>
+        <section class="profile-container">
+            <div class="container">
+                <div class="profile-header">
+                    <h1>⚙️ Meu Perfil</h1>
+                    <p>Gerencie suas informações e veja seu histórico de aventuras</p>
+                </div>
+
+                <div class="profile-tabs">
+                    <button class="tab-btn active" onclick="showProfileTab('dados')">📝 Meus Dados</button>
+                    <button class="tab-btn" onclick="showProfileTab('historico')">📚 Histórico de Mesas</button>
+                </div>
+
+                <!-- Aba Meus Dados -->
+                <div id="dados-tab" class="tab-content active">
+                    <div class="profile-section">
+                        <div class="profile-info">
+                            <div class="profile-avatar">
+                                <img id="user-avatar" src="" alt="Avatar">
+                                <input type="file" id="avatar-upload" accept="image/*" style="display: none;">
+                                <button type="button" class="avatar-edit-btn" onclick="document.getElementById('avatar-upload').click()">
+                                    📷 Alterar Foto
+                                </button>
+                                <div class="avatar-info">
+                                    <h2 id="user-display-name">Carregando...</h2>
+                                    <p id="user-email">email@exemplo.com</p>
+                                </div>
+                            </div>
+                            
+                            <form id="profile-form" class="profile-form">
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label>Nick no site:</label>
+                                        <input type="text" id="edit-nick" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Data de nascimento:</label>
+                                        <input type="date" id="edit-birthdate" required>
+                                    </div>
+                                </div>
+                                
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label>Experiência com RPG:</label>
+                                        <select id="edit-experience" required>
+                                            <option value="iniciante">Iniciante</option>
+                                            <option value="basico">Básico</option>
+                                            <option value="intermediario">Intermediário</option>
+                                            <option value="avancado">Avançado</option>
+                                            <option value="mestre">Mestre</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Como conheceu o site:</label>
+                                        <select id="edit-source">
+                                            <option value="google">Google</option>
+                                            <option value="amigos">Amigos</option>
+                                            <option value="redes-sociais">Redes sociais</option>
+                                            <option value="escola">Escola/Universidade</option>
+                                            <option value="outros">Outros</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label>Interesses culturais:</label>
+                                    <textarea id="edit-interests" placeholder="Conte sobre seus interesses na cultura brasileira..."></textarea>
+                                </div>
+                                
+                                <button type="submit" class="btn-save">💾 Salvar Alterações</button>
+                            </form>
+                        </div>
+                        
+                        <div class="profile-stats">
+                            <div class="stat-card">
+                                <div class="stat-icon">🎲</div>
+                                <div class="stat-info">
+                                    <span class="stat-number" id="mesas-criadas">0</span>
+                                    <span class="stat-label">Mesas Criadas</span>
+                                </div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-icon">👥</div>
+                                <div class="stat-info">
+                                    <span class="stat-number" id="mesas-participadas">0</span>
+                                    <span class="stat-label">Mesas Participadas</span>
+                                </div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-icon">🎭</div>
+                                <div class="stat-info">
+                                    <span class="stat-number" id="personagens-jogados">0</span>
+                                    <span class="stat-label">Personagens Jogados</span>
+                                </div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-icon">📅</div>
+                                <div class="stat-info">
+                                    <span class="stat-number" id="dias-cadastrado">0</span>
+                                    <span class="stat-label">Dias no Site</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Aba Histórico -->
+                <div id="historico-tab" class="tab-content">
+                    <div class="history-section">
+                        <h3>📚 Histórico de Mesas</h3>
+                        <div id="history-list" class="history-list">
+                            <!-- Histórico será carregado aqui -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-brand">
+                    <h3>🇧🇷 Cultura RPG</h3>
+                    <p>Valorizando a cultura brasileira através do RPG</p>
+                </div>
+                <div class="footer-links">
+                    <div class="footer-section">
+                        <h4>Jogo</h4>
+                        <a href="personagens.html">Personagens</a>
+
+                        <a href="mesas.html">Mesas</a>
+                    </div>
+                    <div class="footer-section">
+                        <h4>Sobre</h4>
+                        <a href="sobre.html">Como Jogar</a>
+                        <a href="sobre.html">Regras</a>
+                        <a href="sobre.html">Contato</a>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2024 Cultura RPG. Desenvolvido para promover a valorização cultural brasileira através do RPG.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script type="module" src="js/auth.js"></script>
+    <script src="js/common.js"></script>
+    <script type="module" src="js/perfil.js"></script>
+</body>
+</html>

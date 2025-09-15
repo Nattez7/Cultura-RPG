@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Cultura RPG</title>
+    <link rel="stylesheet" href="css/common.css">
+    <link rel="stylesheet" href="css/login.css">
+</head>
+<body>
+    <div class="login-container">
+        <div class="login-card">
+            <div class="login-header">
+                <h1 class="logo">🇧🇷 Cultura RPG</h1>
+                <h2>Entre na sua conta</h2>
+                <p>Acesse sua conta para continuar sua jornada cultural</p>
+            </div>
+            
+            <div class="login-content">
+                <!-- Login com Google -->
+                <button id="google-login-btn" class="google-login-btn">
+                    <svg class="google-icon" viewBox="0 0 24 24">
+                        <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                        <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                        <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+                        <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+                    </svg>
+                    Entrar com Google
+                </button>
+                
+                <div class="login-divider">
+                    <span>ou</span>
+                </div>
+                
+                <!-- Login com Email e Senha -->
+                <form id="email-login-form" class="email-login-form">
+                    <div class="form-group">
+                        <label>Email:</label>
+                        <input type="email" id="login-email" required placeholder="seu@email.com">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Senha:</label>
+                        <input type="password" id="login-password" required placeholder="Sua senha">
+                    </div>
+                    
+                    <button type="submit" class="email-login-btn">
+                        🔑 Entrar
+                    </button>
+                    
+                    <div class="register-link">
+                        <p>Não tem conta? <a href="#" onclick="showRegisterForm()">Criar conta</a></p>
+                    </div>
+                </form>
+                
+                <!-- Formulário de Registro -->
+                <form id="register-form" class="register-form" style="display: none;">
+                    <h3>Criar Nova Conta</h3>
+                    
+                    <div class="form-group">
+                        <label>Nick:</label>
+                        <input type="text" id="register-nick" required placeholder="Como você quer ser chamado?">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Email:</label>
+                        <input type="email" id="register-email" required placeholder="seu@email.com">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Senha:</label>
+                        <input type="password" id="register-password" required placeholder="Mínimo 6 caracteres">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Confirmar Senha:</label>
+                        <input type="password" id="register-confirm-password" required placeholder="Confirme sua senha">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Data de nascimento:</label>
+                        <input type="date" id="register-birthdate" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Experiência com RPG:</label>
+                        <select id="register-experience" required>
+                            <option value="">Selecione sua experiência</option>
+                            <option value="iniciante">Iniciante - Nunca joguei RPG</option>
+                            <option value="basico">Básico - Já joguei algumas vezes</option>
+                            <option value="intermediario">Intermediário - Jogo regularmente</option>
+                            <option value="avancado">Avançado - Sou experiente</option>
+                            <option value="mestre">Mestre - Já mestrei jogos</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Como conheceu o Cultura RPG?</label>
+                        <select id="register-source">
+                            <option value="">Selecione uma opção</option>
+                            <option value="google">Pesquisa no Google</option>
+                            <option value="amigos">Indicação de amigos</option>
+                            <option value="redes-sociais">Redes sociais</option>
+                            <option value="escola">Escola/Universidade</option>
+                            <option value="outros">Outros</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Interesses culturais (opcional):</label>
+                        <textarea id="register-interests" placeholder="Conte-nos sobre seus interesses na cultura brasileira..."></textarea>
+                    </div>
+                    
+                    <button type="submit" class="register-btn">
+                        🎆 Criar Conta
+                    </button>
+                    
+                    <div class="login-link">
+                        <p>Já tem conta? <a href="#" onclick="showLoginForm()">Fazer login</a></p>
+                    </div>
+                </form>
+            </div>
+            
+
+        </div>
+        
+        <div class="login-background">
+            <div class="floating-element" style="top: 10%; left: 10%;">🎭</div>
+            <div class="floating-element" style="top: 20%; right: 15%;">🏰</div>
+            <div class="floating-element" style="bottom: 30%; left: 20%;">🎲</div>
+            <div class="floating-element" style="bottom: 15%; right: 10%;">📚</div>
+            <div class="floating-element" style="top: 50%; left: 5%;">🎨</div>
+            <div class="floating-element" style="top: 70%; right: 5%;">🎵</div>
+        </div>
+        
+        <!-- Modal de Completar Perfil -->
+        <div id="complete-profile-modal" class="modal" style="display: none;">
+            <div class="modal-content profile-modal">
+                <div class="profile-header">
+                    <h2>🎉 Bem-vindo ao Cultura RPG!</h2>
+                    <p>Complete seu perfil para começar sua jornada cultural</p>
+                </div>
+                
+                <form id="complete-profile-form" class="profile-form">
+                    <div class="form-group">
+                        <label>Nick no site:</label>
+                        <input type="text" id="user-nick" required placeholder="Como você quer ser chamado?">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Data de nascimento:</label>
+                        <input type="date" id="user-birthdate" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Experiência com RPG:</label>
+                        <select id="user-experience" required>
+                            <option value="">Selecione sua experiência</option>
+                            <option value="iniciante">Iniciante - Nunca joguei RPG</option>
+                            <option value="basico">Básico - Já joguei algumas vezes</option>
+                            <option value="intermediario">Intermediário - Jogo regularmente</option>
+                            <option value="avancado">Avançado - Sou experiente</option>
+                            <option value="mestre">Mestre - Já mestrei jogos</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Como conheceu o Cultura RPG?</label>
+                        <select id="user-source">
+                            <option value="">Selecione uma opção</option>
+                            <option value="google">Pesquisa no Google</option>
+                            <option value="amigos">Indicação de amigos</option>
+                            <option value="redes-sociais">Redes sociais</option>
+                            <option value="escola">Escola/Universidade</option>
+                            <option value="outros">Outros</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Interesses culturais (opcional):</label>
+                        <textarea id="user-interests" placeholder="Conte-nos sobre seus interesses na cultura brasileira..."></textarea>
+                    </div>
+                    
+                    <button type="submit" class="btn-complete-profile">
+                        🚀 Finalizar Cadastro
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script type="module" src="js/google-auth.js"></script>
+</body>
+</html>

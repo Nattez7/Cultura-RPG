@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mesa Virtual - Cultura RPG</title>
+    <link rel="stylesheet" href="css/common.css">
+    <link rel="stylesheet" href="css/mesa.css">
+</head>
+<body>
+    <div class="virtual-table">
+        <!-- Header da Mesa -->
+        <div class="table-header">
+            <div class="table-info">
+                <h1 id="mesa-title">Mesa Virtual</h1>
+                <span id="mesa-code">Código: ---</span>
+            </div>
+            <div class="table-controls">
+                <button id="dice-roller-btn" class="control-btn">🎲 Dados</button>
+                <button id="map-btn" class="control-btn">🗺️ Mapa</button>
+                <button id="tokens-btn" class="control-btn">🔴 Tokens</button>
+                <button id="settings-btn" class="control-btn">⚙️ Config</button>
+            </div>
+        </div>
+
+        <!-- Área Principal -->
+        <div class="table-main">
+            <!-- Painel Lateral Esquerdo -->
+            <div class="left-panel">
+                <!-- Ficha do Personagem -->
+                <div class="character-sheet">
+                    <h3>🎭 Meu Personagem</h3>
+                    <div id="character-info">
+                        <select id="character-select">
+                            <option value="">Selecionar Personagem</option>
+                        </select>
+                        <div id="character-details" style="display: none;">
+                            <div class="character-avatar">
+                                <img id="char-image" src="" alt="Personagem">
+                                <h4 id="char-name"></h4>
+                            </div>
+                            <div class="character-stats">
+                                <div class="stat">
+                                    <span class="stat-label">💪 Força:</span>
+                                    <span id="char-forca" class="stat-value">0</span>
+                                </div>
+                                <div class="stat">
+                                    <span class="stat-label">🧠 Sabedoria:</span>
+                                    <span id="char-sabedoria" class="stat-value">0</span>
+                                </div>
+                                <div class="stat">
+                                    <span class="stat-label">✨ Carisma:</span>
+                                    <span id="char-carisma" class="stat-value">0</span>
+                                </div>
+                            </div>
+                            <div class="character-talents">
+                                <h5>Talentos:</h5>
+                                <div id="char-talents"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Jogadores Online -->
+                <div class="players-list">
+                    <h3>👥 Jogadores</h3>
+                    <div id="online-players">
+                        <!-- Lista de jogadores -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Área Central do Jogo -->
+            <div class="game-area">
+                <!-- Mapa/Grid -->
+                <div class="map-container">
+                    <div id="game-map" class="game-map">
+                        <canvas id="map-canvas" width="800" height="600"></canvas>
+                        <div id="tokens-layer" class="tokens-layer"></div>
+                    </div>
+                </div>
+
+                <!-- Controles do Mapa -->
+                <div class="map-controls">
+                    <div class="tool-group">
+                        <button class="tool-btn active" data-tool="token" onclick="setTool('token')">🔴 Token</button>
+                        <button class="tool-btn" data-tool="measure" onclick="setTool('measure')">📏 Medir</button>
+                        <button class="tool-btn" data-tool="pan" onclick="setTool('pan')">✋ Pan</button>
+                    </div>
+                    
+                    <div class="control-group">
+                        <button onclick="toggleGrid()">⬜ Grid</button>
+                        <button data-action="snap" class="active" onclick="toggleSnapToGrid()">🧢 Snap</button>
+                        <button onclick="resetView()">🏠 Reset</button>
+                    </div>
+                    
+                    <div class="grid-controls">
+                        <button onclick="adjustGridSize(-5)">Grid -</button>
+                        <button onclick="adjustGridSize(5)">Grid +</button>
+                    </div>
+                    
+                    <div class="file-controls">
+                        <input type="file" id="map-upload" accept="image/*" style="display: none;">
+                        <button onclick="document.getElementById('map-upload').click()">🖼️ Upload</button>
+                        <button onclick="clearMap()">🗑️ Limpar</button>
+                        <button onclick="clearTokens()">🗑️ Tokens</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Painel Lateral Direito -->
+            <div class="right-panel">
+                <!-- Rolador de Dados -->
+                <div class="dice-section">
+                    <h3>🎲 Dados</h3>
+                    <div class="dice-controls">
+                        <select id="dice-type">
+                            <option value="6">d6</option>
+                            <option value="20">d20</option>
+                            <option value="100">d100</option>
+                        </select>
+                        <input type="number" id="dice-count" value="1" min="1" max="10">
+                        <button onclick="rollDice()">🎲 Rolar</button>
+                    </div>
+                    <div id="dice-results" class="dice-results"></div>
+                </div>
+
+                <!-- Tokens -->
+                <div class="tokens-section">
+                    <h3>🔴 Tokens</h3>
+                    <div class="token-palette">
+                        <div class="token red" onclick="selectToken('red')"></div>
+                        <div class="token blue" onclick="selectToken('blue')"></div>
+                        <div class="token green" onclick="selectToken('green')"></div>
+                        <div class="token yellow" onclick="selectToken('yellow')"></div>
+                        <div class="token purple" onclick="selectToken('purple')"></div>
+                        <div class="token black" onclick="selectToken('black')"></div>
+                    </div>
+                    <button onclick="clearTokens()">🗑️ Limpar Tokens</button>
+                </div>
+
+                <!-- Notas -->
+                <div class="notes-section">
+                    <h3>📝 Notas</h3>
+                    <textarea id="game-notes" placeholder="Anotações da sessão..."></textarea>
+                    <button onclick="saveNotes()">💾 Salvar</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Chat -->
+        <div class="chat-area">
+            <div class="chat-messages" id="chat-messages">
+                <!-- Mensagens do chat -->
+            </div>
+            <div class="chat-input">
+                <input type="text" id="message-input" placeholder="Digite sua mensagem..." onkeypress="handleChatKeyPress(event)">
+                <button onclick="sendMessage()">💬 Enviar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modais -->
+    <div id="dice-modal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeDiceModal()">&times;</span>
+            <h2>🎲 Rolador de Dados</h2>
+            <div class="dice-roller">
+                <div class="dice-options">
+                    <button onclick="quickRoll('forca')">Força (d6)</button>
+                    <button onclick="quickRoll('sabedoria')">Sabedoria (d6)</button>
+                    <button onclick="quickRoll('carisma')">Carisma (d6)</button>
+                </div>
+                <div class="custom-roll">
+                    <input type="number" id="custom-dice" value="1" min="1" max="20">
+                    <span>d</span>
+                    <select id="custom-sides">
+                        <option value="6">6</option>
+                        <option value="20">20</option>
+                        <option value="100">100</option>
+                    </select>
+                    <button onclick="customRoll()">🎲 Rolar</button>
+                </div>
+            </div>
+            <div id="modal-dice-results"></div>
+        </div>
+    </div>
+
+    <script type="module" src="js/mesa-page.js"></script>
+</body>
+</html>

@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mesas de RPG - Cultura RPG</title>
+    <link rel="stylesheet" href="css/common.css">
+    <link rel="stylesheet" href="css/mesas.css">
+</head>
+<body>
+    <header>
+        <nav class="navbar">
+            <div class="nav-container">
+                <h1 class="logo">Cultura RPG</h1>
+                <ul class="nav-menu">
+                    <li><a href="index.html">Início</a></li>
+                    <li><a href="personagens.html">Personagens</a></li>
+
+                    <li><a href="mesas.html" class="active">Mesas</a></li>
+                    <li><a href="sobre.html">Sobre</a></li>
+                </ul>
+                <div class="hamburger">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <main>
+        <section class="page-header">
+            <div class="container">
+                <h1>Mesas de RPG</h1>
+                <p>Encontre ou crie mesas para jogar Cultura RPG</p>
+            </div>
+        </section>
+
+        <section class="game-section">
+            <div class="container">
+                <div class="game-tabs">
+                    <button class="tab-btn active" onclick="showTab('mesas')">Mesas Disponíveis</button>
+                    <button class="tab-btn" onclick="showTab('criar')">Criar Mesa</button>
+                    <button class="tab-btn" onclick="showTab('minhas')">Minhas Mesas</button>
+                </div>
+
+                <div id="mesas-tab" class="tab-content active">
+                    <div class="mesas-header">
+                        <h3>Mesas Abertas para Inscrição</h3>
+                        <div class="filters">
+                            <select id="filter-difficulty">
+                                <option value="">Todas as Dificuldades</option>
+                                <option value="iniciante">Iniciante</option>
+                                <option value="intermediario">Intermediário</option>
+                                <option value="avancado">Avançado</option>
+                            </select>
+                            <select id="filter-mission">
+                                <option value="">Todas as Missões</option>
+                                <option value="carnaval">Origens do Carnaval</option>
+                                <option value="quilombo">Resistência de Palmares</option>
+                                <option value="amazonia">Guardiões da Floresta</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div id="mesas-list" class="mesas-list">
+                        <!-- Mesas serão carregadas aqui -->
+                    </div>
+                </div>
+
+                <div id="criar-tab" class="tab-content">
+                    <div class="criar-mesa">
+                        <h3>Criar Nova Mesa</h3>
+                        <form id="criar-mesa-form">
+                            <div class="form-group">
+                                <label>Nome da Mesa:</label>
+                                <input type="text" id="mesa-nome" required placeholder="Ex: Aventura no Quilombo dos Palmares">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label>Missão:</label>
+                                <select id="mesa-missao" required onchange="toggleCustomMission()">
+                                    <option value="">Selecione uma missão</option>
+                                    <option value="carnaval">As Origens do Carnaval</option>
+                                    <option value="quilombo">A Resistência de Palmares</option>
+                                    <option value="amazonia">Guardiões da Floresta</option>
+                                    <option value="custom">🎨 Criar Missão Personalizada</option>
+                                </select>
+                            </div>
+                            
+                            <div id="custom-mission-fields" class="custom-mission-fields" style="display: none;">
+                                <div class="form-group">
+                                    <label>Nome da Missão:</label>
+                                    <input type="text" id="custom-mission-name" placeholder="Ex: A Revolução da Independência">
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label>Descrição da Missão:</label>
+                                    <textarea id="custom-mission-description" placeholder="Descreva a aventura, contexto histórico, objetivos..."></textarea>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label>Dificuldade:</label>
+                                    <select id="custom-mission-difficulty">
+                                        <option value="iniciante">Iniciante</option>
+                                        <option value="intermediario">Intermediário</option>
+                                        <option value="avancado">Avançado</option>
+                                    </select>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label>Duração Estimada:</label>
+                                    <select id="custom-mission-duration">
+                                        <option value="1-2 horas">1-2 horas</option>
+                                        <option value="2-3 horas">2-3 horas</option>
+                                        <option value="3-4 horas">3-4 horas</option>
+                                        <option value="4-5 horas">4-5 horas</option>
+                                        <option value="5+ horas">5+ horas</option>
+                                    </select>
+                                </div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label>Máximo de Jogadores:</label>
+                                <select id="mesa-max-players" required>
+                                    <option value="3">3 jogadores</option>
+                                    <option value="4" selected>4 jogadores</option>
+                                    <option value="5">5 jogadores</option>
+                                    <option value="6">6 jogadores</option>
+                                </select>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label>Data e Hora:</label>
+                                <input type="datetime-local" id="mesa-data" required>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label>Descrição:</label>
+                                <textarea id="mesa-descricao" placeholder="Descreva sua mesa, estilo de jogo, experiência necessária..."></textarea>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label>Seu Nome (Mestre):</label>
+                                <input type="text" id="mestre-nome" required placeholder="Seu nome como mestre">
+                            </div>
+                            
+                            <button type="submit" class="game-button">Criar Mesa</button>
+                        </form>
+                    </div>
+                </div>
+
+                <div id="minhas-tab" class="tab-content">
+                    <div class="minhas-mesas">
+                        <h3>Minhas Inscrições e Mesas</h3>
+                        <div id="minhas-mesas-list">
+                            <!-- Mesas do usuário serão carregadas aqui -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Modal de Link de Convite -->
+        <div id="invite-modal" class="modal">
+            <div class="modal-content">
+                <span class="close">&times;</span>
+                <div class="invite-content">
+                    <h2>🎉 Mesa Criada com Sucesso!</h2>
+                    <p>Compartilhe este link com os jogadores:</p>
+                    <div class="invite-link-container">
+                        <input type="text" id="invite-link" readonly>
+                        <button id="copy-invite-btn" class="copy-btn">📋 Copiar</button>
+                    </div>
+                    <div class="invite-code">
+                        <p><strong>Código da Mesa:</strong> <span id="mesa-codigo"></span></p>
+                    </div>
+                    <button class="btn-primary" onclick="closeInviteModal()">Entendi</button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Modal de Gerenciamento -->
+        <div id="manage-modal" class="modal">
+            <div class="modal-content manage-modal">
+                <span class="close">&times;</span>
+                <div class="manage-content">
+                    <h2>🛠️ Gerenciar Mesa</h2>
+                    <div class="manage-sections">
+                        <div class="manage-section">
+                            <h3>🎲 Mesa</h3>
+                            <div class="manage-buttons">
+                                <button class="manage-btn edit-btn" onclick="editMesa()">
+                                    ✏️ Editar Mesa
+                                </button>
+                                <button class="manage-btn delete-btn" onclick="deleteMesa()">
+                                    🗑️ Excluir Mesa
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="manage-section">
+                            <h3>👥 Gerenciar Jogadores</h3>
+                            <div class="players-management">
+                                <div id="current-players" class="current-players">
+                                    <!-- Jogadores atuais serão carregados aqui -->
+                                </div>
+                                <div class="manage-buttons">
+                                    <button class="manage-btn add-btn" onclick="addPlayer()">
+                                        ➕ Adicionar Jogador
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <button class="btn-secondary" onclick="closeManageModal()">Fechar</button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Modal de Editar Mesa -->
+        <div id="edit-mesa-modal" class="modal">
+            <div class="modal-content">
+                <span class="close">&times;</span>
+                <div class="edit-mesa-content">
+                    <h2>✏️ Editar Mesa</h2>
+                    <form id="edit-mesa-form">
+                        <div class="form-group">
+                            <label>Nome da Mesa:</label>
+                            <input type="text" id="edit-mesa-nome" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>Missão:</label>
+                            <select id="edit-mesa-missao" required onchange="toggleEditCustomMission()">
+                                <option value="carnaval">As Origens do Carnaval</option>
+                                <option value="quilombo">A Resistência de Palmares</option>
+                                <option value="amazonia">Guardiões da Floresta</option>
+                                <option value="custom">🎨 Missão Personalizada</option>
+                            </select>
+                        </div>
+                        
+                        <div id="edit-custom-mission-fields" class="custom-mission-fields" style="display: none;">
+                            <div class="form-group">
+                                <label>Nome da Missão:</label>
+                                <input type="text" id="edit-custom-mission-name">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label>Descrição da Missão:</label>
+                                <textarea id="edit-custom-mission-description"></textarea>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label>Dificuldade:</label>
+                                <select id="edit-custom-mission-difficulty">
+                                    <option value="iniciante">Iniciante</option>
+                                    <option value="intermediario">Intermediário</option>
+                                    <option value="avancado">Avançado</option>
+                                </select>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label>Duração Estimada:</label>
+                                <select id="edit-custom-mission-duration">
+                                    <option value="1-2 horas">1-2 horas</option>
+                                    <option value="2-3 horas">2-3 horas</option>
+                                    <option value="3-4 horas">3-4 horas</option>
+                                    <option value="4-5 horas">4-5 horas</option>
+                                    <option value="5+ horas">5+ horas</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>Máximo de Jogadores:</label>
+                            <select id="edit-mesa-max-players" required>
+                                <option value="3">3 jogadores</option>
+                                <option value="4">4 jogadores</option>
+                                <option value="5">5 jogadores</option>
+                                <option value="6">6 jogadores</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>Data e Hora:</label>
+                            <input type="datetime-local" id="edit-mesa-data" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>Descrição:</label>
+                            <textarea id="edit-mesa-descricao"></textarea>
+                        </div>
+                        
+                        <div class="form-buttons">
+                            <button type="submit" class="btn-primary">Salvar Alterações</button>
+                            <button type="button" class="btn-secondary" onclick="closeEditModal()">Cancelar</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Modal de Candidatos -->
+        <div id="candidates-modal" class="modal">
+            <div class="modal-content candidates-modal">
+                <span class="close">&times;</span>
+                <div class="candidates-content">
+                    <h2>👥 Candidatos à Mesa</h2>
+                    <div id="candidates-list" class="candidates-list">
+                        <!-- Candidatos serão carregados aqui -->
+                    </div>
+                    <button class="btn-secondary" onclick="closeCandidatesModal()">Fechar</button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2024 Cultura RPG. Desenvolvido para promover a valorização cultural brasileira através do RPG.</p>
+        </div>
+    </footer>
+
+    <script type="module" src="js/auth.js"></script>
+    <script src="js/common.js"></script>
+    <script type="module" src="js/mesas.js"></script>
+</body>
+</html>
