@@ -32,13 +32,13 @@
         <section class="profile-container">
             <div class="container">
                 <div class="profile-header">
-                    <h1>⚙️ Meu Perfil</h1>
+                    <h1>Meu Perfil</h1>
                     <p>Gerencie suas informações e veja seu histórico de aventuras</p>
                 </div>
 
                 <div class="profile-tabs">
-                    <button class="tab-btn active" onclick="showProfileTab('dados')">📝 Meus Dados</button>
-                    <button class="tab-btn" onclick="showProfileTab('historico')">📚 Histórico de Mesas</button>
+                    <button class="tab-btn active" onclick="mostrarAbaPeril('dados')">Meus Dados</button>
+                    <button class="tab-btn" onclick="mostrarAbaPeril('historico')">Histórico de Mesas</button>
                 </div>
 
                 <!-- Aba Meus Dados -->
@@ -49,7 +49,7 @@
                                 <img id="user-avatar" src="" alt="Avatar">
                                 <input type="file" id="avatar-upload" accept="image/*" style="display: none;">
                                 <button type="button" class="avatar-edit-btn" onclick="document.getElementById('avatar-upload').click()">
-                                    📷 Alterar Foto
+                                    Alterar Foto
                                 </button>
                                 <div class="avatar-info">
                                     <h2 id="user-display-name">Carregando...</h2>
@@ -97,7 +97,7 @@
                                     <textarea id="edit-interests" placeholder="Conte sobre seus interesses na cultura brasileira..."></textarea>
                                 </div>
                                 
-                                <button type="submit" class="btn-save">💾 Salvar Alterações</button>
+                                <button type="submit" class="btn-save">Salvar Alterações</button>
                             </form>
                         </div>
                         
@@ -137,7 +137,7 @@
                 <!-- Aba Histórico -->
                 <div id="historico-tab" class="tab-content">
                     <div class="history-section">
-                        <h3>📚 Histórico de Mesas</h3>
+                        <h3>Histórico de Mesas</h3>
                         <div id="history-list" class="history-list">
                             <!-- Histórico será carregado aqui -->
                         </div>

@@ -10,14 +10,14 @@ import {
     getDocs 
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-let currentUser = null;
-let userData = null;
+let usuarioAtual = null;
+let dadosUsuario = null;
 
 // Verificar autenticação
-onAuthStateChanged(auth, (user) => {
-    if (user) {
-        currentUser = user;
-        loadUserProfile();
+onAuthStateChanged(auth, (usuario) => {
+    if (usuario) {
+        usuarioAtual = usuario;
+        carregarPerfilUsuario();
     } else {
         window.location.href = 'login.html';
     }
@@ -25,136 +25,136 @@ onAuthStateChanged(auth, (user) => {
 
 // Inicialização
 document.addEventListener('DOMContentLoaded', function() {
-    const profileForm = document.getElementById('profile-form');
-    if (profileForm) {
-        profileForm.addEventListener('submit', saveProfile);
+    const formularioPerfil = document.getElementById('profile-form');
+    if (formularioPerfil) {
+        formularioPerfil.addEventListener('submit', salvarPerfil);
     }
     
-    const avatarUpload = document.getElementById('avatar-upload');
-    if (avatarUpload) {
-        avatarUpload.addEventListener('change', handleAvatarUpload);
+    const uploadAvatar = document.getElementById('avatar-upload');
+    if (uploadAvatar) {
+        uploadAvatar.addEventListener('change', manipularUploadAvatar);
     }
 });
 
 // Carregar perfil do usuário
-async function loadUserProfile() {
+async function carregarPerfilUsuario() {
     try {
-        const userRef = doc(db, 'users', currentUser.uid);
-        const userDoc = await getDoc(userRef);
+        const refUsuario = doc(db, 'users', usuarioAtual.uid);
+        const docUsuario = await getDoc(refUsuario);
         
-        if (userDoc.exists()) {
-            userData = userDoc.data();
-            displayUserProfile();
-            loadUserHistory();
+        if (docUsuario.exists()) {
+            dadosUsuario = docUsuario.data();
+            exibirPerfilUsuario();
+            carregarHistoricoUsuario();
         } else {
             console.error('Dados do usuário não encontrados');
         }
-    } catch (error) {
-        console.error('Erro ao carregar perfil:', error);
+    } catch (erro) {
+        console.error('Erro ao carregar perfil:', erro);
     }
 }
 
 // Exibir dados do perfil
-function displayUserProfile() {
+function exibirPerfilUsuario() {
     // Avatar e informações básicas
-    document.getElementById('user-avatar').src = userData.photoURL || '';
-    document.getElementById('user-display-name').textContent = userData.name || 'Usuário';
-    document.getElementById('user-email').textContent = userData.email || '';
+    document.getElementById('user-avatar').src = dadosUsuario.photoURL || '';
+    document.getElementById('user-display-name').textContent = dadosUsuario.name || 'Usuário';
+    document.getElementById('user-email').textContent = dadosUsuario.email || '';
     
     // Formulário
-    document.getElementById('edit-nick').value = userData.nick || '';
-    document.getElementById('edit-birthdate').value = userData.birthdate || '';
-    document.getElementById('edit-experience').value = userData.experience || 'iniciante';
-    document.getElementById('edit-source').value = userData.source || '';
-    document.getElementById('edit-interests').value = userData.interests || '';
+    document.getElementById('edit-nick').value = dadosUsuario.nick || '';
+    document.getElementById('edit-birthdate').value = dadosUsuario.birthdate || '';
+    document.getElementById('edit-experience').value = dadosUsuario.experience || 'iniciante';
+    document.getElementById('edit-source').value = dadosUsuario.source || '';
+    document.getElementById('edit-interests').value = dadosUsuario.interests || '';
     
     // Estatísticas
-    document.getElementById('mesas-criadas').textContent = userData.mesasCriadas || 0;
-    document.getElementById('mesas-participadas').textContent = userData.mesasParticipadas || 0;
+    document.getElementById('mesas-criadas').textContent = dadosUsuario.mesasCriadas || 0;
+    document.getElementById('mesas-participadas').textContent = dadosUsuario.mesasParticipadas || 0;
     
     // Calcular dias no site
-    if (userData.createdAt) {
-        const createdDate = new Date(userData.createdAt);
-        const today = new Date();
-        const diffTime = Math.abs(today - createdDate);
-        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-        document.getElementById('dias-cadastrado').textContent = diffDays;
+    if (dadosUsuario.createdAt) {
+        const dataCriacao = new Date(dadosUsuario.createdAt);
+        const hoje = new Date();
+        const diferencaTempo = Math.abs(hoje - dataCriacao);
+        const diferencaDias = Math.ceil(diferencaTempo / (1000 * 60 * 60 * 24));
+        document.getElementById('dias-cadastrado').textContent = diferencaDias;
     }
 }
 
 // Carregar histórico de mesas
-async function loadUserHistory() {
+async function carregarHistoricoUsuario() {
     try {
-        const historyList = document.getElementById('history-list');
+        const listaHistorico = document.getElementById('history-list');
         
         // Buscar mesas onde o usuário participou
-        const mesasQuery = query(
+        const consultaMesas = query(
             collection(db, 'mesas'),
-            where('jogadores', 'array-contains', { userId: currentUser.uid })
+            where('jogadores', 'array-contains', { userId: usuarioAtual.uid })
         );
         
         // Buscar mesas criadas pelo usuário
-        const mesasCriadasQuery = query(
+        const consultaMesasCriadas = query(
             collection(db, 'mesas'),
-            where('mestreId', '==', currentUser.uid)
+            where('mestreId', '==', usuarioAtual.uid)
         );
         
-        const [mesasSnapshot, mesasCriadasSnapshot] = await Promise.all([
-            getDocs(mesasQuery),
-            getDocs(mesasCriadasQuery)
+        const [snapshotMesas, snapshotMesasCriadas] = await Promise.all([
+            getDocs(consultaMesas),
+            getDocs(consultaMesasCriadas)
         ]);
         
-        const allMesas = [];
+        const todasMesas = [];
         const personagensJogados = new Set();
         
         // Processar mesas participadas
-        mesasSnapshot.forEach((doc) => {
-            const mesa = { id: doc.id, ...doc.data(), tipo: 'jogador' };
-            allMesas.push(mesa);
+        snapshotMesas.forEach((documento) => {
+            const mesa = { id: documento.id, ...documento.data(), tipo: 'jogador' };
+            todasMesas.push(mesa);
             
             // Encontrar personagem jogado
-            const jogador = mesa.jogadores?.find(j => j.userId === currentUser.uid);
+            const jogador = mesa.jogadores?.find(j => j.userId === usuarioAtual.uid);
             if (jogador?.personagem) {
                 personagensJogados.add(jogador.personagem);
             }
         });
         
         // Processar mesas criadas
-        mesasCriadasSnapshot.forEach((doc) => {
-            const mesa = { id: doc.id, ...doc.data(), tipo: 'mestre' };
-            allMesas.push(mesa);
+        snapshotMesasCriadas.forEach((documento) => {
+            const mesa = { id: documento.id, ...documento.data(), tipo: 'mestre' };
+            todasMesas.push(mesa);
         });
         
         // Atualizar contador de personagens jogados
         document.getElementById('personagens-jogados').textContent = personagensJogados.size;
         
         // Ordenar por data
-        allMesas.sort((a, b) => new Date(b.data) - new Date(a.data));
+        todasMesas.sort((a, b) => new Date(b.data) - new Date(a.data));
         
-        if (allMesas.length === 0) {
-            historyList.innerHTML = '<div class="no-history">Você ainda não participou de nenhuma mesa. Que tal começar uma aventura?</div>';
+        if (todasMesas.length === 0) {
+            listaHistorico.innerHTML = '<div class="no-history">Você ainda não participou de nenhuma mesa. Que tal começar uma aventura?</div>';
             return;
         }
         
-        historyList.innerHTML = allMesas.map(mesa => createHistoryItem(mesa)).join('');
+        listaHistorico.innerHTML = todasMesas.map(mesa => criarItemHistorico(mesa)).join('');
         
-    } catch (error) {
-        console.error('Erro ao carregar histórico:', error);
+    } catch (erro) {
+        console.error('Erro ao carregar histórico:', erro);
         document.getElementById('history-list').innerHTML = '<div class="no-history">Erro ao carregar histórico de mesas.</div>';
     }
 }
 
 // Criar item do histórico
-function createHistoryItem(mesa) {
-    const mission = getMissionInfo(mesa);
-    const dataFormatada = formatDate(mesa.data);
-    const tipoIcon = mesa.tipo === 'mestre' ? '👑' : '🎭';
-    const tipoText = mesa.tipo === 'mestre' ? 'Mestre' : 'Jogador';
+function criarItemHistorico(mesa) {
+    const missao = obterInfoMissao(mesa);
+    const dataFormatada = formatarData(mesa.data);
+    const iconeRole = mesa.tipo === 'mestre' ? '👑' : '🎭';
+    const textoRole = mesa.tipo === 'mestre' ? 'Mestre' : 'Jogador';
     
     // Encontrar personagem jogado (se for jogador)
     let personagemJogado = '';
     if (mesa.tipo === 'jogador' && mesa.jogadores) {
-        const jogador = mesa.jogadores.find(j => j.userId === currentUser.uid);
+        const jogador = mesa.jogadores.find(j => j.userId === usuarioAtual.uid);
         if (jogador?.personagem) {
             personagemJogado = `<div class="character-played">🎭 ${jogador.personagem}</div>`;
         }
@@ -171,12 +171,12 @@ function createHistoryItem(mesa) {
             
             <div class="history-details">
                 <div class="history-detail">
-                    <span>${tipoIcon}</span>
-                    <span><strong>Papel:</strong> ${tipoText}</span>
+                    <span>${iconeRole}</span>
+                    <span><strong>Papel:</strong> ${textoRole}</span>
                 </div>
                 <div class="history-detail">
                     <span>🎭</span>
-                    <span><strong>Missão:</strong> ${mission.name}</span>
+                    <span><strong>Missão:</strong> ${missao.name}</span>
                 </div>
                 <div class="history-detail">
                     <span>👥</span>
@@ -184,7 +184,7 @@ function createHistoryItem(mesa) {
                 </div>
                 <div class="history-detail">
                     <span>📊</span>
-                    <span><strong>Status:</strong> ${getStatusText(mesa.status)}</span>
+                    <span><strong>Status:</strong> ${obterTextoStatus(mesa.status)}</span>
                 </div>
             </div>
             
@@ -194,142 +194,142 @@ function createHistoryItem(mesa) {
 }
 
 // Obter informações da missão
-function getMissionInfo(mesa) {
+function obterInfoMissao(mesa) {
     if (mesa.missao === 'custom' && mesa.customMission) {
         return mesa.customMission;
     }
     
-    const missions = {
+    const missoes = {
         carnaval: { name: 'As Origens do Carnaval' },
         quilombo: { name: 'A Resistência de Palmares' },
         amazonia: { name: 'Guardiões da Floresta' }
     };
     
-    return missions[mesa.missao] || { name: 'Missão Desconhecida' };
+    return missoes[mesa.missao] || { name: 'Missão Desconhecida' };
 }
 
 // Obter texto do status
-function getStatusText(status) {
-    const statusMap = {
+function obterTextoStatus(status) {
+    const mapaStatus = {
         'aberta': 'Aberta',
         'cheia': 'Lotada',
         'iniciada': 'Em Andamento',
         'finalizada': 'Finalizada'
     };
-    return statusMap[status] || status;
+    return mapaStatus[status] || status;
 }
 
 // Salvar perfil
-async function saveProfile(event) {
-    event.preventDefault();
+async function salvarPerfil(evento) {
+    evento.preventDefault();
     
-    const saveBtn = document.querySelector('.btn-save');
-    const originalText = saveBtn.textContent;
+    const botaoSalvar = document.querySelector('.btn-save');
+    const textoOriginal = botaoSalvar.textContent;
     
     try {
-        saveBtn.disabled = true;
-        saveBtn.textContent = 'Salvando...';
+        botaoSalvar.disabled = true;
+        botaoSalvar.textContent = 'Salvando...';
         
-        const birthdate = new Date(document.getElementById('edit-birthdate').value);
-        const age = Math.floor((new Date() - birthdate) / (365.25 * 24 * 60 * 60 * 1000));
+        const dataNascimento = new Date(document.getElementById('edit-birthdate').value);
+        const idade = Math.floor((new Date() - dataNascimento) / (365.25 * 24 * 60 * 60 * 1000));
         
-        const updatedData = {
+        const dadosAtualizados = {
             nick: document.getElementById('edit-nick').value,
             birthdate: document.getElementById('edit-birthdate').value,
-            age: age,
+            age: idade,
             experience: document.getElementById('edit-experience').value,
             source: document.getElementById('edit-source').value,
             interests: document.getElementById('edit-interests').value,
             updatedAt: new Date().toISOString()
         };
         
-        await setDoc(doc(db, 'users', currentUser.uid), updatedData, { merge: true });
+        await setDoc(doc(db, 'users', usuarioAtual.uid), dadosAtualizados, { merge: true });
         
         // Atualizar dados locais
-        Object.assign(userData, updatedData);
+        Object.assign(dadosUsuario, dadosAtualizados);
         
-        saveBtn.textContent = '✅ Salvo!';
+        botaoSalvar.textContent = '✅ Salvo!';
         setTimeout(() => {
-            saveBtn.textContent = originalText;
-            saveBtn.disabled = false;
+            botaoSalvar.textContent = textoOriginal;
+            botaoSalvar.disabled = false;
         }, 2000);
         
-    } catch (error) {
-        console.error('Erro ao salvar perfil:', error);
-        saveBtn.textContent = '❌ Erro ao salvar';
+    } catch (erro) {
+        console.error('Erro ao salvar perfil:', erro);
+        botaoSalvar.textContent = '❌ Erro ao salvar';
         setTimeout(() => {
-            saveBtn.textContent = originalText;
-            saveBtn.disabled = false;
+            botaoSalvar.textContent = textoOriginal;
+            botaoSalvar.disabled = false;
         }, 2000);
     }
 }
 
 // Mostrar aba do perfil
-function showProfileTab(tabName) {
+function mostrarAbaPeril(nomeAba) {
     // Remover classe active de todas as abas
-    document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-    document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+    document.querySelectorAll('.tab-btn').forEach(botao => botao.classList.remove('active'));
+    document.querySelectorAll('.tab-content').forEach(conteudo => conteudo.classList.remove('active'));
     
     // Ativar aba selecionada
     event.target.classList.add('active');
-    document.getElementById(tabName + '-tab').classList.add('active');
+    document.getElementById(nomeAba + '-tab').classList.add('active');
 }
 
 // Função para formatar data
-function formatDate(dateString) {
-    return new Date(dateString).toLocaleString('pt-BR');
+function formatarData(stringData) {
+    return new Date(stringData).toLocaleString('pt-BR');
 }
 
 // Upload de avatar
-async function handleAvatarUpload(event) {
-    const file = event.target.files[0];
-    if (!file) return;
+async function manipularUploadAvatar(evento) {
+    const arquivo = evento.target.files[0];
+    if (!arquivo) return;
     
     // Validar tipo de arquivo
-    if (!file.type.startsWith('image/')) {
+    if (!arquivo.type.startsWith('image/')) {
         alert('Por favor, selecione apenas arquivos de imagem.');
         return;
     }
     
     // Validar tamanho (máximo 5MB)
-    if (file.size > 5 * 1024 * 1024) {
+    if (arquivo.size > 5 * 1024 * 1024) {
         alert('A imagem deve ter no máximo 5MB.');
         return;
     }
     
     try {
         // Converter para base64 para preview
-        const reader = new FileReader();
-        reader.onload = function(e) {
+        const leitor = new FileReader();
+        leitor.onload = function(e) {
             document.getElementById('user-avatar').src = e.target.result;
         };
-        reader.readAsDataURL(file);
+        leitor.readAsDataURL(arquivo);
         
         // Salvar URL da imagem no perfil
-        const photoURL = await convertToBase64(file);
+        const urlFoto = await converterParaBase64(arquivo);
         
-        await setDoc(doc(db, 'users', currentUser.uid), {
-            photoURL: photoURL,
+        await setDoc(doc(db, 'users', usuarioAtual.uid), {
+            photoURL: urlFoto,
             updatedAt: new Date().toISOString()
         }, { merge: true });
         
-        userData.photoURL = photoURL;
+        dadosUsuario.photoURL = urlFoto;
         
-    } catch (error) {
-        console.error('Erro ao fazer upload da foto:', error);
+    } catch (erro) {
+        console.error('Erro ao fazer upload da foto:', erro);
         alert('Erro ao atualizar foto de perfil.');
     }
 }
 
 // Converter arquivo para base64
-function convertToBase64(file) {
-    return new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.readAsDataURL(file);
-        reader.onload = () => resolve(reader.result);
-        reader.onerror = error => reject(error);
+function converterParaBase64(arquivo) {
+    return new Promise((resolver, rejeitar) => {
+        const leitor = new FileReader();
+        leitor.readAsDataURL(arquivo);
+        leitor.onload = () => resolver(leitor.result);
+        leitor.onerror = erro => rejeitar(erro);
     });
 }
 
 // Exportar funções globais
-window.showProfileTab = showProfileTab;
+window.showProfileTab = mostrarAbaPeril;
