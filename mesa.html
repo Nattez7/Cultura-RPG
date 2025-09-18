@@ -4,188 +4,1657 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mesa Virtual - Cultura RPG</title>
-    <link rel="stylesheet" href="css/common.css">
-    <link rel="stylesheet" href="css/mesa.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --accent: #EBD677;
+            --text: #ffffff;
+            --gradient: linear-gradient(135deg, #EBD677, #D4AF37);
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            background: #1a1a1a;
+            color: white;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            overflow: hidden;
+        }
+        
+        .rpg-interface {
+            display: grid;
+            grid-template-areas: 
+                "toolbar toolbar toolbar"
+                "sidebar canvas chat";
+            grid-template-columns: 300px 1fr 350px;
+            grid-template-rows: 60px 1fr;
+            height: 100vh;
+        }
+        
+        .sidebar {
+            grid-area: sidebar;
+            background: #2d2d2d;
+            border-right: 1px solid #444;
+            overflow-y: auto;
+            padding: 1rem;
+        }
+        
+        .toolbar {
+            grid-area: toolbar;
+            background: #2d2d2d;
+            border-bottom: 1px solid #444;
+            display: flex;
+            align-items: center;
+            padding: 0 1rem;
+            gap: 1rem;
+        }
+        
+        .canvas-container {
+            grid-area: canvas;
+            background: #1a1a1a;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .canvas {
+            width: 200%;
+            height: 200%;
+            position: relative;
+            cursor: grab;
+            min-width: 2000px;
+            min-height: 2000px;
+        }
+        
+        .canvas.dragging {
+            cursor: grabbing;
+        }
+        
+        .map-layer {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-size: cover;
+            background-repeat: no-repeat;
+            background-position: center;
+        }
+        
+        .grid-layer {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                linear-gradient(rgba(255,255,255,0.3) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255,255,255,0.3) 1px, transparent 1px);
+            background-size: 50px 50px;
+            pointer-events: none;
+            z-index: 5;
+        }
+        
+        .grid-layer.hidden {
+            display: none;
+        }
+        
+        .token {
+            position: absolute;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            border: 3px solid var(--accent);
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            cursor: move;
+            transition: transform 0.1s;
+            z-index: 10;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: white;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
+            overflow: hidden;
+        }
+        
+        .token:hover {
+            transform: scale(1.1);
+            z-index: 20;
+        }
+        
+        .token.selected {
+            border-color: #ff6b6b;
+            box-shadow: 0 0 20px rgba(255, 107, 107, 0.5);
+        }
+        
+        .chat-panel {
+            grid-area: chat;
+            background: #2d2d2d;
+            border-left: 1px solid #444;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .chat-header {
+            padding: 1rem;
+            border-bottom: 1px solid #444;
+            font-weight: bold;
+        }
+        
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 1rem;
+        }
+        
+        .chat-message {
+            margin-bottom: 1rem;
+            padding: 0.5rem;
+            border-radius: 8px;
+            background: rgba(255,255,255,0.05);
+        }
+        
+        .chat-input-area {
+            padding: 1rem;
+            border-top: 1px solid #444;
+        }
+        
+        .chat-input {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #555;
+            border-radius: 6px;
+            background: #1a1a1a;
+            color: white;
+        }
+        
+        .player-info {
+            background: rgba(235,214,119,0.1);
+            border: 1px solid var(--accent);
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+        }
+        
+        .dice-section {
+            background: rgba(235,214,119,0.1);
+            border: 1px solid var(--accent);
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+        }
+        
+        .dice-result {
+            background: rgba(0,0,0,0.3);
+            padding: 0.5rem;
+            border-radius: 6px;
+            text-align: center;
+            font-weight: bold;
+        }
+        
+        .zoom-controls {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            z-index: 100;
+        }
+        
+        .zoom-btn {
+            background: #2d2d2d;
+            border: 1px solid #555;
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 6px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .coordinates {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            background: rgba(0,0,0,0.7);
+            padding: 0.5rem;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            z-index: 100;
+        }
+        
+        .tool-btn {
+            background: transparent;
+            border: 1px solid #555;
+            color: white;
+            padding: 0.5rem;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .tool-btn:hover {
+            background: #444;
+            border-color: var(--accent);
+        }
+        
+        .tool-btn.active {
+            background: var(--accent);
+            color: #000;
+        }
+        
+        /* Tokens personalizados */
+        .token-upload {
+            margin-bottom: 1rem;
+        }
+        
+        .token-upload input[type="file"] {
+            display: none;
+        }
+        
+        .token-upload-btn {
+            width: 100%;
+            background: #38a169;
+            color: white;
+            border: none;
+            padding: 0.5rem;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-bottom: 0.5rem;
+        }
+        
+        .custom-tokens {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+        
+        .custom-token {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: border-color 0.3s;
+            background-size: cover;
+            background-position: center;
+            position: relative;
+        }
+        
+        .custom-token:hover {
+            border-color: #fff;
+        }
+        
+        .custom-token.selected {
+            border-color: var(--accent);
+        }
+        
+        .custom-token .remove-token {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: #e53e3e;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 15px;
+            height: 15px;
+            font-size: 10px;
+            cursor: pointer;
+            display: none;
+        }
+        
+        .custom-token:hover .remove-token {
+            display: block;
+        }
+        
+        .text-element {
+            position: absolute;
+            background: rgba(0,0,0,0.7);
+            color: white;
+            padding: 0.5rem;
+            border-radius: 4px;
+            border: 1px solid var(--accent);
+            cursor: move;
+            z-index: 15;
+            font-size: 14px;
+            min-width: 50px;
+            text-align: left;
+            white-space: pre-wrap;
+            max-width: 300px;
+        }
+        
+        .text-element:hover {
+            border-color: #fff;
+        }
+        
+        .text-element.editing {
+            background: rgba(235,214,119,0.2);
+            border-color: var(--accent);
+        }
+        
+        .color-btn {
+            width: 30px;
+            height: 30px;
+            border: 2px solid #555;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .color-btn:hover {
+            transform: scale(1.1);
+            border-color: var(--accent);
+        }
+        
+        .color-btn.selected {
+            border-color: var(--accent);
+            border-width: 3px;
+        }
+        
+        .draw-color-btn {
+            width: 30px;
+            height: 30px;
+            border: 2px solid #555;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .draw-color-btn:hover {
+            transform: scale(1.1);
+            border-color: var(--accent);
+        }
+        
+        .draw-color-btn.selected {
+            border-color: var(--accent);
+            border-width: 3px;
+        }
+        
+        /* Modal de seleção de personagem */
+        .modal {
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.8);
+        }
+        
+        .modal-content {
+            background-color: #2d2d2d;
+            margin: 5% auto;
+            padding: 2rem;
+            border-radius: 10px;
+            width: 90%;
+            max-width: 800px;
+            position: relative;
+        }
+        
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            position: absolute;
+            right: 1rem;
+            top: 1rem;
+        }
+        
+        .close:hover {
+            color: white;
+        }
+        
+        .character-card-modal {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid #444;
+            border-radius: 8px;
+            padding: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+        
+        .character-card-modal:hover {
+            border-color: var(--accent);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 20px rgba(235,214,119,0.3);
+        }
+        
+        .character-image-modal {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid var(--accent);
+            margin: 0 auto 1rem;
+            display: block;
+        }
+        
+        .character-name {
+            color: var(--accent);
+            font-size: 1.1rem;
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 0.5rem;
+        }
+        
+        .character-description {
+            color: #ccc;
+            font-size: 0.9rem;
+            text-align: center;
+            margin-bottom: 1rem;
+            line-height: 1.4;
+        }
+        
+        .character-stats {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 1rem;
+        }
+        
+        .stat-item-modal {
+            text-align: center;
+            font-size: 0.8rem;
+        }
+        
+        .stat-value {
+            display: block;
+            font-weight: bold;
+            color: var(--accent);
+            font-size: 1.2rem;
+        }
+        
+        .character-talents {
+            background: rgba(0,0,0,0.3);
+            padding: 0.75rem;
+            border-radius: 6px;
+            margin-bottom: 1rem;
+        }
+        
+        .talent-title {
+            color: var(--accent);
+            font-size: 0.85rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+        
+        .talent-list {
+            font-size: 0.75rem;
+            color: #bbb;
+            line-height: 1.3;
+        }
+        
+        .select-character-btn {
+            width: 100%;
+            background: var(--accent);
+            color: #000;
+            border: none;
+            padding: 0.75rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+        
+        .select-character-btn:hover {
+            background: #D4AF37;
+            transform: translateY(-1px);
+        }
+    </style>
 </head>
 <body>
-    <div class="virtual-table">
-        <!-- Header da Mesa -->
-        <div class="table-header">
-            <div class="table-info">
-                <h1 id="mesa-title">Mesa Virtual</h1>
-                <span id="mesa-code">Código: ---</span>
-            </div>
-            <div class="table-controls">
-                <button id="dice-roller-btn" class="control-btn">Dados</button>
-                <button id="map-btn" class="control-btn">Mapa</button>
-                <button id="tokens-btn" class="control-btn">Tokens</button>
-                <button id="settings-btn" class="control-btn">Configuração</button>
+    <div class="rpg-interface">
+        <!-- Toolbar -->
+        <div class="toolbar">
+            <button class="tool-btn" title="Mostrar/Ocultar Grid" onclick="toggleGrid()">
+                <i class="fas fa-th"></i>
+            </button>
+            
+            <input type="file" id="map-upload" accept="image/*" style="display: none;">
+            <button class="tool-btn" title="Upload de Mapa" onclick="document.getElementById('map-upload').click()">
+                <i class="fas fa-image"></i>
+            </button>
+            
+            <button class="tool-btn" title="Adicionar Texto" onclick="adicionarTexto()">
+                <i class="fas fa-font"></i>
+            </button>
+            
+            <button class="tool-btn" id="draw-btn" title="Desenhar" onclick="toggleDrawMode()">
+                <i class="fas fa-pen"></i>
+            </button>
+            
+            <button class="tool-btn" title="Limpar Desenhos" onclick="clearDrawings()">
+                <i class="fas fa-eraser"></i>
+            </button>
+            
+            <div style="margin-left: auto; display: flex; align-items: center; gap: 1rem;">
+                <span id="mesa-title">Mesa Virtual</span>
+                <span id="mesa-code" style="color: var(--accent);">Código: ---</span>
             </div>
         </div>
 
-        <!-- Área Principal -->
-        <div class="table-main">
-            <!-- Painel Lateral Esquerdo -->
-            <div class="left-panel">
-                <!-- Ficha do Personagem -->
-                <div class="character-sheet">
-                    <h3>Meu Personagem</h3>
-                    <div id="character-info">
-                        <select id="character-select">
-                            <option value="">Selecionar Personagem</option>
-                        </select>
-                        <div id="character-details" style="display: none;">
-                            <div class="character-avatar">
-                                <img id="char-image" src="" alt="Personagem">
-                                <h4 id="char-name"></h4>
+        <!-- Sidebar Esquerda - Ficha do Personagem -->
+        <div class="sidebar">
+            <div id="character-sheet" style="display: none;">
+                <h3 style="color: var(--accent); margin-bottom: 1rem; text-align: center;">
+                    <i class="fas fa-scroll"></i> Ficha do Personagem
+                </h3>
+                
+                <!-- Avatar e Nome -->
+                <div style="text-align: center; margin-bottom: 2rem;">
+                    <div id="char-avatar" style="
+                        width: 80px; height: 80px; border-radius: 50%; background: var(--gradient);
+                        display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem;
+                        overflow: hidden; border: 2px solid var(--accent);
+                    ">
+                        <i class="fas fa-user" style="font-size: 2rem; color: var(--text);"></i>
+                    </div>
+                    <h4 id="sheet-char-name" style="color: var(--text); margin: 0 0 0.5rem;">-</h4>
+                    <p id="sheet-char-level" style="color: var(--accent); margin: 0; font-weight: bold;">Nível 1</p>
+                </div>
+                
+
+                
+                <!-- Atributos -->
+                <div style="background: rgba(255,255,255,0.05); border-radius: 8px; padding: 1rem; margin-bottom: 1rem;">
+                    <h5 style="color: var(--accent); margin-bottom: 0.5rem;">Atributos</h5>
+                    <div id="sheet-stats" style="display: grid; gap: 0.5rem;"></div>
+                </div>
+                
+                <!-- Upload de Tokens -->
+                <div class="token-upload">
+                    <input type="file" id="token-upload" accept="image/*">
+                    <button class="token-upload-btn" onclick="document.getElementById('token-upload').click()">
+                        📷 Adicionar Token
+                    </button>
+                </div>
+                
+                <!-- Tokens Personalizados -->
+                <div id="custom-tokens" class="custom-tokens"></div>
+            </div>
+            
+            <!-- Botão Adicionar Personagem -->
+            <div id="add-character-section">
+                <button id="add-character-btn" onclick="mostrarSelecaoPersonagem()" 
+                    style="background: var(--accent); color: #000; border: none; padding: 1rem; 
+                           border-radius: 8px; cursor: pointer; font-weight: bold; width: 100%;">
+                    <i class="fas fa-plus"></i> Adicionar Personagem na Mesa
+                </button>
+            </div>
+        </div>
+
+        <!-- Canvas -->
+        <div class="canvas-container">
+            <div class="canvas" id="canvas">
+                <div class="map-layer" id="map-layer"></div>
+                <canvas id="draw-canvas" width="2000" height="2000" style="position: absolute; top: 0; left: 0; z-index: 8; pointer-events: none;"></canvas>
+                <div class="grid-layer" id="grid-layer"></div>
+            </div>
+            
+            <div class="coordinates" id="coordinates">X: 0, Y: 0</div>
+            
+            <div class="zoom-controls">
+                <button class="zoom-btn" onclick="zoomIn()">
+                    <i class="fas fa-plus"></i>
+                </button>
+                <button class="zoom-btn" onclick="zoomOut()">
+                    <i class="fas fa-minus"></i>
+                </button>
+                <button class="zoom-btn" onclick="resetZoom()">
+                    <i class="fas fa-expand-arrows-alt"></i>
+                </button>
+                <button class="zoom-btn" onclick="centerMap()">
+                    <i class="fas fa-crosshairs"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Chat e Controles -->
+        <div class="chat-panel">
+            <div class="chat-header">
+                <i class="fas fa-comments"></i> Chat da Mesa
+            </div>
+            
+            <div class="chat-messages" id="chat-messages">
+                <div class="chat-message">
+                    <strong style="color: #FFD700;">Mestre:</strong> Bem-vindos à aventura! Vocês podem ouvir sons estranhos ao longe...
+                </div>
+            </div>
+            
+            <div class="chat-input-area">
+                <div style="display: flex; gap: 0.5rem;">
+                    <input type="text" class="chat-input" id="chat-input" placeholder="Digite sua mensagem..." style="flex: 1;">
+                    <button onclick="sendChatMessage()" style="background: var(--accent); color: #000; border: none; padding: 0.75rem; border-radius: 6px; cursor: pointer;">
+                        <i class="fas fa-paper-plane"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Seleção de Personagem -->
+    <div id="character-selection-modal" class="modal" style="display: none;">
+        <div class="modal-content" style="max-width: 900px; max-height: 90vh; overflow-y: auto;">
+            <span class="close" onclick="fecharSelecaoPersonagem()">&times;</span>
+            <h2 style="color: var(--accent); margin-bottom: 1rem; text-align: center;">
+                <i class="fas fa-users"></i> Escolha seu Personagem
+            </h2>
+            <p style="text-align: center; margin-bottom: 2rem; color: #ccc;">
+                Selecione um dos personagens históricos brasileiros para jogar nesta mesa:
+            </p>
+            
+            <div id="characters-grid" style="
+                display: grid; 
+                grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); 
+                gap: 1rem; 
+                margin-bottom: 2rem;
+            "></div>
+            
+            <div style="text-align: center; padding-top: 1rem; border-top: 1px solid #444;">
+                <button onclick="fecharSelecaoPersonagem()" style="
+                    background: #666; color: white; border: none; padding: 0.75rem 2rem; 
+                    border-radius: 6px; cursor: pointer; font-size: 1rem;
+                ">Cancelar</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Modal de Texto -->
+    <div id="text-modal" class="modal" style="display: none;">
+        <div class="modal-content" style="max-width: 500px;">
+            <span class="close" onclick="fecharModalTexto()">&times;</span>
+            <h2 style="color: var(--accent); margin-bottom: 1.5rem; text-align: center;">
+                <i class="fas fa-font"></i> <span id="text-modal-title">Adicionar Texto</span>
+            </h2>
+            
+            <div style="margin-bottom: 1.5rem;">
+                <label style="display: block; margin-bottom: 0.5rem; color: var(--accent); font-weight: bold;">Texto:</label>
+                <textarea id="text-input" placeholder="Digite seu texto aqui..." style="
+                    width: 100%; height: 100px; padding: 0.75rem; border: 1px solid #555; 
+                    border-radius: 6px; background: #1a1a1a; color: white; resize: vertical;
+                    font-family: inherit; font-size: 14px;
+                "></textarea>
+            </div>
+            
+            <div style="margin-bottom: 1.5rem;">
+                <label style="display: block; margin-bottom: 0.5rem; color: var(--accent); font-weight: bold;">Tamanho da Fonte:</label>
+                <select id="font-size" style="
+                    width: 100%; padding: 0.5rem; border: 1px solid #555; border-radius: 6px; 
+                    background: #1a1a1a; color: white;
+                ">
+                    <option value="12px">Pequeno (12px)</option>
+                    <option value="14px" selected>Normal (14px)</option>
+                    <option value="16px">Médio (16px)</option>
+                    <option value="18px">Grande (18px)</option>
+                    <option value="24px">Muito Grande (24px)</option>
+                </select>
+            </div>
+            
+            <div style="margin-bottom: 1.5rem;">
+                <label style="display: block; margin-bottom: 0.5rem; color: var(--accent); font-weight: bold;">Cor do Texto:</label>
+                <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                    <button class="color-btn" data-color="#ffffff" style="background: #ffffff;"></button>
+                    <button class="color-btn" data-color="#EBD677" style="background: #EBD677;"></button>
+                    <button class="color-btn" data-color="#ff6b6b" style="background: #ff6b6b;"></button>
+                    <button class="color-btn" data-color="#4ecdc4" style="background: #4ecdc4;"></button>
+                    <button class="color-btn" data-color="#45b7d1" style="background: #45b7d1;"></button>
+                    <button class="color-btn" data-color="#96ceb4" style="background: #96ceb4;"></button>
+                    <button class="color-btn" data-color="#feca57" style="background: #feca57;"></button>
+                    <button class="color-btn" data-color="#ff9ff3" style="background: #ff9ff3;"></button>
+                </div>
+            </div>
+            
+            <div style="display: flex; gap: 1rem; justify-content: center;">
+                <button onclick="fecharModalTexto()" style="
+                    background: #666; color: white; border: none; padding: 0.75rem 1.5rem; 
+                    border-radius: 6px; cursor: pointer;
+                ">Cancelar</button>
+                <button id="delete-text-btn" onclick="excluirTexto()" style="
+                    background: #dc3545; color: white; border: none; padding: 0.75rem 1.5rem; 
+                    border-radius: 6px; cursor: pointer; display: none;
+                ">Excluir</button>
+                <button onclick="confirmarTexto()" style="
+                    background: var(--accent); color: #000; border: none; padding: 0.75rem 1.5rem; 
+                    border-radius: 6px; cursor: pointer; font-weight: bold;
+                ">Confirmar</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Modal de Confirmação -->
+    <div id="confirm-modal" class="modal" style="display: none;">
+        <div class="modal-content" style="max-width: 400px;">
+            <h2 style="color: var(--accent); margin-bottom: 1rem; text-align: center;">
+                <i class="fas fa-exclamation-triangle"></i> Confirmar Exclusão
+            </h2>
+            <p style="text-align: center; margin-bottom: 2rem; color: #ccc;">
+                Tem certeza que deseja excluir este texto?
+            </p>
+            <div style="display: flex; gap: 1rem; justify-content: center;">
+                <button onclick="fecharConfirmModal()" style="
+                    background: #666; color: white; border: none; padding: 0.75rem 1.5rem; 
+                    border-radius: 6px; cursor: pointer;
+                ">Cancelar</button>
+                <button onclick="confirmarExclusao()" style="
+                    background: #dc3545; color: white; border: none; padding: 0.75rem 1.5rem; 
+                    border-radius: 6px; cursor: pointer; font-weight: bold;
+                ">Excluir</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Modal de Desenho -->
+    <div id="draw-modal" class="modal" style="display: none;">
+        <div class="modal-content" style="max-width: 400px;">
+            <span class="close" onclick="fecharModalDesenho()">&times;</span>
+            <h2 style="color: var(--accent); margin-bottom: 1.5rem; text-align: center;">
+                <i class="fas fa-pen"></i> Configurar Desenho
+            </h2>
+            
+            <div style="margin-bottom: 1.5rem;">
+                <label style="display: block; margin-bottom: 0.5rem; color: var(--accent); font-weight: bold;">Cor do Pincel:</label>
+                <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                    <button class="draw-color-btn" data-color="#EBD677" style="background: #EBD677;"></button>
+                    <button class="draw-color-btn" data-color="#ffffff" style="background: #ffffff;"></button>
+                    <button class="draw-color-btn" data-color="#ff6b6b" style="background: #ff6b6b;"></button>
+                    <button class="draw-color-btn" data-color="#4ecdc4" style="background: #4ecdc4;"></button>
+                    <button class="draw-color-btn" data-color="#45b7d1" style="background: #45b7d1;"></button>
+                    <button class="draw-color-btn" data-color="#96ceb4" style="background: #96ceb4;"></button>
+                    <button class="draw-color-btn" data-color="#feca57" style="background: #feca57;"></button>
+                    <button class="draw-color-btn" data-color="#ff9ff3" style="background: #ff9ff3;"></button>
+                    <button class="draw-color-btn" data-color="#000000" style="background: #000000;"></button>
+                </div>
+            </div>
+            
+            <div style="margin-bottom: 1.5rem;">
+                <label style="display: block; margin-bottom: 0.5rem; color: var(--accent); font-weight: bold;">Tamanho do Pincel:</label>
+                <select id="brush-size" style="
+                    width: 100%; padding: 0.5rem; border: 1px solid #555; border-radius: 6px; 
+                    background: #1a1a1a; color: white;
+                ">
+                    <option value="1">Muito Fino (1px)</option>
+                    <option value="2">Fino (2px)</option>
+                    <option value="3" selected>Normal (3px)</option>
+                    <option value="5">Médio (5px)</option>
+                    <option value="8">Grosso (8px)</option>
+                    <option value="12">Muito Grosso (12px)</option>
+                </select>
+            </div>
+            
+            <div style="display: flex; gap: 1rem; justify-content: center;">
+                <button onclick="fecharModalDesenho()" style="
+                    background: #666; color: white; border: none; padding: 0.75rem 1.5rem; 
+                    border-radius: 6px; cursor: pointer;
+                ">Cancelar</button>
+                <button onclick="ativarDesenho()" style="
+                    background: var(--accent); color: #000; border: none; padding: 0.75rem 1.5rem; 
+                    border-radius: 6px; cursor: pointer; font-weight: bold;
+                ">Desenhar</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let zoom = 1;
+        let panX = 0;
+        let panY = 0;
+        let isDragging = false;
+        let dragStart = { x: 0, y: 0 };
+        let customTokens = [];
+        let mesaData = null;
+        
+        const canvas = document.getElementById('canvas');
+        const mapLayer = document.getElementById('map-layer');
+        
+        // Carregar mesa pela URL
+        async function loadMesaFromURL() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const codigo = urlParams.get('codigo');
+            
+            if (!codigo) {
+                document.getElementById('mesa-title').textContent = 'Mesa Virtual - Código não fornecido';
+                return;
+            }
+            
+            try {
+                // Simular busca da mesa (integrar com Firebase depois)
+                mesaData = { codigo: codigo, nome: 'Mesa de Aventura' };
+                document.getElementById('mesa-title').textContent = mesaData.nome;
+                document.getElementById('mesa-code').textContent = `Código: ${codigo}`;
+                
+                loadCustomTokens();
+            } catch (error) {
+                console.error('Erro ao carregar mesa:', error);
+                document.getElementById('mesa-title').textContent = 'Erro ao carregar mesa';
+            }
+        }
+        
+        // Pan do mapa
+        canvas.addEventListener('mousedown', (e) => {
+            if (drawMode) {
+                startDrawing(e);
+                return;
+            }
+            isDragging = true;
+            dragStart.x = e.clientX - panX;
+            dragStart.y = e.clientY - panY;
+            canvas.classList.add('dragging');
+        });
+        
+        canvas.addEventListener('mousemove', (e) => {
+            // Atualizar coordenadas
+            const rect = canvas.getBoundingClientRect();
+            const x = Math.floor((e.clientX - rect.left) / zoom);
+            const y = Math.floor((e.clientY - rect.top) / zoom);
+            document.getElementById('coordinates').textContent = `X: ${x}, Y: ${y}`;
+            
+            if (drawMode && isDrawing) {
+                draw(e);
+            } else if (isDragging && !drawMode) {
+                panX = e.clientX - dragStart.x;
+                panY = e.clientY - dragStart.y;
+                updateTransform();
+            }
+        });
+        
+        canvas.addEventListener('mouseup', () => {
+            if (drawMode) {
+                stopDrawing();
+            }
+            isDragging = false;
+            canvas.classList.remove('dragging');
+        });
+        
+        // Zoom
+        canvas.addEventListener('wheel', (e) => {
+            e.preventDefault();
+            const delta = e.deltaY > 0 ? 0.9 : 1.1;
+            zoom *= delta;
+            zoom = Math.max(0.1, Math.min(5, zoom));
+            updateTransform();
+        });
+        
+        function zoomIn() {
+            zoom *= 1.2;
+            zoom = Math.min(5, zoom);
+            updateTransform();
+        }
+        
+        function zoomOut() {
+            zoom *= 0.8;
+            zoom = Math.max(0.1, zoom);
+            updateTransform();
+        }
+        
+        function resetZoom() {
+            zoom = 1;
+            panX = 0;
+            panY = 0;
+            updateTransform();
+        }
+        
+        function centerMap() {
+            const containerRect = document.querySelector('.canvas-container').getBoundingClientRect();
+            const canvasRect = canvas.getBoundingClientRect();
+            
+            panX = (containerRect.width - canvasRect.width * zoom) / 2;
+            panY = (containerRect.height - canvasRect.height * zoom) / 2;
+            updateTransform();
+        }
+        
+        function updateTransform() {
+            canvas.style.transform = `translate(${panX}px, ${panY}px) scale(${zoom})`;
+        }
+        
+        // Grid
+        function toggleGrid() {
+            const gridLayer = document.getElementById('grid-layer');
+            gridLayer.classList.toggle('hidden');
+        }
+        
+        // Upload de mapa
+        document.getElementById('map-upload').addEventListener('change', function(event) {
+            const file = event.target.files[0];
+            if (file && file.type.startsWith('image/')) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    mapLayer.style.backgroundImage = `url(${e.target.result})`;
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+        
+        // Upload de token personalizado
+        document.getElementById('token-upload').addEventListener('change', function(event) {
+            const file = event.target.files[0];
+            if (file && file.type.startsWith('image/')) {
+                addCustomToken(file);
+            }
+        });
+        
+        // Adicionar token personalizado
+        function addCustomToken(file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const tokenId = Date.now() + Math.random();
+                const customToken = {
+                    id: tokenId,
+                    image: e.target.result,
+                    name: file.name
+                };
+                
+                customTokens.push(customToken);
+                saveCustomTokens();
+                renderCustomTokens();
+            };
+            reader.readAsDataURL(file);
+        }
+        
+        // Renderizar tokens personalizados
+        function renderCustomTokens() {
+            const container = document.getElementById('custom-tokens');
+            container.innerHTML = customTokens.map(token => `
+                <div class="custom-token" 
+                     data-token-id="${token.id}"
+                     onclick="createTokenFromCustom('${token.id}')"
+                     style="background-image: url('${token.image}')"
+                     title="${token.name}">
+                    <button class="remove-token" onclick="removeCustomToken('${token.id}', event)">×</button>
+                </div>
+            `).join('');
+        }
+        
+        // Criar token a partir do personalizado
+        function createTokenFromCustom(tokenId) {
+            const customToken = customTokens.find(t => t.id === tokenId);
+            if (customToken) {
+                const x = 200 + Math.random() * 100;
+                const y = 200 + Math.random() * 100;
+                createToken(customToken.image, x, y, customToken.name);
+            }
+        }
+        
+        // Remover token personalizado
+        function removeCustomToken(tokenId, event) {
+            event.stopPropagation();
+            customTokens = customTokens.filter(t => t.id !== tokenId);
+            saveCustomTokens();
+            renderCustomTokens();
+        }
+        
+        // Salvar tokens personalizados no localStorage
+        function saveCustomTokens() {
+            localStorage.setItem(`custom-tokens-${mesaData?.codigo || 'default'}`, JSON.stringify(customTokens));
+        }
+        
+        // Carregar tokens personalizados do localStorage
+        function loadCustomTokens() {
+            const saved = localStorage.getItem(`custom-tokens-${mesaData?.codigo || 'default'}`);
+            if (saved) {
+                customTokens = JSON.parse(saved);
+                renderCustomTokens();
+            }
+        }
+        
+        // Dados personalizados
+        function rollCustomDice() {
+            const input = document.getElementById('dice-input').value.trim();
+            if (!input) return;
+            
+            try {
+                const result = parseDiceRoll(input);
+                document.getElementById('dice-result').textContent = result.display;
+                addChatMessage('Você', `Rolou ${result.display}`);
+            } catch (error) {
+                document.getElementById('dice-result').textContent = 'Formato inválido';
+            }
+        }
+        
+        function parseDiceRoll(input) {
+            input = input.replace(/\s/g, '').toLowerCase();
+            
+            const match = input.match(/(\d+)d(\d+)([+-]\d+)?/);
+            if (!match) throw new Error('Formato inválido');
+            
+            const count = parseInt(match[1]);
+            const sides = parseInt(match[2]);
+            const modifier = match[3] ? parseInt(match[3]) : 0;
+            
+            if (count > 20 || sides > 100) throw new Error('Muitos dados');
+            
+            const rolls = [];
+            let total = 0;
+            
+            for (let i = 0; i < count; i++) {
+                const roll = Math.floor(Math.random() * sides) + 1;
+                rolls.push(roll);
+                total += roll;
+            }
+            
+            total += modifier;
+            
+            let display = `${count}d${sides}`;
+            if (modifier !== 0) {
+                display += (modifier > 0 ? '+' : '') + modifier;
+            }
+            display += `: [${rolls.join(', ')}]`;
+            if (modifier !== 0) {
+                display += ` ${modifier > 0 ? '+' : ''}${modifier}`;
+            }
+            display += ` = ${total}`;
+            
+            return { display, total, rolls };
+        }
+        
+        let playerToken = null;
+        let personagensDisponiveis = {};
+        let editingElement = null;
+        let selectedColor = '#ffffff';
+        let isDrawing = false;
+        let drawMode = false;
+        let drawCanvas, drawCtx;
+        let lastX = 0;
+        let lastY = 0;
+        
+        // Carregar personagens disponíveis
+        function carregarPersonagens() {
+            personagensDisponiveis = {
+                zumbi: {
+                    name: 'Zumbi dos Palmares',
+                    description: 'Líder quilombola, símbolo da resistência contra a escravidão.',
+                    stats: { força: 3, sabedoria: 1, carisma: 1 },
+                    background: 'Nascido livre em Palmares, foi capturado ainda criança e educado por um padre português.',
+                    talents: ['Liderança de Guerra: +1 dado extra em situações de combate', 'Resistência Quilombola: Pode rolar novamente falhas em testes de resistência física'],
+                    image: 'images/personagens/Zumbi dos Palmares.jpg'
+                },
+                maria: {
+                    name: 'Maria Bonita',
+                    description: 'Cangaceira corajosa, companheira de Lampião no sertão nordestino.',
+                    stats: { força: 2, sabedoria: 1, carisma: 2 },
+                    background: 'Maria Déa, conhecida como Maria Bonita, foi a primeira mulher a integrar um grupo de cangaceiros.',
+                    talents: ['Tiro Certeiro: +1 dado extra em ações com armas de fogo', 'Charme Sertanejo: Pode usar Carisma no lugar de Força em situações de intimidação'],
+                    image: 'images/personagens/Maria Bonita.webp'
+                },
+                chico: {
+                    name: 'Chico Mendes',
+                    description: 'Seringueiro e ambientalista, defensor da Amazônia.',
+                    stats: { força: 1, sabedoria: 2, carisma: 2 },
+                    background: 'Francisco Alves Mendes Filho foi um seringueiro, sindicalista e ativista ambiental brasileiro.',
+                    talents: ['Conhecimento da Floresta: +1 dado extra em ações relacionadas à natureza', 'Mobilização Popular: Pode rolar novamente falhas em testes de convencimento'],
+                    image: 'images/personagens/Chico Mendes.jpg'
+                },
+                dandara: {
+                    name: 'Dandara',
+                    description: 'Guerreira quilombola, estrategista militar de Palmares.',
+                    stats: { força: 2, sabedoria: 2, carisma: 1 },
+                    background: 'Guerreira negra que lutou contra o sistema escravocrata. Companheira de Zumbi.',
+                    talents: ['Mestre em Combate: +1 dado extra em lutas corpo a corpo', 'Táticas de Guerra: Pode usar Sabedoria no lugar de Força em combates estratégicos'],
+                    image: 'images/personagens/Dandara.jpeg'
+                },
+                santos: {
+                    name: 'Santos Dumont',
+                    description: 'Pioneiro da aviação, inventor e visionário brasileiro.',
+                    stats: { força: 1, sabedoria: 3, carisma: 1 },
+                    background: 'Alberto Santos Dumont foi um inventor, aeronauta e pioneiro da aviação.',
+                    talents: ['Genialidade Inventiva: +1 dado extra ao criar ou consertar máquinas', 'Visionário: Pode rolar novamente falhas em testes de inovação tecnológica'],
+                    image: 'images/personagens/Santos Dumont.jpg'
+                },
+                machado: {
+                    name: 'Machado de Assis',
+                    description: 'Maior escritor brasileiro, mestre da literatura nacional.',
+                    stats: { força: 1, sabedoria: 2, carisma: 2 },
+                    background: 'Joaquim Maria Machado de Assis foi um escritor brasileiro, considerado o maior nome da literatura nacional.',
+                    talents: ['Mestre das Palavras: +1 dado extra em persuasão através da eloquência', 'Análise Humana: Pode usar Sabedoria no lugar de Carisma para entender motivações'],
+                    image: 'images/personagens/Machado de Assis.jpg'
+                },
+                pixinguinha: {
+                    name: 'Pixinguinha',
+                    description: 'Compositor e instrumentista, pai do choro brasileiro.',
+                    stats: { força: 1, sabedoria: 1, carisma: 3 },
+                    background: 'Alfredo da Rocha Viana Filho, conhecido como Pixinguinha, foi um compositor brasileiro.',
+                    talents: ['Maestria Musical: +1 dado extra em ações envolvendo música', 'Alma do Choro: Pode rolar novamente falhas ao tentar conectar pessoas através da música'],
+                    image: 'images/personagens/Pixinguinha.jpg'
+                },
+                tarsila: {
+                    name: 'Tarsila do Amaral',
+                    description: 'Pintora modernista, ícone das artes plásticas brasileiras.',
+                    stats: { força: 1, sabedoria: 1, carisma: 3 },
+                    background: 'Tarsila de Aguiar do Amaral foi uma pintora e desenhista brasileira e uma das figuras centrais do movimento modernista.',
+                    talents: ['Visão Artística: +1 dado extra em ações criativas e artísticas', 'Inspiração Modernista: Pode usar Carisma no lugar de Sabedoria para resolver problemas'],
+                    image: 'images/personagens/Tarsila do Amaral.jpg'
+                },
+                lampiao: {
+                    name: 'Lampião',
+                    description: 'Rei do Cangaço, lendário líder do sertão nordestino.',
+                    stats: { força: 2, sabedoria: 1, carisma: 2 },
+                    background: 'Virgulino Ferreira da Silva, conhecido como Lampião, foi o mais famoso líder cangaceiro do Nordeste brasileiro.',
+                    talents: ['Rei do Sertão: +1 dado extra em ações no ambiente da caatinga', 'Liderança Cangaceira: Pode usar Carisma no lugar de Força para intimidar'],
+                    image: 'images/personagens/Lampiao.jpg'
+                }
+            };
+        }
+        
+        // Mostrar modal de seleção de personagem
+        function mostrarSelecaoPersonagem() {
+            const modal = document.getElementById('character-selection-modal');
+            const grid = document.getElementById('characters-grid');
+            
+            // Carregar personagens se ainda não foram carregados
+            if (Object.keys(personagensDisponiveis).length === 0) {
+                carregarPersonagens();
+            }
+            
+            // Criar cards dos personagens
+            grid.innerHTML = Object.keys(personagensDisponiveis).map(id => 
+                criarCardPersonagem(id, personagensDisponiveis[id])
+            ).join('');
+            
+            modal.style.display = 'block';
+        }
+        
+        // Criar card de personagem para seleção
+        function criarCardPersonagem(id, personagem) {
+            const statIcons = { força: '💪', sabedoria: '🧠', carisma: '✨' };
+            
+            return `
+                <div class="character-card-modal">
+                    <img src="${personagem.image}" alt="${personagem.name}" class="character-image-modal">
+                    <div class="character-name">${personagem.name}</div>
+                    <div class="character-description">${personagem.description}</div>
+                    
+                    <div class="character-stats">
+                        ${Object.entries(personagem.stats).map(([stat, value]) => `
+                            <div class="stat-item-modal">
+                                <span class="stat-value">${value}</span>
+                                <div>${statIcons[stat]} ${stat.charAt(0).toUpperCase() + stat.slice(1)}</div>
                             </div>
-                            <div class="character-stats">
-                                <div class="stat">
-                                    <span class="stat-label">Força:</span>
-                                    <span id="char-forca" class="stat-value">0</span>
-                                </div>
-                                <div class="stat">
-                                    <span class="stat-label">Sabedoria:</span>
-                                    <span id="char-sabedoria" class="stat-value">0</span>
-                                </div>
-                                <div class="stat">
-                                    <span class="stat-label">Carisma:</span>
-                                    <span id="char-carisma" class="stat-value">0</span>
-                                </div>
-                            </div>
-                            <div class="character-talents">
-                                <h5>Talentos:</h5>
-                                <div id="char-talents"></div>
-                            </div>
+                        `).join('')}
+                    </div>
+                    
+                    <div class="character-talents">
+                        <div class="talent-title">⭐ Talentos:</div>
+                        <div class="talent-list">
+                            ${personagem.talents ? personagem.talents.map(talent => `• ${talent}`).join('<br>') : 'Talentos especiais'}
                         </div>
                     </div>
-                </div>
-
-                <!-- Jogadores Online -->
-                <div class="players-list">
-                    <h3>Jogadores</h3>
-                    <div id="online-players">
-                        <!-- Lista de jogadores -->
-                    </div>
-                </div>
-            </div>
-
-            <!-- Área Central do Jogo -->
-            <div class="game-area">
-                <!-- Mapa/Grid -->
-                <div class="map-container">
-                    <div id="game-map" class="game-map">
-                        <canvas id="map-canvas" width="800" height="600"></canvas>
-                        <div id="tokens-layer" class="tokens-layer"></div>
-                    </div>
-                </div>
-
-                <!-- Controles do Mapa -->
-                <div class="map-controls">
-                    <div class="tool-group">
-                        <button class="tool-btn active" data-tool="token" onclick="setTool('token')">Token</button>
-                        <button class="tool-btn" data-tool="measure" onclick="setTool('measure')">Medir</button>
-                        <button class="tool-btn" data-tool="pan" onclick="setTool('pan')">Pan</button>
-                    </div>
                     
-                    <div class="control-group">
-                        <button onclick="toggleGrid()">Grid</button>
-                        <button data-action="snap" class="active" onclick="toggleSnapToGrid()">Snap</button>
-                        <button onclick="resetView()">Reset</button>
+                    <button class="select-character-btn" onclick="selecionarPersonagem('${id}')">
+                        🎭 Escolher ${personagem.name}
+                    </button>
+                </div>
+            `;
+        }
+        
+        // Selecionar personagem
+        function selecionarPersonagem(personagemId) {
+            const personagem = personagensDisponiveis[personagemId];
+            if (!personagem) return;
+            
+            // Criar token do personagem no mapa
+            const x = 200 + Math.random() * 100;
+            const y = 200 + Math.random() * 100;
+            
+            playerToken = createToken(personagem.image, x, y, personagem.name);
+            
+            // Adicionar automaticamente como token personalizado
+            adicionarTokenPersonagem(personagem);
+            
+            // Atualizar ficha do personagem
+            updateCharacterSheet(personagem);
+            
+            // Ocultar botão e mostrar ficha
+            document.getElementById('add-character-section').style.display = 'none';
+            document.getElementById('character-sheet').style.display = 'block';
+            
+            // Fechar modal
+            fecharSelecaoPersonagem();
+            
+            addChatMessage('Sistema', `${personagem.name} entrou na mesa!`);
+        }
+        
+        // Adicionar token do personagem aos tokens personalizados
+        function adicionarTokenPersonagem(personagem) {
+            const tokenId = 'char_' + Date.now();
+            const customToken = {
+                id: tokenId,
+                image: personagem.image,
+                name: personagem.name
+            };
+            
+            // Verificar se já existe
+            const exists = customTokens.find(t => t.name === personagem.name);
+            if (!exists) {
+                customTokens.push(customToken);
+                saveCustomTokens();
+                renderCustomTokens();
+            }
+        }
+        
+        // Fechar modal de seleção
+        function fecharSelecaoPersonagem() {
+            document.getElementById('character-selection-modal').style.display = 'none';
+        }
+        
+        // Atualizar ficha do personagem
+        function updateCharacterSheet(personagem) {
+            // Avatar
+            const avatar = document.getElementById('char-avatar');
+            if (personagem.image) {
+                avatar.innerHTML = `<img src="${personagem.image}" style="width: 100%; height: 100%; object-fit: cover;">`;
+            }
+            
+            // Informações básicas
+            document.getElementById('sheet-char-name').textContent = personagem.name;
+            document.getElementById('sheet-char-level').textContent = 'Personagem Histórico';
+            
+            // Atributos
+            const statsContainer = document.getElementById('sheet-stats');
+            const statIcons = { força: 'fist-raised', sabedoria: 'brain', carisma: 'star' };
+            
+            statsContainer.innerHTML = Object.entries(personagem.stats).map(([stat, value]) => `
+                <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.5rem; background: rgba(255,255,255,0.05); border-radius: 4px;">
+                    <div style="display: flex; align-items: center; gap: 0.5rem;">
+                        <i class="fas fa-${statIcons[stat]}" style="color: var(--accent); width: 16px;"></i>
+                        <span style="text-transform: capitalize; font-size: 0.9rem;">${stat}</span>
                     </div>
-                    
-                    <div class="grid-controls">
-                        <button onclick="adjustGridSize(-5)">Grid -</button>
-                        <button onclick="adjustGridSize(5)">Grid +</button>
-                    </div>
-                    
-                    <div class="file-controls">
-                        <input type="file" id="map-upload" accept="image/*" style="display: none;">
-                        <button onclick="document.getElementById('map-upload').click()">Upload</button>
-                        <button onclick="clearMap()">Limpar</button>
-                        <button onclick="clearTokens()">Tokens</button>
-                    </div>
+                    <span style="color: var(--accent); font-weight: bold;">${value} dados</span>
                 </div>
-            </div>
-
-            <!-- Painel Lateral Direito -->
-            <div class="right-panel">
-                <!-- Rolador de Dados -->
-                <div class="dice-section">
-                    <h3>Dados</h3>
-                    <div class="dice-controls">
-                        <select id="dice-type">
-                            <option value="6">d6</option>
-                            <option value="20">d20</option>
-                            <option value="100">d100</option>
-                        </select>
-                        <input type="number" id="dice-count" value="1" min="1" max="10">
-                        <button onclick="rollDice()">🎲 Rolar</button>
-                    </div>
-                    <div id="dice-results" class="dice-results"></div>
-                </div>
-
-                <!-- Tokens -->
-                <div class="tokens-section">
-                    <h3>🔴 Tokens</h3>
-                    <div class="token-palette">
-                        <div class="token red" onclick="selectToken('red')"></div>
-                        <div class="token blue" onclick="selectToken('blue')"></div>
-                        <div class="token green" onclick="selectToken('green')"></div>
-                        <div class="token yellow" onclick="selectToken('yellow')"></div>
-                        <div class="token purple" onclick="selectToken('purple')"></div>
-                        <div class="token black" onclick="selectToken('black')"></div>
-                    </div>
-                    <button onclick="clearTokens()">🗑️ Limpar Tokens</button>
-                </div>
-
-                <!-- Notas -->
-                <div class="notes-section">
-                    <h3>📝 Notas</h3>
-                    <textarea id="game-notes" placeholder="Anotações da sessão..."></textarea>
-                    <button onclick="saveNotes()">💾 Salvar</button>
-                </div>
-            </div>
-        </div>
-
-        <!-- Chat -->
-        <div class="chat-area">
-            <div class="chat-messages" id="chat-messages">
-                <!-- Mensagens do chat -->
-            </div>
-            <div class="chat-input">
-                <input type="text" id="message-input" placeholder="Digite sua mensagem..." onkeypress="handleChatKeyPress(event)">
-                <button onclick="sendMessage()">💬 Enviar</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Modais -->
-    <div id="dice-modal" class="modal">
-        <div class="modal-content">
-            <span class="close" onclick="closeDiceModal()">&times;</span>
-            <h2>🎲 Rolador de Dados</h2>
-            <div class="dice-roller">
-                <div class="dice-options">
-                    <button onclick="quickRoll('forca')">Força (d6)</button>
-                    <button onclick="quickRoll('sabedoria')">Sabedoria (d6)</button>
-                    <button onclick="quickRoll('carisma')">Carisma (d6)</button>
-                </div>
-                <div class="custom-roll">
-                    <input type="number" id="custom-dice" value="1" min="1" max="20">
-                    <span>d</span>
-                    <select id="custom-sides">
-                        <option value="6">6</option>
-                        <option value="20">20</option>
-                        <option value="100">100</option>
-                    </select>
-                    <button onclick="customRoll()">🎲 Rolar</button>
-                </div>
-            </div>
-            <div id="modal-dice-results"></div>
-        </div>
-    </div>
-
-    <script type="module" src="js/mesa-page.js"></script>
+            `).join('');
+        }
+        
+        // Criar token
+        function createToken(imageSrc, x, y, name) {
+            const token = document.createElement('div');
+            token.className = 'token';
+            token.style.left = x + 'px';
+            token.style.top = y + 'px';
+            token.style.backgroundImage = `url('${imageSrc}')`;
+            token.style.backgroundSize = 'cover';
+            token.style.backgroundPosition = 'center';
+            token.style.backgroundRepeat = 'no-repeat';
+            token.title = name || 'Token';
+            
+            // Eventos do token
+            token.addEventListener('mousedown', (e) => {
+                e.stopPropagation();
+                startTokenDrag(e, token);
+            });
+            
+            canvas.appendChild(token);
+            return token;
+        }
+        
+        // Selecionar token
+        function selectToken(token) {
+            document.querySelectorAll('.token').forEach(t => t.classList.remove('selected'));
+            token.classList.add('selected');
+        }
+        
+        // Arrastar token
+        function startTokenDrag(e, token) {
+            const startX = e.clientX - token.offsetLeft;
+            const startY = e.clientY - token.offsetTop;
+            
+            function onMouseMove(e) {
+                token.style.left = (e.clientX - startX) + 'px';
+                token.style.top = (e.clientY - startY) + 'px';
+            }
+            
+            function onMouseUp() {
+                document.removeEventListener('mousemove', onMouseMove);
+                document.removeEventListener('mouseup', onMouseUp);
+            }
+            
+            document.addEventListener('mousemove', onMouseMove);
+            document.addEventListener('mouseup', onMouseUp);
+        }
+        
+        // Chat
+        function addChatMessage(sender, message) {
+            const chatMessages = document.getElementById('chat-messages');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = 'chat-message';
+            
+            const senderColor = sender === 'Sistema' ? 'var(--accent)' : 
+                               sender === 'Mestre' ? '#FFD700' : '#4CAF50';
+            
+            messageDiv.innerHTML = `<strong style="color: ${senderColor};">${sender}:</strong> ${message}`;
+            chatMessages.appendChild(messageDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+        
+        function sendChatMessage() {
+            const input = document.getElementById('chat-input');
+            const message = input.value.trim();
+            if (message) {
+                // Verificar se é comando de dados
+                const diceMatch = message.match(/^(\d+)d(\d+)$/i);
+                if (diceMatch) {
+                    const numDice = parseInt(diceMatch[1]);
+                    const sides = parseInt(diceMatch[2]);
+                    rollDice(numDice, sides);
+                } else {
+                    addChatMessage('Você', message);
+                }
+                input.value = '';
+            }
+        }
+        
+        function rollDice(numDice, sides) {
+            if (numDice > 100) {
+                addChatMessage('Sistema', 'Máximo de 100 dados por rolagem.');
+                return;
+            }
+            if (sides > 1000) {
+                addChatMessage('Sistema', 'Máximo de 1000 lados por dado.');
+                return;
+            }
+            
+            const rolls = [];
+            let total = 0;
+            
+            for (let i = 0; i < numDice; i++) {
+                const roll = Math.floor(Math.random() * sides) + 1;
+                rolls.push(roll);
+                total += roll;
+            }
+            
+            let resultMessage = `🎲 ${numDice}d${sides}: `;
+            if (numDice <= 10) {
+                resultMessage += `[${rolls.join(', ')}] = ${total}`;
+            } else {
+                resultMessage += `Total: ${total}`;
+            }
+            
+            addChatMessage('Você', resultMessage);
+        }
+        
+        document.getElementById('chat-input').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                sendChatMessage();
+            }
+        });
+        
+        document.getElementById('dice-input').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                rollCustomDice();
+            }
+        });
+        
+        // Inicializar canvas de desenho
+        function initDrawCanvas() {
+            drawCanvas = document.getElementById('draw-canvas');
+            drawCtx = drawCanvas.getContext('2d');
+            drawCtx.strokeStyle = '#EBD677';
+            drawCtx.lineWidth = 3;
+            drawCtx.lineCap = 'round';
+            drawCtx.lineJoin = 'round';
+        }
+        
+        // Toggle modo desenho
+        function toggleDrawMode() {
+            document.getElementById('draw-modal').style.display = 'block';
+        }
+        
+        function fecharModalDesenho() {
+            document.getElementById('draw-modal').style.display = 'none';
+        }
+        
+        function ativarDesenho() {
+            if (!drawCtx) {
+                initDrawCanvas();
+            }
+            
+            const corSelecionada = document.querySelector('.draw-color-btn.selected')?.dataset.color || '#EBD677';
+            const tamanho = document.getElementById('brush-size').value;
+            
+            drawCtx.strokeStyle = corSelecionada;
+            drawCtx.lineWidth = parseInt(tamanho);
+            
+            drawMode = true;
+            const drawBtn = document.getElementById('draw-btn');
+            const drawCanvas = document.getElementById('draw-canvas');
+            
+            drawBtn.classList.add('active');
+            drawCanvas.style.pointerEvents = 'auto';
+            canvas.style.cursor = 'crosshair';
+            
+            fecharModalDesenho();
+        }
+        
+        function desativarDesenho() {
+            drawMode = false;
+            const drawBtn = document.getElementById('draw-btn');
+            const drawCanvas = document.getElementById('draw-canvas');
+            
+            drawBtn.classList.remove('active');
+            drawCanvas.style.pointerEvents = 'none';
+            canvas.style.cursor = 'grab';
+        }
+        
+        // Funções de desenho
+        function startDrawing(e) {
+            if (!drawMode) return;
+            e.preventDefault();
+            e.stopPropagation();
+            isDrawing = true;
+            const rect = canvas.getBoundingClientRect();
+            lastX = (e.clientX - rect.left - panX) / zoom;
+            lastY = (e.clientY - rect.top - panY) / zoom;
+        }
+        
+        function draw(e) {
+            if (!isDrawing || !drawMode) return;
+            e.preventDefault();
+            e.stopPropagation();
+            
+            const rect = canvas.getBoundingClientRect();
+            const currentX = (e.clientX - rect.left - panX) / zoom;
+            const currentY = (e.clientY - rect.top - panY) / zoom;
+            
+            drawCtx.beginPath();
+            drawCtx.moveTo(lastX, lastY);
+            drawCtx.lineTo(currentX, currentY);
+            drawCtx.stroke();
+            
+            lastX = currentX;
+            lastY = currentY;
+        }
+        
+        function stopDrawing() {
+            isDrawing = false;
+        }
+        
+        // Limpar desenhos
+        function clearDrawings() {
+            if (confirm('Limpar todos os desenhos?')) {
+                drawCtx.clearRect(0, 0, drawCanvas.width, drawCanvas.height);
+            }
+        }
+        
+        // Verificar se já tem personagem criado ao carregar
+        window.addEventListener('load', () => {
+            loadMesaFromURL();
+            carregarPersonagens();
+            initDrawCanvas();
+            
+            // Event listener para parar desenho ao sair do canvas
+            canvas.addEventListener('mouseleave', stopDrawing);
+        });
+        
+        // Adicionar texto no grid
+        function adicionarTexto() {
+            editingElement = null;
+            document.getElementById('text-modal-title').textContent = 'Adicionar Texto';
+            document.getElementById('text-input').value = '';
+            document.getElementById('font-size').value = '14px';
+            selectedColor = '#ffffff';
+            document.getElementById('delete-text-btn').style.display = 'none';
+            atualizarCoresModal();
+            document.getElementById('text-modal').style.display = 'block';
+        }
+        
+        function criarElementoTexto(texto, x, y, fontSize = '14px', color = '#ffffff') {
+            const textElement = document.createElement('div');
+            textElement.className = 'text-element';
+            textElement.style.left = x + 'px';
+            textElement.style.top = y + 'px';
+            textElement.style.fontSize = fontSize;
+            textElement.style.color = color;
+            textElement.textContent = texto;
+            textElement.dataset.originalText = texto;
+            
+            // Duplo clique para editar
+            textElement.addEventListener('dblclick', (e) => {
+                e.stopPropagation();
+                editarTexto(textElement);
+            });
+            
+            // Arrastar
+            textElement.addEventListener('mousedown', (e) => {
+                e.stopPropagation();
+                startTokenDrag(e, textElement);
+            });
+            
+            // Clique direito para remover
+            textElement.addEventListener('contextmenu', (e) => {
+                e.preventDefault();
+                if (confirm('Remover este texto?')) {
+                    textElement.remove();
+                }
+            });
+            
+            canvas.appendChild(textElement);
+        }
+        
+        function editarTexto(element) {
+            editingElement = element;
+            document.getElementById('text-modal-title').textContent = 'Editar Texto';
+            document.getElementById('text-input').value = element.dataset.originalText || element.textContent;
+            document.getElementById('font-size').value = element.style.fontSize || '14px';
+            selectedColor = element.style.color || '#ffffff';
+            document.getElementById('delete-text-btn').style.display = 'inline-block';
+            atualizarCoresModal();
+            document.getElementById('text-modal').style.display = 'block';
+        }
+        
+        function excluirTexto() {
+            if (editingElement) {
+                document.getElementById('confirm-modal').style.display = 'block';
+            }
+        }
+        
+        function fecharConfirmModal() {
+            document.getElementById('confirm-modal').style.display = 'none';
+        }
+        
+        function confirmarExclusao() {
+            if (editingElement) {
+                editingElement.remove();
+                fecharConfirmModal();
+                fecharModalTexto();
+            }
+        }
+        
+        function fecharModalTexto() {
+            document.getElementById('text-modal').style.display = 'none';
+            editingElement = null;
+        }
+        
+        function confirmarTexto() {
+            const texto = document.getElementById('text-input').value.trim();
+            if (!texto) return;
+            
+            const fontSize = document.getElementById('font-size').value;
+            
+            if (editingElement) {
+                // Editando texto existente
+                editingElement.textContent = texto;
+                editingElement.dataset.originalText = texto;
+                editingElement.style.fontSize = fontSize;
+                editingElement.style.color = selectedColor;
+            } else {
+                // Criando novo texto
+                const x = 300 + Math.random() * 200;
+                const y = 300 + Math.random() * 200;
+                criarElementoTexto(texto, x, y, fontSize, selectedColor);
+            }
+            
+            fecharModalTexto();
+        }
+        
+        function atualizarCoresModal() {
+            document.querySelectorAll('.color-btn').forEach(btn => {
+                btn.classList.remove('selected');
+                if (btn.dataset.color === selectedColor) {
+                    btn.classList.add('selected');
+                }
+            });
+        }
+        
+        // Event listeners para cores
+        document.addEventListener('DOMContentLoaded', function() {
+            document.querySelectorAll('.color-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    selectedColor = this.dataset.color;
+                    atualizarCoresModal();
+                });
+            });
+            
+            // Event listeners para cores de desenho
+            document.querySelectorAll('.draw-color-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    document.querySelectorAll('.draw-color-btn').forEach(b => b.classList.remove('selected'));
+                    this.classList.add('selected');
+                });
+            });
+            
+            // Selecionar primeira cor por padrão
+            const firstDrawColor = document.querySelector('.draw-color-btn');
+            if (firstDrawColor) {
+                firstDrawColor.classList.add('selected');
+            }
+        });
+        
+        // Fechar modal clicando fora
+        window.onclick = function(event) {
+            const characterModal = document.getElementById('character-selection-modal');
+            const textModal = document.getElementById('text-modal');
+            const drawModal = document.getElementById('draw-modal');
+            
+            if (event.target === characterModal) {
+                fecharSelecaoPersonagem();
+            }
+            if (event.target === textModal) {
+                fecharModalTexto();
+            }
+            if (event.target === drawModal) {
+                fecharModalDesenho();
+            }
+            
+            const confirmModal = document.getElementById('confirm-modal');
+            if (event.target === confirmModal) {
+                fecharConfirmModal();
+            }
+        }
+    </script>
 </body>
 </html>
