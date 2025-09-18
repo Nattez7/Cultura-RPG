@@ -28,6 +28,8 @@ let measureEnd = null;
 let backgroundImage = null;
 let snapToGrid = true;
 let currentTool = 'token'; // token, measure, pan
+let customTokens = [];
+let selectedCustomToken = null;
 
 // Personagens disponíveis
 const characters = {
@@ -274,7 +276,11 @@ function handleMouseDown(event) {
                 dragOffset.y = worldY - clickedToken.y;
             } else {
                 // Criar novo token
-                placeToken(worldX, worldY, selectedToken);
+                if (selectedToken) {
+                    placeToken(worldX, worldY, selectedToken);
+                } else if (selectedCustomToken) {
+                    placeToken(worldX, worldY, null);
+                }
             }
         }
     }
@@ -363,6 +369,7 @@ function placeToken(x, y, color) {
         x: finalX,
         y: finalY,
         color: color,
+        customImage: selectedCustomToken ? customTokens.find(t => t.id === selectedCustomToken)?.image : null,
         size: gridSize * 0.8
     };
     
@@ -373,14 +380,41 @@ function placeToken(x, y, color) {
 // Desenhar tokens
 function drawTokens() {
     tokens.forEach(token => {
-        ctx.fillStyle = getTokenColor(token.color);
-        ctx.strokeStyle = selectedTokenId === token.id ? '#fff' : '#000';
-        ctx.lineWidth = 2 / zoom;
-        
-        ctx.beginPath();
-        ctx.arc(token.x, token.y, token.size / 2, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.stroke();
+        if (token.customImage) {
+            // Desenhar token personalizado
+            const img = new Image();
+            img.onload = function() {
+                ctx.save();
+                ctx.beginPath();
+                ctx.arc(token.x, token.y, token.size / 2, 0, Math.PI * 2);
+                ctx.clip();
+                ctx.drawImage(img, 
+                    token.x - token.size / 2, 
+                    token.y - token.size / 2, 
+                    token.size, 
+                    token.size
+                );
+                ctx.restore();
+                
+                // Borda
+                ctx.strokeStyle = selectedTokenId === token.id ? '#fff' : '#000';
+                ctx.lineWidth = 2 / zoom;
+                ctx.beginPath();
+                ctx.arc(token.x, token.y, token.size / 2, 0, Math.PI * 2);
+                ctx.stroke();
+            };
+            img.src = token.customImage;
+        } else {
+            // Desenhar token padrão
+            ctx.fillStyle = getTokenColor(token.color);
+            ctx.strokeStyle = selectedTokenId === token.id ? '#fff' : '#000';
+            ctx.lineWidth = 2 / zoom;
+            
+            ctx.beginPath();
+            ctx.arc(token.x, token.y, token.size / 2, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.stroke();
+        }
     });
 }
 
@@ -456,12 +490,25 @@ function getTokenColor(color) {
 // Selecionar token
 function selectToken(color) {
     selectedToken = color;
+    selectedCustomToken = null;
     
     // Atualizar visual
-    document.querySelectorAll('.token').forEach(token => {
+    document.querySelectorAll('.token, .custom-token').forEach(token => {
         token.classList.remove('selected');
     });
     document.querySelector(`.token.${color}`).classList.add('selected');
+}
+
+// Selecionar token personalizado
+function selectCustomToken(tokenId) {
+    selectedCustomToken = tokenId;
+    selectedToken = null;
+    
+    // Atualizar visual
+    document.querySelectorAll('.token, .custom-token').forEach(token => {
+        token.classList.remove('selected');
+    });
+    document.querySelector(`[data-token-id="${tokenId}"]`).classList.add('selected');
 }
 
 // Limpar mapa
@@ -730,6 +777,14 @@ function setupEventListeners() {
         }
     });
     
+    // Upload de token personalizado
+    document.getElementById('token-upload').addEventListener('change', function(event) {
+        const file = event.target.files[0];
+        if (file && file.type.startsWith('image/')) {
+            addCustomToken(file);
+        }
+    });
+    
     // Modal de dados
     document.getElementById('dice-roller-btn').addEventListener('click', function() {
         document.getElementById('dice-modal').style.display = 'block';
@@ -739,6 +794,64 @@ function setupEventListeners() {
     setupKeyboardShortcuts();
     
     loadNotes();
+    loadCustomTokens();
+}
+
+// Adicionar token personalizado
+function addCustomToken(file) {
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        const tokenId = Date.now() + Math.random();
+        const customToken = {
+            id: tokenId,
+            image: e.target.result,
+            name: file.name
+        };
+        
+        customTokens.push(customToken);
+        saveCustomTokens();
+        renderCustomTokens();
+    };
+    reader.readAsDataURL(file);
+}
+
+// Renderizar tokens personalizados
+function renderCustomTokens() {
+    const container = document.getElementById('custom-tokens');
+    container.innerHTML = customTokens.map(token => `
+        <div class="custom-token" 
+             data-token-id="${token.id}"
+             onclick="selectCustomToken('${token.id}')"
+             style="background-image: url('${token.image}')"
+             title="${token.name}">
+            <button class="remove-token" onclick="removeCustomToken('${token.id}', event)">×</button>
+        </div>
+    `).join('');
+}
+
+// Remover token personalizado
+function removeCustomToken(tokenId, event) {
+    event.stopPropagation();
+    customTokens = customTokens.filter(t => t.id !== tokenId);
+    if (selectedCustomToken === tokenId) {
+        selectedCustomToken = null;
+    }
+    saveCustomTokens();
+    renderCustomTokens();
+}
+
+// Salvar tokens personalizados no localStorage
+function saveCustomTokens() {
+    localStorage.setItem(`custom-tokens-${mesaData?.codigo || 'default'}`, JSON.stringify(customTokens));
+}
+
+// Carregar tokens personalizados do localStorage
+function loadCustomTokens() {
+    const saved = localStorage.getItem(`custom-tokens-${mesaData?.codigo || 'default'}`);
+    if (saved) {
+        customTokens = JSON.parse(saved);
+        renderCustomTokens();
+    }
 }
 
 // Fechar modal de dados
@@ -748,6 +861,8 @@ function closeDiceModal() {
 
 // Exportar funções globais
 window.selectToken = selectToken;
+window.selectCustomToken = selectCustomToken;
+window.removeCustomToken = removeCustomToken;
 window.clearMap = clearMap;
 window.toggleGrid = toggleGrid;
 window.clearTokens = clearTokens;
