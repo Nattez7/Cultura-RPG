@@ -4,188 +4,311 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mesa Virtual - Cultura RPG</title>
-    <link rel="stylesheet" href="css/common.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="css/mesa.css">
 </head>
 <body>
-    <div class="virtual-table">
-        <!-- Header da Mesa -->
-        <div class="table-header">
-            <div class="table-info">
-                <h1 id="mesa-title">Mesa Virtual</h1>
-                <span id="mesa-code">Código: ---</span>
-            </div>
-            <div class="table-controls">
-                <button id="dice-roller-btn" class="control-btn">Dados</button>
-                <button id="map-btn" class="control-btn">Mapa</button>
-                <button id="tokens-btn" class="control-btn">Tokens</button>
-                <button id="settings-btn" class="control-btn">Configuração</button>
-            </div>
-        </div>
-
-        <!-- Área Principal -->
-        <div class="table-main">
-            <!-- Painel Lateral Esquerdo -->
-            <div class="left-panel">
-                <!-- Ficha do Personagem -->
-                <div class="character-sheet">
-                    <h3>Meu Personagem</h3>
-                    <div id="character-info">
-                        <select id="character-select">
-                            <option value="">Selecionar Personagem</option>
-                        </select>
-                        <div id="character-details" style="display: none;">
-                            <div class="character-avatar">
-                                <img id="char-image" src="" alt="Personagem">
-                                <h4 id="char-name"></h4>
-                            </div>
-                            <div class="character-stats">
-                                <div class="stat">
-                                    <span class="stat-label">Força:</span>
-                                    <span id="char-forca" class="stat-value">0</span>
-                                </div>
-                                <div class="stat">
-                                    <span class="stat-label">Sabedoria:</span>
-                                    <span id="char-sabedoria" class="stat-value">0</span>
-                                </div>
-                                <div class="stat">
-                                    <span class="stat-label">Carisma:</span>
-                                    <span id="char-carisma" class="stat-value">0</span>
-                                </div>
-                            </div>
-                            <div class="character-talents">
-                                <h5>Talentos:</h5>
-                                <div id="char-talents"></div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Jogadores Online -->
-                <div class="players-list">
-                    <h3>Jogadores</h3>
-                    <div id="online-players">
-                        <!-- Lista de jogadores -->
-                    </div>
-                </div>
-            </div>
-
-            <!-- Área Central do Jogo -->
-            <div class="game-area">
-                <!-- Mapa/Grid -->
-                <div class="map-container">
-                    <div id="game-map" class="game-map">
-                        <canvas id="map-canvas" width="800" height="600"></canvas>
-                        <div id="tokens-layer" class="tokens-layer"></div>
-                    </div>
-                </div>
-
-                <!-- Controles do Mapa -->
-                <div class="map-controls">
-                    <div class="tool-group">
-                        <button class="tool-btn active" data-tool="token" onclick="setTool('token')">Token</button>
-                        <button class="tool-btn" data-tool="measure" onclick="setTool('measure')">Medir</button>
-                        <button class="tool-btn" data-tool="pan" onclick="setTool('pan')">Pan</button>
-                    </div>
-                    
-                    <div class="control-group">
-                        <button onclick="toggleGrid()">Grid</button>
-                        <button data-action="snap" class="active" onclick="toggleSnapToGrid()">Snap</button>
-                        <button onclick="resetView()">Reset</button>
-                    </div>
-                    
-                    <div class="grid-controls">
-                        <button onclick="adjustGridSize(-5)">Grid -</button>
-                        <button onclick="adjustGridSize(5)">Grid +</button>
-                    </div>
-                    
-                    <div class="file-controls">
-                        <input type="file" id="map-upload" accept="image/*" style="display: none;">
-                        <button onclick="document.getElementById('map-upload').click()">Upload</button>
-                        <button onclick="clearMap()">Limpar</button>
-                        <button onclick="clearTokens()">Tokens</button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Painel Lateral Direito -->
-            <div class="right-panel">
-                <!-- Rolador de Dados -->
-                <div class="dice-section">
-                    <h3>Dados</h3>
-                    <div class="dice-controls">
-                        <select id="dice-type">
-                            <option value="6">d6</option>
-                            <option value="20">d20</option>
-                            <option value="100">d100</option>
-                        </select>
-                        <input type="number" id="dice-count" value="1" min="1" max="10">
-                        <button onclick="rollDice()">🎲 Rolar</button>
-                    </div>
-                    <div id="dice-results" class="dice-results"></div>
-                </div>
-
-                <!-- Tokens -->
-                <div class="tokens-section">
-                    <h3>🔴 Tokens</h3>
-                    <div class="token-palette">
-                        <div class="token red" onclick="selectToken('red')"></div>
-                        <div class="token blue" onclick="selectToken('blue')"></div>
-                        <div class="token green" onclick="selectToken('green')"></div>
-                        <div class="token yellow" onclick="selectToken('yellow')"></div>
-                        <div class="token purple" onclick="selectToken('purple')"></div>
-                        <div class="token black" onclick="selectToken('black')"></div>
-                    </div>
-                    <button onclick="clearTokens()">🗑️ Limpar Tokens</button>
-                </div>
-
-                <!-- Notas -->
-                <div class="notes-section">
-                    <h3>📝 Notas</h3>
-                    <textarea id="game-notes" placeholder="Anotações da sessão..."></textarea>
-                    <button onclick="saveNotes()">💾 Salvar</button>
-                </div>
+    <div class="rpg-interface">
+        <!-- Toolbar -->
+        <div class="toolbar">
+            <button class="tool-btn" title="Mostrar/Ocultar Grid" onclick="toggleGrid()">
+                <i class="fas fa-th"></i>
+            </button>
+            
+            <input type="file" id="map-upload" accept="image/*" style="display: none;">
+            <button class="tool-btn" title="Upload de Mapa" onclick="document.getElementById('map-upload').click()">
+                <i class="fas fa-image"></i>
+            </button>
+            
+            <button class="tool-btn" title="Adicionar Texto" onclick="adicionarTexto()">
+                <i class="fas fa-font"></i>
+            </button>
+            
+            <button class="tool-btn" id="select-btn" title="Modo Seleção/Movimento" onclick="toggleSelectMode()">
+                <i class="fas fa-mouse-pointer"></i>
+            </button>
+            
+            <button class="tool-btn" id="draw-btn" title="Desenhar" onclick="toggleDrawMode()">
+                <i class="fas fa-pen"></i>
+            </button>
+            
+            <button class="tool-btn" id="ruler-btn" title="Medir Distância" onclick="toggleRulerMode()">
+                <i class="fas fa-ruler"></i>
+            </button>
+            
+            <button class="tool-btn" title="Limpar Desenhos" onclick="clearDrawings()">
+                <i class="fas fa-eraser"></i>
+            </button>
+            
+            <div style="margin-left: auto; display: flex; align-items: center; gap: 1rem;">
+                <span id="mesa-title">Mesa Virtual</span>
+                <span id="mesa-code" style="color: var(--accent);">Código: ---</span>
             </div>
         </div>
 
-        <!-- Chat -->
-        <div class="chat-area">
+        <!-- Sidebar Esquerda - Ficha do Personagem -->
+        <div class="sidebar">
+            <div id="character-sheet" style="display: none;">
+                <h3 style="color: var(--accent); margin-bottom: 1rem; text-align: center;">
+                    <i class="fas fa-scroll"></i> Ficha do Personagem
+                </h3>
+                
+                <!-- Avatar e Nome -->
+                <div style="text-align: center; margin-bottom: 2rem;">
+                    <div id="char-avatar" style="
+                        width: 80px; height: 80px; border-radius: 50%; background: var(--gradient);
+                        display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem;
+                        overflow: hidden; border: 2px solid var(--accent);
+                    ">
+                        <i class="fas fa-user" style="font-size: 2rem; color: var(--text);"></i>
+                    </div>
+                    <h4 id="sheet-char-name" style="color: var(--text); margin: 0 0 0.5rem;">-</h4>
+                    <p id="sheet-char-level" style="color: var(--accent); margin: 0; font-weight: bold;">Nível 1</p>
+                </div>
+                
+
+                
+                <!-- Atributos -->
+                <div style="background: rgba(255,255,255,0.05); border-radius: 8px; padding: 1rem; margin-bottom: 1rem;">
+                    <h5 style="color: var(--accent); margin-bottom: 0.5rem;">Atributos</h5>
+                    <div id="sheet-stats" style="display: grid; gap: 0.5rem;"></div>
+                </div>
+                
+                <!-- Upload de Tokens -->
+                <div class="token-upload">
+                    <input type="file" id="token-upload" accept="image/*">
+                    <button class="token-upload-btn" onclick="document.getElementById('token-upload').click()">
+                        📷 Adicionar Token
+                    </button>
+                </div>
+                
+                <!-- Tokens Personalizados -->
+                <div id="custom-tokens" class="custom-tokens"></div>
+            </div>
+            
+            <!-- Botão Adicionar Personagem -->
+            <div id="add-character-section">
+                <button id="add-character-btn" onclick="mostrarSelecaoPersonagem()" 
+                    style="background: var(--accent); color: #000; border: none; padding: 1rem; 
+                           border-radius: 8px; cursor: pointer; font-weight: bold; width: 100%;">
+                    <i class="fas fa-plus"></i> Adicionar Personagem na Mesa
+                </button>
+            </div>
+        </div>
+
+        <!-- Canvas -->
+        <div class="canvas-container">
+            <div class="canvas" id="canvas">
+                <div class="map-layer" id="map-layer"></div>
+                <canvas id="draw-canvas" width="4000" height="4000" style="position: absolute; top: 0; left: 0; z-index: 8; pointer-events: none;"></canvas>
+                <div class="grid-layer" id="grid-layer"></div>
+            </div>
+            
+            <div class="coordinates" id="coordinates">X: 0, Y: 0</div>
+            
+            <div class="zoom-controls">
+                <button class="zoom-btn" onclick="zoomIn()">
+                    <i class="fas fa-plus"></i>
+                </button>
+                <button class="zoom-btn" onclick="zoomOut()">
+                    <i class="fas fa-minus"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Chat e Controles -->
+        <div class="chat-panel">
+            <div class="chat-header">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <span><i class="fas fa-comments"></i> Chat da Mesa</span>
+                    <button onclick="limparChat()" style="
+                        background: #666; color: white; border: none; padding: 0.25rem 0.5rem;
+                        border-radius: 4px; cursor: pointer; font-size: 0.8rem;
+                    " title="Limpar Chat">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </div>
+            </div>
+            
             <div class="chat-messages" id="chat-messages">
-                <!-- Mensagens do chat -->
+                <div class="chat-message">
+                    <strong style="color: #FFD700;">Mestre:</strong> Bem-vindos à aventura! Vocês podem ouvir sons estranhos ao longe...
+                </div>
             </div>
-            <div class="chat-input">
-                <input type="text" id="message-input" placeholder="Digite sua mensagem..." onkeypress="handleChatKeyPress(event)">
-                <button onclick="sendMessage()">💬 Enviar</button>
+            
+            <div class="chat-input-area">
+                <div style="display: flex; gap: 0.5rem;">
+                    <input type="text" class="chat-input" id="chat-input" placeholder="Digite sua mensagem..." style="flex: 1;">
+                    <button onclick="sendChatMessage()" style="background: var(--accent); color: #000; border: none; padding: 0.75rem; border-radius: 6px; cursor: pointer;">
+                        <i class="fas fa-paper-plane"></i>
+                    </button>
+                </div>
             </div>
         </div>
     </div>
 
-    <!-- Modais -->
-    <div id="dice-modal" class="modal">
-        <div class="modal-content">
-            <span class="close" onclick="closeDiceModal()">&times;</span>
-            <h2>🎲 Rolador de Dados</h2>
-            <div class="dice-roller">
-                <div class="dice-options">
-                    <button onclick="quickRoll('forca')">Força (d6)</button>
-                    <button onclick="quickRoll('sabedoria')">Sabedoria (d6)</button>
-                    <button onclick="quickRoll('carisma')">Carisma (d6)</button>
-                </div>
-                <div class="custom-roll">
-                    <input type="number" id="custom-dice" value="1" min="1" max="20">
-                    <span>d</span>
-                    <select id="custom-sides">
-                        <option value="6">6</option>
-                        <option value="20">20</option>
-                        <option value="100">100</option>
-                    </select>
-                    <button onclick="customRoll()">🎲 Rolar</button>
+    <!-- Modal de Seleção de Personagem -->
+    <div id="character-selection-modal" class="modal" style="display: none;">
+        <div class="modal-content" style="max-width: 900px; max-height: 90vh; overflow-y: auto;">
+            <span class="close" onclick="fecharSelecaoPersonagem()">&times;</span>
+            <h2 style="color: var(--accent); margin-bottom: 1rem; text-align: center;">
+                <i class="fas fa-users"></i> Escolha seu Personagem
+            </h2>
+            <p style="text-align: center; margin-bottom: 2rem; color: #ccc;">
+                Selecione um dos personagens históricos brasileiros para jogar nesta mesa:
+            </p>
+            
+            <div id="characters-grid" style="
+                display: grid; 
+                grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); 
+                gap: 1rem; 
+                margin-bottom: 2rem;
+            "></div>
+            
+            <div style="text-align: center; padding-top: 1rem; border-top: 1px solid #444;">
+                <button onclick="fecharSelecaoPersonagem()" style="
+                    background: #666; color: white; border: none; padding: 0.75rem 2rem; 
+                    border-radius: 6px; cursor: pointer; font-size: 1rem;
+                ">Cancelar</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Modal de Texto -->
+    <div id="text-modal" class="modal" style="display: none;">
+        <div class="modal-content" style="max-width: 500px;">
+            <span class="close" onclick="fecharModalTexto()">&times;</span>
+            <h2 style="color: var(--accent); margin-bottom: 1.5rem; text-align: center;">
+                <i class="fas fa-font"></i> <span id="text-modal-title">Adicionar Texto</span>
+            </h2>
+            
+            <div style="margin-bottom: 1.5rem;">
+                <label style="display: block; margin-bottom: 0.5rem; color: var(--accent); font-weight: bold;">Texto:</label>
+                <textarea id="text-input" placeholder="Digite seu texto aqui..." style="
+                    width: 100%; height: 100px; padding: 0.75rem; border: 1px solid #555; 
+                    border-radius: 6px; background: #1a1a1a; color: white; resize: vertical;
+                    font-family: inherit; font-size: 14px;
+                "></textarea>
+            </div>
+            
+            <div style="margin-bottom: 1.5rem;">
+                <label style="display: block; margin-bottom: 0.5rem; color: var(--accent); font-weight: bold;">Tamanho da Fonte:</label>
+                <select id="font-size" style="
+                    width: 100%; padding: 0.5rem; border: 1px solid #555; border-radius: 6px; 
+                    background: #1a1a1a; color: white;
+                ">
+                    <option value="12px">Pequeno (12px)</option>
+                    <option value="14px" selected>Normal (14px)</option>
+                    <option value="16px">Médio (16px)</option>
+                    <option value="18px">Grande (18px)</option>
+                    <option value="24px">Muito Grande (24px)</option>
+                </select>
+            </div>
+            
+            <div style="margin-bottom: 1.5rem;">
+                <label style="display: block; margin-bottom: 0.5rem; color: var(--accent); font-weight: bold;">Cor do Texto:</label>
+                <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                    <button class="color-btn" data-color="#ffffff" style="background: #ffffff;"></button>
+                    <button class="color-btn" data-color="#EBD677" style="background: #EBD677;"></button>
+                    <button class="color-btn" data-color="#ff6b6b" style="background: #ff6b6b;"></button>
+                    <button class="color-btn" data-color="#4ecdc4" style="background: #4ecdc4;"></button>
+                    <button class="color-btn" data-color="#45b7d1" style="background: #45b7d1;"></button>
+                    <button class="color-btn" data-color="#96ceb4" style="background: #96ceb4;"></button>
+                    <button class="color-btn" data-color="#feca57" style="background: #feca57;"></button>
+                    <button class="color-btn" data-color="#ff9ff3" style="background: #ff9ff3;"></button>
                 </div>
             </div>
-            <div id="modal-dice-results"></div>
+            
+            <div style="display: flex; gap: 1rem; justify-content: center;">
+                <button onclick="fecharModalTexto()" style="
+                    background: #666; color: white; border: none; padding: 0.75rem 1.5rem; 
+                    border-radius: 6px; cursor: pointer;
+                ">Cancelar</button>
+                <button id="delete-text-btn" onclick="excluirTexto()" style="
+                    background: #dc3545; color: white; border: none; padding: 0.75rem 1.5rem; 
+                    border-radius: 6px; cursor: pointer; display: none;
+                ">Excluir</button>
+                <button onclick="confirmarTexto()" style="
+                    background: var(--accent); color: #000; border: none; padding: 0.75rem 1.5rem; 
+                    border-radius: 6px; cursor: pointer; font-weight: bold;
+                ">Confirmar</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Modal de Confirmação -->
+    <div id="confirm-modal" class="modal" style="display: none;">
+        <div class="modal-content" style="max-width: 400px;">
+            <h2 style="color: var(--accent); margin-bottom: 1rem; text-align: center;">
+                <i class="fas fa-exclamation-triangle"></i> Confirmar Exclusão
+            </h2>
+            <p style="text-align: center; margin-bottom: 2rem; color: #ccc;">
+                Tem certeza que deseja excluir este texto?
+            </p>
+            <div style="display: flex; gap: 1rem; justify-content: center;">
+                <button onclick="fecharConfirmModal()" style="
+                    background: #666; color: white; border: none; padding: 0.75rem 1.5rem; 
+                    border-radius: 6px; cursor: pointer;
+                ">Cancelar</button>
+                <button onclick="confirmarExclusao()" style="
+                    background: #dc3545; color: white; border: none; padding: 0.75rem 1.5rem; 
+                    border-radius: 6px; cursor: pointer; font-weight: bold;
+                ">Excluir</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Modal de Desenho -->
+    <div id="draw-modal" class="modal" style="display: none;">
+        <div class="modal-content" style="max-width: 400px;">
+            <span class="close" onclick="fecharModalDesenho()">&times;</span>
+            <h2 style="color: var(--accent); margin-bottom: 1.5rem; text-align: center;">
+                <i class="fas fa-pen"></i> Configurar Desenho
+            </h2>
+            
+            <div style="margin-bottom: 1.5rem;">
+                <label style="display: block; margin-bottom: 0.5rem; color: var(--accent); font-weight: bold;">Cor do Pincel:</label>
+                <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                    <button class="draw-color-btn" data-color="#EBD677" style="background: #EBD677;"></button>
+                    <button class="draw-color-btn" data-color="#ffffff" style="background: #ffffff;"></button>
+                    <button class="draw-color-btn" data-color="#ff6b6b" style="background: #ff6b6b;"></button>
+                    <button class="draw-color-btn" data-color="#4ecdc4" style="background: #4ecdc4;"></button>
+                    <button class="draw-color-btn" data-color="#45b7d1" style="background: #45b7d1;"></button>
+                    <button class="draw-color-btn" data-color="#96ceb4" style="background: #96ceb4;"></button>
+                    <button class="draw-color-btn" data-color="#feca57" style="background: #feca57;"></button>
+                    <button class="draw-color-btn" data-color="#ff9ff3" style="background: #ff9ff3;"></button>
+                    <button class="draw-color-btn" data-color="#000000" style="background: #000000;"></button>
+                </div>
+            </div>
+            
+            <div style="margin-bottom: 1.5rem;">
+                <label style="display: block; margin-bottom: 0.5rem; color: var(--accent); font-weight: bold;">Tamanho do Pincel:</label>
+                <select id="brush-size" style="
+                    width: 100%; padding: 0.5rem; border: 1px solid #555; border-radius: 6px; 
+                    background: #1a1a1a; color: white;
+                ">
+                    <option value="1">Muito Fino (1px)</option>
+                    <option value="2">Fino (2px)</option>
+                    <option value="3" selected>Normal (3px)</option>
+                    <option value="5">Médio (5px)</option>
+                    <option value="8">Grosso (8px)</option>
+                    <option value="12">Muito Grosso (12px)</option>
+                </select>
+            </div>
+            
+            <div style="display: flex; gap: 1rem; justify-content: center;">
+                <button onclick="fecharModalDesenho()" style="
+                    background: #666; color: white; border: none; padding: 0.75rem 1.5rem; 
+                    border-radius: 6px; cursor: pointer;
+                ">Cancelar</button>
+                <button onclick="ativarDesenho()" style="
+                    background: var(--accent); color: #000; border: none; padding: 0.75rem 1.5rem; 
+                    border-radius: 6px; cursor: pointer; font-weight: bold;
+                ">Desenhar</button>
+            </div>
         </div>
     </div>
 
-    <script type="module" src="js/mesa-page.js"></script>
+    <script src="js/mesa.js"></script>
 </body>
 </html>

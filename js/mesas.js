@@ -3,17 +3,17 @@ import { collection, doc, addDoc, setDoc, getDocs, deleteDoc, updateDoc, onSnaps
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
 // Estado do usuário
-let currentUser = null;
+let usuarioAtual = null;
 
 // Monitorar estado de autenticação
-onAuthStateChanged(auth, (user) => {
-    currentUser = user;
+onAuthStateChanged(auth, (usuario) => {
+    usuarioAtual = usuario;
 });
 
 // Estado do jogo
-let gameState = {
+let estadoJogo = {
     mesas: [],
-    missions: {
+    missoes: {
         carnaval: {
             name: 'As Origens do Carnaval',
             description: 'Viaje ao Rio de Janeiro do século XIX e descubra como nasceu a maior festa popular do Brasil. Explore os bailes de máscaras da elite, os cordões dos bairros populares e as influências africanas que moldaram nossa cultura carnavalesca.',
@@ -273,146 +273,146 @@ let gameState = {
 };
 
 // Carregar missões do Firestore (com fallback)
-async function loadMissionsFromFirebase() {
+async function carregarMissoesDoFirebase() {
     try {
-        const querySnapshot = await getDocs(collection(db, 'missoes'));
+        const snapshotConsulta = await getDocs(collection(db, 'missoes'));
         
-        if (!querySnapshot.empty) {
-            const firestoreData = {};
-            querySnapshot.forEach((doc) => {
-                firestoreData[doc.id] = doc.data();
+        if (!snapshotConsulta.empty) {
+            const dadosFirestore = {};
+            snapshotConsulta.forEach((documento) => {
+                dadosFirestore[documento.id] = documento.data();
             });
             
-            gameState.missions = firestoreData;
-            console.log('Missões carregadas do Firestore:', Object.keys(firestoreData));
+            estadoJogo.missoes = dadosFirestore;
+            console.log('Missões carregadas do Firestore:', Object.keys(dadosFirestore));
             return true;
         } else {
             console.log('Nenhuma missão encontrada no Firestore');
             return false;
         }
-    } catch (error) {
-        console.error('Erro ao carregar missões do Firestore:', error);
+    } catch (erro) {
+        console.error('Erro ao carregar missões do Firestore:', erro);
         return false;
     }
 }
 
 // Inicialização
 document.addEventListener('DOMContentLoaded', async function() {
-    initializeMesasSystem();
+    inicializarSistemaMesas();
     
     // Tentar carregar missões do Firestore primeiro
-    const missionsLoaded = await loadMissionsFromFirebase();
-    if (!missionsLoaded) {
+    const missoesCarregadas = await carregarMissoesDoFirebase();
+    if (!missoesCarregadas) {
         console.log('Usando missões locais como fallback');
     }
     
-    loadMesasFromFirebase();
+    carregarMesasDoFirebase();
 });
 
-function initializeMesasSystem() {
+function inicializarSistemaMesas() {
     console.log('Inicializando sistema de mesas...');
     
-    const criarMesaForm = document.getElementById('criar-mesa-form');
-    console.log('Formulário encontrado:', criarMesaForm);
+    const formularioCriarMesa = document.getElementById('criar-mesa-form');
+    console.log('Formulário encontrado:', formularioCriarMesa);
     
-    if (criarMesaForm) {
-        criarMesaForm.addEventListener('submit', criarMesa);
+    if (formularioCriarMesa) {
+        formularioCriarMesa.addEventListener('submit', criarMesa);
         console.log('Event listener adicionado ao formulário');
     } else {
         console.error('Formulário criar-mesa-form não encontrado!');
     }
     
     // Definir data mínima como agora
-    const dataInput = document.getElementById('mesa-data');
-    if (dataInput) {
-        const now = new Date();
-        now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
-        dataInput.min = now.toISOString().slice(0, 16);
+    const entradaData = document.getElementById('mesa-data');
+    if (entradaData) {
+        const agora = new Date();
+        agora.setMinutes(agora.getMinutes() - agora.getTimezoneOffset());
+        entradaData.min = agora.toISOString().slice(0, 16);
     }
     
     // Event listeners para filtros
-    const filterDifficulty = document.getElementById('filter-difficulty');
-    const filterMission = document.getElementById('filter-mission');
+    const filtroDificuldade = document.getElementById('filter-difficulty');
+    const filtroMissao = document.getElementById('filter-mission');
     
-    if (filterDifficulty) {
-        filterDifficulty.addEventListener('change', loadMesas);
+    if (filtroDificuldade) {
+        filtroDificuldade.addEventListener('change', carregarMesas);
     }
     
-    if (filterMission) {
-        filterMission.addEventListener('change', loadMesas);
+    if (filtroMissao) {
+        filtroMissao.addEventListener('change', carregarMesas);
     }
 }
 
 // Mostrar abas
-function showTab(tabName) {
+function mostrarAba(nomeAba) {
     // Remover classe active de todas as abas
-    document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-    document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+    document.querySelectorAll('.tab-btn').forEach(botao => botao.classList.remove('active'));
+    document.querySelectorAll('.tab-content').forEach(conteudo => conteudo.classList.remove('active'));
     
     // Ativar aba selecionada
     event.target.classList.add('active');
-    document.getElementById(tabName + '-tab').classList.add('active');
+    document.getElementById(nomeAba + '-tab').classList.add('active');
     
     // Carregar conteúdo específico da aba
-    if (tabName === 'mesas') {
-        loadMesas();
-    } else if (tabName === 'minhas') {
-        loadMinhasMesas();
+    if (nomeAba === 'mesas') {
+        carregarMesas();
+    } else if (nomeAba === 'minhas') {
+        carregarMinhasMesas();
     }
 }
 
 // Carregar mesas do Firestore
-function loadMesasFromFirebase() {
+function carregarMesasDoFirebase() {
     try {
         onSnapshot(collection(db, 'mesas'), (snapshot) => {
-            gameState.mesas = [];
-            snapshot.forEach((doc) => {
-                gameState.mesas.push({ id: doc.id, ...doc.data() });
+            estadoJogo.mesas = [];
+            snapshot.forEach((documento) => {
+                estadoJogo.mesas.push({ id: documento.id, ...documento.data() });
             });
-            loadMesas();
-            loadMinhasMesas();
+            carregarMesas();
+            carregarMinhasMesas();
         });
-    } catch (error) {
-        console.log('Erro ao carregar mesas:', error);
-        loadMesas();
-        loadMinhasMesas();
+    } catch (erro) {
+        console.log('Erro ao carregar mesas:', erro);
+        carregarMesas();
+        carregarMinhasMesas();
     }
 }
 
 // Carregar mesas
-function loadMesas() {
-    const mesasList = document.getElementById('mesas-list');
-    if (!mesasList) return;
+function carregarMesas() {
+    const listaMesas = document.getElementById('mesas-list');
+    if (!listaMesas) return;
     
-    const filterDifficulty = document.getElementById('filter-difficulty')?.value || '';
-    const filterMission = document.getElementById('filter-mission')?.value || '';
+    const filtroDificuldade = document.getElementById('filter-difficulty')?.value || '';
+    const filtroMissao = document.getElementById('filter-mission')?.value || '';
     
-    let mesasFiltradas = gameState.mesas;
+    let mesasFiltradas = estadoJogo.mesas;
     
-    if (filterDifficulty) {
+    if (filtroDificuldade) {
         mesasFiltradas = mesasFiltradas.filter(mesa => 
-            gameState.missions[mesa.missao]?.difficulty === filterDifficulty
+            estadoJogo.missoes[mesa.missao]?.difficulty === filtroDificuldade
         );
     }
     
-    if (filterMission) {
-        mesasFiltradas = mesasFiltradas.filter(mesa => mesa.missao === filterMission);
+    if (filtroMissao) {
+        mesasFiltradas = mesasFiltradas.filter(mesa => mesa.missao === filtroMissao);
     }
     
     if (mesasFiltradas.length === 0) {
-        mesasList.innerHTML = '<p style="text-align: center; color: #666; padding: 2rem;">Nenhuma mesa encontrada com os filtros selecionados.</p>';
+        listaMesas.innerHTML = '<p style="text-align: center; color: #666; padding: 2rem;">Nenhuma mesa encontrada com os filtros selecionados.</p>';
         return;
     }
     
-    mesasList.innerHTML = mesasFiltradas.map(mesa => createMesaCard(mesa)).join('');
+    listaMesas.innerHTML = mesasFiltradas.map(mesa => criarCardMesa(mesa)).join('');
 }
 
 // Criar card de mesa
-function createMesaCard(mesa) {
-    const mission = getMissionInfo(mesa);
-    const dataFormatada = formatDate(mesa.data);
-    const statusClass = `status-${mesa.status}`;
-    const statusText = {
+function criarCardMesa(mesa) {
+    const missao = obterInfoMissao(mesa);
+    const dataFormatada = formatarData(mesa.data);
+    const classeStatus = `status-${mesa.status}`;
+    const textoStatus = {
         'aberta': 'Aberta',
         'cheia': 'Lotada',
         'iniciada': 'Em Andamento'
@@ -422,13 +422,13 @@ function createMesaCard(mesa) {
         <div class="mesa-card">
             <div class="mesa-header">
                 <h4 class="mesa-title">${mesa.nome}</h4>
-                <span class="mesa-status ${statusClass}">${statusText[mesa.status]}</span>
+                <span class="mesa-status ${classeStatus}">${textoStatus[mesa.status]}</span>
             </div>
             
             <div class="mesa-info">
                 <div class="info-item">
                     <span>🎭</span>
-                    <span><strong>Missão:</strong> ${mission.name}</span>
+                    <span><strong>Missão:</strong> ${missao.name}</span>
                 </div>
                 <div class="info-item">
                     <span>👑</span>
@@ -440,37 +440,37 @@ function createMesaCard(mesa) {
                 </div>
                 <div class="info-item">
                     <span>⏱️</span>
-                    <span><strong>Duração:</strong> ${mission.duration}</span>
+                    <span><strong>Duração:</strong> ${missao.duration}</span>
                 </div>
                 <div class="info-item">
                     <span>📊</span>
-                    <span><strong>Dificuldade:</strong> ${mission.difficulty}</span>
+                    <span><strong>Dificuldade:</strong> ${missao.difficulty}</span>
                 </div>
-                ${mission.period ? `
+                ${missao.period ? `
                 <div class="info-item">
                     <span>📆</span>
-                    <span><strong>Período:</strong> ${mission.period}</span>
+                    <span><strong>Período:</strong> ${missao.period}</span>
                 </div>
                 ` : ''}
             </div>
             
             <div class="mesa-description">
                 <p><strong>Descrição da Mesa:</strong> ${mesa.descricao}</p>
-                <p><strong>Sobre a Missão:</strong> ${mission.description}</p>
-                ${mission.characters ? `
+                <p><strong>Sobre a Missão:</strong> ${missao.description}</p>
+                ${missao.characters ? `
                 <div class="mission-characters">
-                    <strong>Personagens Principais:</strong> ${mission.characters.join(', ')}
+                    <strong>Personagens Principais:</strong> ${missao.characters.join(', ')}
                 </div>
                 ` : ''}
-                ${mission.themes ? `
+                ${missao.themes ? `
                 <div class="mission-themes">
-                    <strong>Temas:</strong> ${mission.themes.join(' • ')}
+                    <strong>Temas:</strong> ${missao.themes.join(' • ')}
                 </div>
                 ` : ''}
-                ${mission.masterGuide ? `
+                ${missao.masterGuide ? `
                 <div class="master-guide-preview">
                     <strong>Para Mestres:</strong> Inclui guia completo com contexto histórico, locais detalhados, encontros pré-definidos e dicas de gameplay.
-                    <button class="view-guide-btn" onclick="showMasterGuide('${mesa.missao}')">
+                    <button class="view-guide-btn" onclick="mostrarGuiaMestre('${mesa.missao}')">
                         📜 Ver Guia do Mestre
                     </button>
                 </div>
@@ -482,7 +482,7 @@ function createMesaCard(mesa) {
                     👥 ${mesa.currentPlayers}/${mesa.maxPlayers} jogadores
                 </span>
                 <button class="join-btn" 
-                        onclick="joinMesa('${mesa.id}')" 
+                        onclick="entrarMesa('${mesa.id}')" 
                         ${mesa.status !== 'aberta' ? 'disabled' : ''}>
                     ${mesa.status === 'aberta' ? 'Inscrever-se' : 'Indisponível'}
                 </button>
@@ -492,27 +492,27 @@ function createMesaCard(mesa) {
 }
 
 // Inscrever-se em mesa
-async function joinMesa(mesaId) {
-    if (!currentUser) {
+async function entrarMesa(idMesa) {
+    if (!usuarioAtual) {
         alert('Você precisa estar logado para se inscrever em uma mesa.');
         window.location.href = 'login.html';
         return;
     }
     
-    const mesa = gameState.mesas.find(m => m.id === mesaId);
+    const mesa = estadoJogo.mesas.find(m => m.id === idMesa);
     if (!mesa || mesa.status !== 'aberta') return;
     
     // Verificar se já está inscrito
     if (!mesa.jogadores) mesa.jogadores = [];
-    if (mesa.jogadores.some(j => j.userId === currentUser.uid)) {
+    if (mesa.jogadores.some(j => j.userId === usuarioAtual.uid)) {
         alert('Você já está inscrito nesta mesa!');
         return;
     }
     
     // Adicionar jogador
     const novoJogador = {
-        userId: currentUser.uid,
-        nome: currentUser.displayName || currentUser.email,
+        userId: usuarioAtual.uid,
+        nome: usuarioAtual.displayName || usuarioAtual.email,
         dataInscricao: new Date().toISOString()
     };
     
@@ -525,46 +525,46 @@ async function joinMesa(mesaId) {
     }
     
     try {
-        await updateDoc(doc(db, 'mesas', mesaId), {
+        await updateDoc(doc(db, 'mesas', idMesa), {
             jogadores: mesa.jogadores,
             currentPlayers: mesa.currentPlayers,
             status: mesa.status
         });
         
         alert(`Inscrição realizada com sucesso! O mestre ${mesa.mestre} entrará em contato.`);
-    } catch (error) {
-        alert('Erro ao se inscrever na mesa: ' + error.message);
+    } catch (erro) {
+        alert('Erro ao se inscrever na mesa: ' + erro.message);
     }
 }
 
 // Gerar código único para mesa
-function generateMesaCode() {
-    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-    let result = '';
+function gerarCodigoMesa() {
+    const caracteres = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+    let resultado = '';
     for (let i = 0; i < 6; i++) {
-        result += chars.charAt(Math.floor(Math.random() * chars.length));
+        resultado += caracteres.charAt(Math.floor(Math.random() * caracteres.length));
     }
-    return result;
+    return resultado;
 }
 
 // Verificar se código já existe
-async function isCodeUnique(code) {
+async function codigoEhUnico(codigo) {
     try {
-        const querySnapshot = await getDocs(collection(db, 'mesas'));
-        return !querySnapshot.docs.some(doc => doc.data().codigo === code);
-    } catch (error) {
+        const snapshotConsulta = await getDocs(collection(db, 'mesas'));
+        return !snapshotConsulta.docs.some(documento => documento.data().codigo === codigo);
+    } catch (erro) {
         return true; // Se não conseguir verificar, assume que é único
     }
 }
 
 // Criar mesa
-async function criarMesa(event) {
+async function criarMesa(evento) {
     console.log('Função criarMesa chamada');
-    event.preventDefault();
+    evento.preventDefault();
     
-    console.log('Usuário atual:', currentUser);
+    console.log('Usuário atual:', usuarioAtual);
     
-    if (!currentUser) {
+    if (!usuarioAtual) {
         alert('Você precisa estar logado para criar uma mesa.');
         return;
     }
@@ -573,17 +573,17 @@ async function criarMesa(event) {
     // Gerar código único
     let codigo;
     do {
-        codigo = generateMesaCode();
-    } while (!(await isCodeUnique(codigo)));
+        codigo = gerarCodigoMesa();
+    } while (!(await codigoEhUnico(codigo)));
     
     console.log('Código gerado:', codigo);
     
     const missaoSelecionada = document.getElementById('mesa-missao').value;
-    let missaoData = {};
+    let dadosMissao = {};
     
     if (missaoSelecionada === 'custom') {
         // Missão personalizada
-        missaoData = {
+        dadosMissao = {
             missao: 'custom',
             customMission: {
                 name: document.getElementById('custom-mission-name').value,
@@ -594,16 +594,16 @@ async function criarMesa(event) {
         };
     } else {
         // Missão padrão
-        missaoData = {
+        dadosMissao = {
             missao: missaoSelecionada
         };
     }
     
     const novaMesa = {
         nome: document.getElementById('mesa-nome').value,
-        ...missaoData,
+        ...dadosMissao,
         mestre: document.getElementById('mestre-nome').value,
-        mestreId: currentUser.uid,
+        mestreId: usuarioAtual.uid,
         maxPlayers: parseInt(document.getElementById('mesa-max-players').value),
         currentPlayers: 0,
         data: document.getElementById('mesa-data').value,
@@ -622,64 +622,67 @@ async function criarMesa(event) {
         console.log('Mesa salva com sucesso!');
         
         // Mostrar modal com link de convite
-        const mesaUrl = `${window.location.origin}/mesa.html?codigo=${codigo}`;
-        showInviteModal(codigo, mesaUrl);
+        const urlMesa = `${window.location.origin}/mesa.html?codigo=${codigo}`;
+        mostrarModalConvite(codigo, urlMesa);
         
         // Limpar formulário
-        event.target.reset();
+        evento.target.reset();
         
         // Voltar para aba de mesas
-        document.querySelector('[onclick="showTab(\'mesas\')"]').click();
-    } catch (error) {
-        console.error('Erro ao criar mesa:', error);
-        alert('Erro ao criar mesa: ' + error.message);
+        const botaoMesas = document.querySelector('[onclick*="mesas"]');
+        if (botaoMesas) {
+            botaoMesas.click();
+        }
+    } catch (erro) {
+        console.error('Erro ao criar mesa:', erro);
+        alert('Erro ao criar mesa: ' + erro.message);
     }
 }
 
 // Carregar minhas mesas
-function loadMinhasMesas() {
-    const minhasMesasList = document.getElementById('minhas-mesas-list');
-    if (!minhasMesasList) return;
+function carregarMinhasMesas() {
+    const listaMinhasMesas = document.getElementById('minhas-mesas-list');
+    if (!listaMinhasMesas) return;
     
-    if (!currentUser) {
-        minhasMesasList.innerHTML = '<p style="text-align: center; color: #666; padding: 2rem;">Faça login para ver suas mesas.</p>';
+    if (!usuarioAtual) {
+        listaMinhasMesas.innerHTML = '<p style="text-align: center; color: #666; padding: 2rem;">Faça login para ver suas mesas.</p>';
         return;
     }
     
-    const minhasMesas = gameState.mesas.filter(mesa => 
-        mesa.mestreId === currentUser.uid || 
-        (mesa.jogadores && mesa.jogadores.some(j => j.userId === currentUser.uid))
+    const minhasMesas = estadoJogo.mesas.filter(mesa => 
+        mesa.mestreId === usuarioAtual.uid || 
+        (mesa.jogadores && mesa.jogadores.some(j => j.userId === usuarioAtual.uid))
     );
     
     if (minhasMesas.length === 0) {
-        minhasMesasList.innerHTML = '<p style="text-align: center; color: #666; padding: 2rem;">Você ainda não criou nem se inscreveu em nenhuma mesa.</p>';
+        listaMinhasMesas.innerHTML = '<p style="text-align: center; color: #666; padding: 2rem;">Você ainda não criou nem se inscreveu em nenhuma mesa.</p>';
         return;
     }
     
-    minhasMesasList.innerHTML = minhasMesas.map(mesa => {
-        const isMestre = mesa.mestreId === currentUser.uid;
-        return createMinhaMesaCard({...mesa, tipo: isMestre ? 'mestre' : 'jogador'});
+    listaMinhasMesas.innerHTML = minhasMesas.map(mesa => {
+        const ehMestre = mesa.mestreId === usuarioAtual.uid;
+        return criarCardMinhaMesa({...mesa, tipo: ehMestre ? 'mestre' : 'jogador'});
     }).join('');
 }
 
 // Criar card de minha mesa
-function createMinhaMesaCard(mesa) {
-    const mission = gameState.missions[mesa.missao] || { name: 'Missão não encontrada' };
-    const dataFormatada = formatDate(mesa.data);
-    const tipoIcon = mesa.tipo === 'mestre' ? '👑' : '🎭';
-    const tipoText = mesa.tipo === 'mestre' ? 'Mestre' : 'Jogador';
+function criarCardMinhaMesa(mesa) {
+    const missao = estadoJogo.missoes[mesa.missao] || { name: 'Missão não encontrada' };
+    const dataFormatada = formatarData(mesa.data);
+    const iconeRole = mesa.tipo === 'mestre' ? '👑' : '🎭';
+    const textoRole = mesa.tipo === 'mestre' ? 'Mestre' : 'Jogador';
     
     return `
         <div class="mesa-card">
             <div class="mesa-header">
                 <h4 class="mesa-title">${mesa.nome}</h4>
-                <span class="mesa-status status-${mesa.status}">${tipoIcon} ${tipoText}</span>
+                <span class="mesa-status status-${mesa.status}">${iconeRole} ${textoRole}</span>
             </div>
             
             <div class="mesa-info">
                 <div class="info-item">
                     <span>🎭</span>
-                    <span><strong>Missão:</strong> ${mission.name}</span>
+                    <span><strong>Missão:</strong> ${missao.name}</span>
                 </div>
                 <div class="info-item">
                     <span>📅</span>
@@ -695,19 +698,19 @@ function createMinhaMesaCard(mesa) {
                 ${mesa.descricao}
             </div>
             
-            ${mesa.tipo === 'mestre' ? createMestreActions(mesa) : createJogadorActions(mesa)}
+            ${mesa.tipo === 'mestre' ? criarAcoesMestre(mesa) : criarAcoesJogador(mesa)}
         </div>
     `;
 }
 
 // Ações do mestre
-function createMestreActions(mesa) {
-    const mesaUrl = `${window.location.origin}/mesa.html?codigo=${mesa.codigo}`;
+function criarAcoesMestre(mesa) {
+    const urlMesa = `${window.location.origin}/mesa.html?codigo=${mesa.codigo}`;
     return `
         <div class="mesa-actions">
             <div class="mesa-code">
                 <strong>Código:</strong> ${mesa.codigo}
-                <button class="copy-btn" onclick="copyMesaLink('${mesa.codigo}')" title="Copiar link">
+                <button class="copy-btn" onclick="copiarLinkMesa('${mesa.codigo}')" title="Copiar link">
                     📋
                 </button>
             </div>
@@ -723,12 +726,12 @@ function createMestreActions(mesa) {
 }
 
 // Ações do jogador
-function createJogadorActions(mesa) {
+function criarAcoesJogador(mesa) {
     return `
         <div class="mesa-actions">
             <div class="mesa-code">
                 <strong>Código:</strong> ${mesa.codigo}
-                <button class="copy-btn" onclick="copyMesaLink('${mesa.codigo}')" title="Copiar link">
+                <button class="copy-btn" onclick="copiarLinkMesa('${mesa.codigo}')" title="Copiar link">
                     📋
                 </button>
             </div>
@@ -956,13 +959,13 @@ async function cancelarMesa(mesaId) {
 }
 
 // Sair da mesa (jogador)
-async function sairMesa(mesaId) {
+async function sairMesa(idMesa) {
     if (!confirm('Tem certeza que deseja sair desta mesa?')) return;
     
-    const mesa = gameState.mesas.find(m => m.id === mesaId);
+    const mesa = estadoJogo.mesas.find(m => m.id === idMesa);
     
     if (mesa && mesa.jogadores) {
-        mesa.jogadores = mesa.jogadores.filter(j => j.userId !== currentUser.uid);
+        mesa.jogadores = mesa.jogadores.filter(j => j.userId !== usuarioAtual.uid);
         mesa.currentPlayers = mesa.jogadores.length;
         
         if (mesa.status === 'cheia' && mesa.currentPlayers < mesa.maxPlayers) {
@@ -970,32 +973,32 @@ async function sairMesa(mesaId) {
         }
         
         try {
-            await updateDoc(doc(db, 'mesas', mesaId), {
+            await updateDoc(doc(db, 'mesas', idMesa), {
                 jogadores: mesa.jogadores,
                 currentPlayers: mesa.currentPlayers,
                 status: mesa.status
             });
             
             alert('Você saiu da mesa com sucesso!');
-        } catch (error) {
-            alert('Erro ao sair da mesa: ' + error.message);
+        } catch (erro) {
+            alert('Erro ao sair da mesa: ' + erro.message);
         }
     }
 }
 
 // Copiar link da mesa
-function copyMesaLink(codigo) {
-    const mesaUrl = `${window.location.origin}/mesa.html?codigo=${codigo}`;
-    navigator.clipboard.writeText(mesaUrl).then(() => {
+function copiarLinkMesa(codigo) {
+    const urlMesa = `${window.location.origin}/mesa.html?codigo=${codigo}`;
+    navigator.clipboard.writeText(urlMesa).then(() => {
         alert('Link da mesa copiado para a área de transferência!');
     }).catch(() => {
         // Fallback para navegadores mais antigos
-        const textArea = document.createElement('textarea');
-        textArea.value = mesaUrl;
-        document.body.appendChild(textArea);
-        textArea.select();
+        const areaTexto = document.createElement('textarea');
+        areaTexto.value = urlMesa;
+        document.body.appendChild(areaTexto);
+        areaTexto.select();
         document.execCommand('copy');
-        document.body.removeChild(textArea);
+        document.body.removeChild(areaTexto);
         alert('Link da mesa copiado para a área de transferência!');
     });
 }
@@ -1013,16 +1016,16 @@ async function findMesaByCodigo(codigo) {
 }
 
 // Mostrar modal de convite
-function showInviteModal(codigo, mesaUrl) {
+function mostrarModalConvite(codigo, urlMesa) {
     document.getElementById('mesa-codigo').textContent = codigo;
-    document.getElementById('invite-link').value = mesaUrl;
+    document.getElementById('invite-link').value = urlMesa;
     document.getElementById('invite-modal').style.display = 'block';
     
     // Event listener para copiar link
     document.getElementById('copy-invite-btn').onclick = function() {
-        const linkInput = document.getElementById('invite-link');
-        linkInput.select();
-        navigator.clipboard.writeText(linkInput.value).then(() => {
+        const entradaLink = document.getElementById('invite-link');
+        entradaLink.select();
+        navigator.clipboard.writeText(entradaLink.value).then(() => {
             this.textContent = '✓ Copiado!';
             this.style.background = '#4caf50';
             setTimeout(() => {
@@ -1142,7 +1145,7 @@ function toggleEditCustomMission() {
 }
 
 // Atualizar função de criar card para suportar missões personalizadas
-function getMissionInfo(mesa) {
+function obterInfoMissao(mesa) {
     if (mesa.missao === 'custom' && mesa.customMission) {
         return {
             name: mesa.customMission.name,
@@ -1152,7 +1155,7 @@ function getMissionInfo(mesa) {
         };
     }
     
-    return gameState.missions[mesa.missao] || { 
+    return estadoJogo.missoes[mesa.missao] || { 
         name: 'Missão não encontrada', 
         description: 'Informações não disponíveis',
         duration: 'N/A', 
@@ -1161,67 +1164,67 @@ function getMissionInfo(mesa) {
 }
 
 // Mostrar guia do mestre
-function showMasterGuide(missionId) {
-    const mission = gameState.missions[missionId];
-    if (!mission || !mission.masterGuide) return;
+function mostrarGuiaMestre(idMissao) {
+    const missao = estadoJogo.missoes[idMissao];
+    if (!missao || !missao.masterGuide) return;
     
-    const guide = mission.masterGuide;
-    const modal = document.getElementById('master-guide-modal') || createMasterGuideModal();
+    const guia = missao.masterGuide;
+    const modal = document.getElementById('master-guide-modal') || criarModalGuiaMestre();
     
-    document.getElementById('guide-mission-title').textContent = mission.name;
-    document.getElementById('guide-introduction').textContent = guide.introduction;
+    document.getElementById('guide-mission-title').textContent = missao.name;
+    document.getElementById('guide-introduction').textContent = guia.introduction;
     
     // Contexto histórico
-    const contextDiv = document.getElementById('guide-context');
-    const context = guide.historicalContext;
-    contextDiv.innerHTML = `
-        <p><strong>Período:</strong> ${context?.period || 'Não informado'}</p>
-        <p><strong>Local:</strong> ${context?.location || 'Não informado'}</p>
-        <p><strong>Contexto Social:</strong> ${context?.socialContext || 'Não informado'}</p>
-        <p><strong>Momento Político:</strong> ${context?.politicalMoment || context?.culturalMoment || 'Não informado'}</p>
+    const divContexto = document.getElementById('guide-context');
+    const contexto = guia.historicalContext;
+    divContexto.innerHTML = `
+        <p><strong>Período:</strong> ${contexto?.period || 'Não informado'}</p>
+        <p><strong>Local:</strong> ${contexto?.location || 'Não informado'}</p>
+        <p><strong>Contexto Social:</strong> ${contexto?.socialContext || 'Não informado'}</p>
+        <p><strong>Momento Político:</strong> ${contexto?.politicalMoment || contexto?.culturalMoment || 'Não informado'}</p>
     `;
     
     // Locais importantes
-    const locationsDiv = document.getElementById('guide-locations');
-    locationsDiv.innerHTML = guide.keyLocations.map(loc => `
+    const divLocais = document.getElementById('guide-locations');
+    divLocais.innerHTML = guia.keyLocations.map(local => `
         <div class="guide-location">
-            <h4>${loc.name}</h4>
-            <p>${loc.description}</p>
-            <p><em>Atmosfera:</em> ${loc.atmosphere}</p>
-            <p><strong>NPCs:</strong> ${loc.npcs.join(', ')}</p>
+            <h4>${local.name}</h4>
+            <p>${local.description}</p>
+            <p><em>Atmosfera:</em> ${local.atmosphere}</p>
+            <p><strong>NPCs:</strong> ${local.npcs.join(', ')}</p>
         </div>
     `).join('');
     
     // Encontros
-    const encountersDiv = document.getElementById('guide-encounters');
-    encountersDiv.innerHTML = guide.encounters.map(enc => `
+    const divEncontros = document.getElementById('guide-encounters');
+    divEncontros.innerHTML = guia.encounters.map(encontro => `
         <div class="guide-encounter">
-            <h4>${enc.title}</h4>
-            <p>${enc.description}</p>
-            <p><strong>Desafio:</strong> ${enc.challenge}</p>
-            <p><strong>Recompensa:</strong> ${enc.reward}</p>
+            <h4>${encontro.title}</h4>
+            <p>${encontro.description}</p>
+            <p><strong>Desafio:</strong> ${encontro.challenge}</p>
+            <p><strong>Recompensa:</strong> ${encontro.reward}</p>
         </div>
     `).join('');
     
     // Lições culturais
-    const lessonsDiv = document.getElementById('guide-lessons');
-    lessonsDiv.innerHTML = guide.culturalLessons.map(lesson => `<li>${lesson}</li>`).join('');
+    const divLicoes = document.getElementById('guide-lessons');
+    divLicoes.innerHTML = guia.culturalLessons.map(licao => `<li>${licao}</li>`).join('');
     
     // Dicas de gameplay
-    const tipsDiv = document.getElementById('guide-tips');
-    tipsDiv.innerHTML = guide.gameplayTips.map(tip => `<li>${tip}</li>`).join('');
+    const divDicas = document.getElementById('guide-tips');
+    divDicas.innerHTML = guia.gameplayTips.map(dica => `<li>${dica}</li>`).join('');
     
     modal.style.display = 'block';
 }
 
 // Criar modal do guia do mestre
-function createMasterGuideModal() {
+function criarModalGuiaMestre() {
     const modal = document.createElement('div');
     modal.id = 'master-guide-modal';
     modal.className = 'modal';
     modal.innerHTML = `
         <div class="modal-content master-guide-content">
-            <span class="close" onclick="closeMasterGuideModal()">&times;</span>
+            <span class="close" onclick="fecharModalGuiaMestre()">&times;</span>
             <h2 id="guide-mission-title"></h2>
             
             <div class="guide-section">
@@ -1261,12 +1264,13 @@ function createMasterGuideModal() {
 }
 
 // Fechar modal do guia do mestre
-function closeMasterGuideModal() {
+function fecharModalGuiaMestre() {
     const modal = document.getElementById('master-guide-modal');
     if (modal) modal.style.display = 'none';
 }
 
 // Função para formatar data
+
 function formatDate(dateString) {
     const date = new Date(dateString);
     return date.toLocaleString('pt-BR', {
@@ -1301,10 +1305,23 @@ function testNotification() {
 window.testNotification = testNotification;
 window.showTab = showTab;
 window.joinMesa = joinMesa;
+
+function formatarData(stringData) {
+    return new Date(stringData).toLocaleString('pt-BR');
+}
+
+// Manter compatibilidade
+window.closeMasterGuideModal = fecharModalGuiaMestre;
+window.formatDate = formatarData;
+
+// Exportar funções globais (mantendo compatibilidade)
+window.showTab = mostrarAba;
+window.joinMesa = entrarMesa;
+
 window.gerenciarMesa = gerenciarMesa;
 window.cancelarMesa = cancelarMesa;
 window.sairMesa = sairMesa;
-window.copyMesaLink = copyMesaLink;
+window.copyMesaLink = copiarLinkMesa;
 window.findMesaByCodigo = findMesaByCodigo;
 window.closeInviteModal = closeInviteModal;
 window.closeManageModal = closeManageModal;
@@ -1317,5 +1334,13 @@ window.closeCandidatesModal = closeCandidatesModal;
 
 window.toggleCustomMission = toggleCustomMission;
 window.toggleEditCustomMission = toggleEditCustomMission;
-window.showMasterGuide = showMasterGuide;
+window.showMasterGuide = mostrarGuiaMestre;
 window.closeMasterGuideModal = closeMasterGuideModal;
+
+// Funções em português
+window.mostrarAba = mostrarAba;
+window.entrarMesa = entrarMesa;
+window.mostrarGuiaMestre = mostrarGuiaMestre;
+window.copiarLinkMesa = copiarLinkMesa;
+window.mostrarModalConvite = mostrarModalConvite;
+window.carregarMinhasMesas = carregarMinhasMesas;
