@@ -15,10 +15,22 @@
                 <ul class="nav-menu">
                     <li><a href="index.html">Início</a></li>
                     <li><a href="personagens.html" class="active">Personagens</a></li>
-
+                    <li><a href="missoes.html">Missões</a></li>
                     <li><a href="mesas.html">Mesas</a></li>
                     <li><a href="sobre.html">Sobre</a></li>
                 </ul>
+                <div class="notifications">
+                    <div class="notification-icon" id="notificationIcon">
+                        🔔
+                        <span class="notification-badge" id="notificationBadge" style="display: none;">0</span>
+                    </div>
+                    <div class="notification-dropdown" id="notificationDropdown">
+                        <div class="notification-header">Notificações</div>
+                        <div id="notificationList">
+                            <div class="notification-empty">Nenhuma notificação</div>
+                        </div>
+                    </div>
+                </div>
                 <div class="hamburger">
                     <span></span>
                     <span></span>
@@ -62,6 +74,7 @@
 
     <script type="module" src="js/auth.js"></script>
     <script src="js/common.js"></script>
+    <script src="js/notifications.js"></script>
     <script type="module" src="js/personagens.js"></script>
 </body>
 </html>

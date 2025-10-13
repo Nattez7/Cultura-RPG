@@ -1,23 +1,20 @@
 import { db } from './firebase-config.js';
 import { collection, getDocs } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-let missions = {};
+let missoes = {};
 
-// Inicialização
 document.addEventListener('DOMContentLoaded', function() {
-    loadMissions();
-    setupModal();
+    carregarMissoes();
+    configurarModal();
 });
 
-// Carregar missões do Firestore
-async function loadMissions() {
-    const missionsList = document.getElementById('missions-list');
+async function carregarMissoes() {
+    const listaMissoes = document.getElementById('missions-list');
     
-    // Mostrar loading
-    missionsList.innerHTML = `
+    listaMissoes.innerHTML = `
         <div class="loading">
             <div class="loading-spinner"></div>
-            <p>Carregando missões...</p>
+            <p>Carregando missoes...</p>
         </div>
     `;
     
@@ -25,155 +22,149 @@ async function loadMissions() {
         const querySnapshot = await getDocs(collection(db, 'missoes'));
         
         if (querySnapshot.empty) {
-            missionsList.innerHTML = `
+            listaMissoes.innerHTML = `
                 <div class="loading">
-                    <p>Nenhuma missão encontrada no banco de dados.</p>
+                    <p>Nenhuma missao encontrada no banco de dados.</p>
                 </div>
             `;
             return;
         }
         
-        missions = {};
+        missoes = {};
         querySnapshot.forEach((doc) => {
-            missions[doc.id] = doc.data();
+            missoes[doc.id] = doc.data();
         });
         
-        displayMissions();
+        exibirMissoes();
         
     } catch (error) {
-        console.error('Erro ao carregar missões:', error);
-        missionsList.innerHTML = `
+        console.error('Erro ao carregar missoes:', error);
+        listaMissoes.innerHTML = `
             <div class="loading">
-                <p>Erro ao carregar missões. Tente recarregar a página.</p>
+                <p>Erro ao carregar missoes. Tente recarregar a pagina.</p>
             </div>
         `;
     }
 }
 
-// Exibir missões
-function displayMissions() {
-    const missionsList = document.getElementById('missions-list');
+function exibirMissoes() {
+    const listaMissoes = document.getElementById('missions-list');
     
-    if (Object.keys(missions).length === 0) {
-        missionsList.innerHTML = `
+    if (Object.keys(missoes).length === 0) {
+        listaMissoes.innerHTML = `
             <div class="loading">
-                <p>Nenhuma missão disponível.</p>
+                <p>Nenhuma missao disponivel.</p>
             </div>
         `;
         return;
     }
     
-    missionsList.innerHTML = Object.keys(missions).map(id => 
-        createMissionCard(id, missions[id])
+    listaMissoes.innerHTML = Object.keys(missoes).map(id => 
+        criarCardMissao(id, missoes[id])
     ).join('');
 }
 
-// Criar card de missão
-function createMissionCard(id, mission) {
-    const difficultyClass = `difficulty-${mission.difficulty}`;
+function criarCardMissao(id, missao) {
+    const classDificuldade = `difficulty-${missao.difficulty}`;
     
     return `
-        <div class="mission-card" onclick="showMissionDetails('${id}')">
+        <div class="mission-card" onclick="mostrarDetalhesMissao('${id}')">
             <div class="mission-header">
                 <div>
-                    <h3 class="mission-title">${mission.name}</h3>
+                    <h3 class="mission-title">${missao.name}</h3>
                 </div>
-                <span class="mission-difficulty ${difficultyClass}">${mission.difficulty}</span>
+                <span class="mission-difficulty ${classDificuldade}">${missao.difficulty}</span>
             </div>
             
             <div class="mission-info">
                 <div class="info-item">
-                    <span>⏱️</span>
-                    <span><strong>Duração:</strong> ${mission.duration}</span>
+                    <span>Duracao:</span>
+                    <span><strong>${missao.duration}</strong></span>
                 </div>
                 <div class="info-item">
-                    <span>📅</span>
-                    <span><strong>Período:</strong> ${mission.period || 'Não informado'}</span>
+                    <span>Periodo:</span>
+                    <span><strong>${missao.period || 'Nao informado'}</strong></span>
                 </div>
             </div>
             
             <div class="mission-description">
-                ${mission.description}
+                ${missao.description}
             </div>
             
-
-            
-            ${mission.themes ? `
+            ${missao.themes ? `
             <div class="mission-tags">
-                ${mission.themes.map(theme => `<span class="mission-tag">${theme}</span>`).join('')}
+                ${missao.themes.map(theme => `<span class="mission-tag">${theme}</span>`).join('')}
             </div>
             ` : ''}
             
             <button class="view-details-btn">
-                📖 Ver Guia Completo do Mestre
+                Ver Guia Completo do Mestre
             </button>
         </div>
     `;
 }
 
-// Mostrar detalhes da missão
-function showMissionDetails(missionId) {
-    const mission = missions[missionId];
-    if (!mission) return;
+function mostrarDetalhesMissao(idMissao) {
+    const missao = missoes[idMissao];
+    if (!missao) return;
     
-    const modalContent = document.getElementById('mission-details');
+    const conteudoModal = document.getElementById('mission-details');
     
-    modalContent.innerHTML = `
+    conteudoModal.innerHTML = `
         <div class="mission-detail-header">
-            <h2 class="mission-detail-title">${mission.name}</h2>
-            <p class="mission-detail-subtitle">${mission.description}</p>
+            <h2 class="mission-detail-title">${missao.name}</h2>
+            <p class="mission-detail-subtitle">${missao.description}</p>
             
             <div class="mission-detail-meta">
                 <div class="meta-item">
                     <div class="meta-label">Dificuldade</div>
-                    <div class="meta-value">${mission.difficulty}</div>
+                    <div class="meta-value">${missao.difficulty}</div>
                 </div>
                 <div class="meta-item">
-                    <div class="meta-label">Duração</div>
-                    <div class="meta-value">${mission.duration}</div>
+                    <div class="meta-label">Duracao</div>
+                    <div class="meta-value">${missao.duration}</div>
                 </div>
                 <div class="meta-item">
-                    <div class="meta-label">Período</div>
-                    <div class="meta-value">${mission.period || 'Não informado'}</div>
+                    <div class="meta-label">Periodo</div>
+                    <div class="meta-value">${missao.period || 'Nao informado'}</div>
                 </div>
             </div>
         </div>
         
         <div class="mission-detail-content">
-            ${mission.masterGuide ? createMasterGuideContent(mission.masterGuide) : createBasicContent(mission)}
+            ${missao.masterGuide ? criarConteudoGuiaMestre(missao.masterGuide) : criarConteudoBasico(missao)}
         </div>
     `;
     
     document.getElementById('mission-modal').style.display = 'block';
 }
 
-// Criar conteúdo do guia do mestre
-function createMasterGuideContent(guide) {
+function criarConteudoGuiaMestre(guia) {
     return `
         <div class="detail-section">
-            <h3>📖 Introdução</h3>
-            <p>${guide.introduction}</p>
+            <h3>Introducao</h3>
+            <p>${guia.introduction}</p>
         </div>
         
-        ${guide.historicalContext ? `
+        ${guia.historicalContext ? `
         <div class="detail-section">
-            <h3>🏛️ Contexto Histórico</h3>
+            <h3>Contexto Historico</h3>
             <div class="context-grid">
                 <div class="context-item">
-                    <h4>📅 Período</h4>
-                    <p>${guide.historicalContext.period}</p>
+                    <h4>Periodo</h4>
+                    <p>${guia.historicalContext.period}</p>
                 </div>
                 <div class="context-item">
-                    <h4>📍 Local</h4>
-                    <p>${guide.historicalContext.location}</p>
+                    <h4>Local</h4>
+                    <p>${guia.historicalContext.location}</p>
                 </div>
                 <div class="context-item">
-                    <h4>🏛️ Contexto Social</h4>
-                    <p>${guide.historicalContext.socialContext}</p>
+                    <h4>Contexto Social</h4>
+                    <p>${guia.historicalContext.socialContext}</p>
                 </div>
                 <div class="context-item">
-                    <h4>⚖️ Momento Político</h4>
-                    <p>${guide.historicalContext.politicalMoment || guide.historicalContext.culturalMoment}</p>
+                    <h4>Momento Politico</h4>
+                    <p>${guia.historicalContext.politicalMoment || guia.historicalContext.culturalMoment}</p>
                 </div>
             </div>
         </div>
@@ -252,46 +243,42 @@ function createMasterGuideContent(guide) {
     `;
 }
 
-// Criar conteúdo básico (para missões sem guia completo)
-function createBasicContent(mission) {
+function criarConteudoBasico(missao) {
     return `
         <div class="detail-section">
-            <h3>📖 Sobre a Missão</h3>
-            <p>${mission.description}</p>
+            <h3>Sobre a Missao</h3>
+            <p>${missao.description}</p>
         </div>
         
-        ${mission.objectives ? `
+        ${missao.objectives ? `
         <div class="detail-section">
-            <h3>🎯 Objetivos</h3>
+            <h3>Objetivos</h3>
             <ul class="lessons-list">
-                ${mission.objectives.map(obj => `<li>${obj}</li>`).join('')}
+                ${missao.objectives.map(obj => `<li>${obj}</li>`).join('')}
             </ul>
         </div>
         ` : ''}
         
-
-        
-        ${mission.themes ? `
+        ${missao.themes ? `
         <div class="detail-section">
-            <h3>🏷️ Temas Abordados</h3>
+            <h3>Temas Abordados</h3>
             <div class="mission-tags">
-                ${mission.themes.map(theme => `<span class="mission-tag">${theme}</span>`).join('')}
+                ${missao.themes.map(theme => `<span class="mission-tag">${theme}</span>`).join('')}
             </div>
         </div>
         ` : ''}
         
         <div class="detail-section">
-            <p><em>Esta missão ainda não possui um guia completo do mestre. As informações detalhadas serão adicionadas em breve.</em></p>
+            <p><em>Esta missao ainda nao possui um guia completo do mestre. As informacoes detalhadas serao adicionadas em breve.</em></p>
         </div>
     `;
 }
 
-// Configurar modal
-function setupModal() {
+function configurarModal() {
     const modal = document.getElementById('mission-modal');
-    const closeBtn = modal.querySelector('.close');
+    const botaoFechar = modal.querySelector('.close');
     
-    closeBtn.onclick = function() {
+    botaoFechar.onclick = function() {
         modal.style.display = 'none';
     };
     
@@ -302,5 +289,4 @@ function setupModal() {
     };
 }
 
-// Exportar funções globais
-window.showMissionDetails = showMissionDetails;
+window.mostrarDetalhesMissao = mostrarDetalhesMissao;

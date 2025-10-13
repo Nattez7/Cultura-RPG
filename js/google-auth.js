@@ -16,71 +16,58 @@ import {
     getDocs
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-// Configurar provedor Google
-const provider = new GoogleAuthProvider();
-provider.addScope('profile');
-provider.addScope('email');
+const provedorGoogle = new GoogleAuthProvider();
+provedorGoogle.addScope('profile');
+provedorGoogle.addScope('email');
 
-// Estado do usuário
-let currentUser = null;
+let usuarioAtual = null;
+let modalAberto = false;
 
-// Variável para controlar se o modal está aberto
-let modalOpen = false;
-
-// Verificar se usuário já está logado (apenas para usuários existentes)
 onAuthStateChanged(auth, (user) => {
-    // Não redirecionar automaticamente - deixar o login manual controlar
+    // deixa o login manual controlar
 });
 
-// Inicialização
 document.addEventListener('DOMContentLoaded', function() {
-    const googleLoginBtn = document.getElementById('google-login-btn');
-    const emailLoginForm = document.getElementById('email-login-form');
-    const registerForm = document.getElementById('register-form');
+    const botaoLoginGoogle = document.getElementById('google-login-btn');
+    const formularioEmailLogin = document.getElementById('email-login-form');
+    const formularioRegistro = document.getElementById('register-form');
     
-    if (googleLoginBtn) {
-        googleLoginBtn.addEventListener('click', signInWithGoogle);
+    if (botaoLoginGoogle) {
+        botaoLoginGoogle.addEventListener('click', entrarComGoogle);
     }
     
-    if (emailLoginForm) {
-        emailLoginForm.addEventListener('submit', signInWithEmail);
+    if (formularioEmailLogin) {
+        formularioEmailLogin.addEventListener('submit', entrarComEmail);
     }
     
-    if (registerForm) {
-        registerForm.addEventListener('submit', registerWithEmail);
+    if (formularioRegistro) {
+        formularioRegistro.addEventListener('submit', registrarComEmail);
     }
 });
 
-// Login com Google
-async function signInWithGoogle() {
-    const loginBtn = document.getElementById('google-login-btn');
+async function entrarComGoogle() {
+    const botaoLogin = document.getElementById('google-login-btn');
     
     try {
-        // Mostrar estado de carregamento
-        loginBtn.classList.add('loading');
-        loginBtn.textContent = 'Entrando...';
+        botaoLogin.classList.add('loading');
+        botaoLogin.textContent = 'Entrando...';
         
-        // Fazer login com Google
-        const result = await signInWithPopup(auth, provider);
-        const user = result.user;
+        const resultado = await signInWithPopup(auth, provedorGoogle);
+        const usuario = resultado.user;
         
-        console.log('Login realizado com sucesso:', user.displayName);
+        console.log('Login realizado com sucesso:', usuario.displayName);
         
-        // Verificar se é novo usuário
-        const canRedirect = await checkAndSaveUserData(user);
+        const podeRedirecionar = await verificarESalvarDadosUsuario(usuario);
         
-        if (canRedirect) {
-            // Usuário existente - redirecionar
+        if (podeRedirecionar) {
             window.location.href = 'mesas.html';
         }
-        // Se for novo usuário, o modal será mostrado e não redireciona ainda
         
     } catch (error) {
         console.error('Erro no login:', error);
         
-        // Remover estado de carregamento
-        loginBtn.classList.remove('loading');
-        loginBtn.innerHTML = `
+        botaoLogin.classList.remove('loading');
+        botaoLogin.innerHTML = `
             <svg class="google-icon" viewBox="0 0 24 24">
                 <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
                 <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
@@ -90,101 +77,93 @@ async function signInWithGoogle() {
             Entrar com Google
         `;
         
-        // Mostrar erro para o usuário
-        showError(getErrorMessage(error.code));
+        mostrarErro(obterMensagemErro(error.code));
     }
 }
 
-// Verificar se é novo usuário e salvar dados
-async function checkAndSaveUserData(user) {
+async function verificarESalvarDadosUsuario(usuario) {
     try {
-        console.log('Verificando se usuário existe:', user.uid);
-        const userRef = doc(db, 'users', user.uid);
-        const userDoc = await getDoc(userRef);
+        console.log('Verificando se usuario existe:', usuario.uid);
+        const refUsuario = doc(db, 'users', usuario.uid);
+        const docUsuario = await getDoc(refUsuario);
         
-        console.log('Documento existe?', userDoc.exists());
+        console.log('Documento existe?', docUsuario.exists());
         
-        if (!userDoc.exists()) {
-            console.log('Novo usuário detectado - mostrando modal');
-            // Aguardar um pouco para garantir que a página carregou
+        if (!docUsuario.exists()) {
+            console.log('Novo usuario detectado - mostrando modal');
             setTimeout(() => {
-                showCompleteProfileModal(user);
+                mostrarModalCompletarPerfil(usuario);
             }, 500);
-            return false; // Não redirecionar ainda
+            return false;
         } else {
-            console.log('Usuário existente - atualizando lastLogin');
-            // Usuário existente - apenas atualizar lastLogin
-            await setDoc(userRef, {
+            console.log('Usuario existente - atualizando lastLogin');
+            await setDoc(refUsuario, {
                 lastLogin: new Date().toISOString()
             }, { merge: true });
             
-            return true; // Pode redirecionar
+            return true;
         }
         
     } catch (error) {
-        console.error('Erro ao verificar dados do usuário:', error);
-        return true; // Em caso de erro, permitir acesso
+        console.error('Erro ao verificar dados do usuario:', error);
+        return true;
     }
 }
 
-// Mostrar modal de completar perfil
-function showCompleteProfileModal(user) {
+function mostrarModalCompletarPerfil(usuario) {
     console.log('Tentando mostrar modal de completar perfil');
     const modal = document.getElementById('complete-profile-modal');
-    const form = document.getElementById('complete-profile-form');
+    const formulario = document.getElementById('complete-profile-form');
     
     if (!modal) {
-        console.error('Modal não encontrado!');
+        console.error('Modal nao encontrado!');
         return;
     }
     
-    if (!form) {
-        console.error('Formulário não encontrado!');
+    if (!formulario) {
+        console.error('Formulario nao encontrado!');
         return;
     }
     
-    console.log('Modal e formulário encontrados, configurando...');
+    console.log('Modal e formulario encontrados, configurando...');
     
-    // Definir data máxima (18 anos atrás)
-    const maxDate = new Date();
-    maxDate.setFullYear(maxDate.getFullYear() - 13); // Mínimo 13 anos
-    const birthdateInput = document.getElementById('user-birthdate');
-    if (birthdateInput) {
-        birthdateInput.max = maxDate.toISOString().split('T')[0];
+    const dataMaxima = new Date();
+    dataMaxima.setFullYear(dataMaxima.getFullYear() - 13);
+    const inputDataNascimento = document.getElementById('user-birthdate');
+    if (inputDataNascimento) {
+        inputDataNascimento.max = dataMaxima.toISOString().split('T')[0];
     }
     
     console.log('Mostrando modal...');
-    modalOpen = true;
+    modalAberto = true;
     modal.style.display = 'flex';
     
-    // Event listener para o formulário
-    form.onsubmit = async (e) => {
+    formulario.onsubmit = async (e) => {
         e.preventDefault();
-        console.log('Formulário submetido');
-        await completeUserProfile(user);
+        console.log('Formulario submetido');
+        await completarPerfilUsuario(usuario);
     };
     
     console.log('Modal configurado e exibido');
 }
 
-// Completar perfil do usuário
-async function completeUserProfile(user) {
-    const submitBtn = document.querySelector('.btn-complete-profile');
+async function completarPerfilUsuario(usuario) {
+    const botaoSubmit = document.querySelector('.btn-complete-profile');
     
     try {
-        submitBtn.disabled = true;
-        submitBtn.textContent = 'Salvando...';
+        botaoSubmit.disabled = true;
+        botaoSubmit.textContent = 'Salvando...';
         
-        const birthdate = new Date(document.getElementById('user-birthdate').value);
-        const age = Math.floor((new Date() - birthdate) / (365.25 * 24 * 60 * 60 * 1000));
+        const dataNascimento = new Date(document.getElementById('user-birthdate').value);
+        const idade = Math.floor((new Date() - dataNascimento) / (365.25 * 24 * 60 * 60 * 1000));
         
-        const userData = {
-            name: user.displayName,
-            email: user.email,
-            photoURL: user.photoURL,
+        const dadosUsuario = {
+            name: usuario.displayName,
+            email: usuario.email,
+            photoURL: usuario.photoURL,
             nick: document.getElementById('user-nick').value,
             birthdate: document.getElementById('user-birthdate').value,
-            age: age,
+            age: idade,
             experience: document.getElementById('user-experience').value,
             source: document.getElementById('user-source').value,
             interests: document.getElementById('user-interests').value,
@@ -195,126 +174,118 @@ async function completeUserProfile(user) {
             profileCompleted: true
         };
         
-        await setDoc(doc(db, 'users', user.uid), userData);
+        await setDoc(doc(db, 'users', usuario.uid), dadosUsuario);
         
         console.log('Perfil completado com sucesso');
         
-        // Fechar modal e redirecionar
-        modalOpen = false;
+        modalAberto = false;
         document.getElementById('complete-profile-modal').style.display = 'none';
         window.location.href = 'mesas.html';
         
     } catch (error) {
         console.error('Erro ao completar perfil:', error);
-        showError('Erro ao salvar perfil. Tente novamente.');
+        mostrarErro('Erro ao salvar perfil. Tente novamente.');
         
-        submitBtn.disabled = false;
-        submitBtn.textContent = '🚀 Finalizar Cadastro';
+        botaoSubmit.disabled = false;
+        botaoSubmit.textContent = 'Finalizar Cadastro';
     }
 }
 
-// Obter mensagem de erro amigável
-function getErrorMessage(errorCode) {
-    switch (errorCode) {
+function obterMensagemErro(codigoErro) {
+    switch (codigoErro) {
         case 'auth/popup-closed-by-user':
             return 'Login cancelado. Tente novamente.';
         case 'auth/popup-blocked':
             return 'Pop-up bloqueado pelo navegador. Permita pop-ups e tente novamente.';
         case 'auth/network-request-failed':
-            return 'Erro de conexão. Verifique sua internet e tente novamente.';
+            return 'Erro de conexao. Verifique sua internet e tente novamente.';
         case 'auth/too-many-requests':
             return 'Muitas tentativas. Aguarde alguns minutos e tente novamente.';
         case 'auth/invalid-credential':
-            return 'Credenciais inválidas. Verifique nick e senha.';
+            return 'Credenciais invalidas. Verifique nick e senha.';
         case 'auth/user-not-found':
-            return 'Usuário não encontrado.';
+            return 'Usuario nao encontrado.';
         case 'auth/wrong-password':
             return 'Senha incorreta.';
         case 'auth/weak-password':
             return 'Senha muito fraca. Use pelo menos 6 caracteres.';
         case 'auth/email-already-in-use':
-            return 'Este email já está em uso.';
+            return 'Este email ja esta em uso.';
         default:
             return 'Erro no login. Tente novamente.';
     }
 }
 
-// Login com email e senha
-async function signInWithEmail(event) {
+async function entrarComEmail(event) {
     event.preventDefault();
     
     const email = document.getElementById('login-email').value.trim();
-    const password = document.getElementById('login-password').value;
+    const senha = document.getElementById('login-password').value;
     
-    if (!email || !password) {
-        showError('Preencha email e senha.');
+    if (!email || !senha) {
+        mostrarErro('Preencha email e senha.');
         return;
     }
     
     try {
-        await signInWithEmailAndPassword(auth, email, password);
+        await signInWithEmailAndPassword(auth, email, senha);
         window.location.href = 'mesas.html';
         
     } catch (error) {
         console.error('Erro no login:', error);
         if (error.code === 'auth/invalid-credential') {
-            showError('Email ou senha incorretos.');
+            mostrarErro('Email ou senha incorretos.');
         } else {
-            showError(getErrorMessage(error.code));
+            mostrarErro(obterMensagemErro(error.code));
         }
     }
 }
 
-// Registrar com email e senha
-async function registerWithEmail(event) {
+async function registrarComEmail(event) {
     event.preventDefault();
     
     const nick = document.getElementById('register-nick').value.trim();
     const email = document.getElementById('register-email').value.trim();
-    const password = document.getElementById('register-password').value;
-    const confirmPassword = document.getElementById('register-confirm-password').value;
-    const birthdate = document.getElementById('register-birthdate').value;
-    const experience = document.getElementById('register-experience').value;
-    const source = document.getElementById('register-source').value;
-    const interests = document.getElementById('register-interests').value;
+    const senha = document.getElementById('register-password').value;
+    const confirmarSenha = document.getElementById('register-confirm-password').value;
+    const dataNascimento = document.getElementById('register-birthdate').value;
+    const experiencia = document.getElementById('register-experience').value;
+    const fonte = document.getElementById('register-source').value;
+    const interesses = document.getElementById('register-interests').value;
     
-    if (password !== confirmPassword) {
-        showError('As senhas não coincidem.');
+    if (senha !== confirmarSenha) {
+        mostrarErro('As senhas nao coincidem.');
         return;
     }
     
     try {
-        // Verificar se nick já existe
-        const nickQuery = query(
+        const consultaNick = query(
             collection(db, 'users'),
             where('nick', '==', nick)
         );
         
-        const nickSnapshot = await getDocs(nickQuery);
+        const snapshotNick = await getDocs(consultaNick);
         
-        if (!nickSnapshot.empty) {
-            showError('Este nick já está em uso.');
+        if (!snapshotNick.empty) {
+            mostrarErro('Este nick ja esta em uso.');
             return;
         }
         
-        // Criar conta no Firebase Auth
-        const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-        const user = userCredential.user;
+        const credencialUsuario = await createUserWithEmailAndPassword(auth, email, senha);
+        const usuario = credencialUsuario.user;
         
-        // Calcular idade
-        const birthdateObj = new Date(birthdate);
-        const age = Math.floor((new Date() - birthdateObj) / (365.25 * 24 * 60 * 60 * 1000));
+        const objDataNascimento = new Date(dataNascimento);
+        const idade = Math.floor((new Date() - objDataNascimento) / (365.25 * 24 * 60 * 60 * 1000));
         
-        // Salvar dados no Firestore
-        const userData = {
+        const dadosUsuario = {
             name: nick,
             email: email,
             nick: nick,
-            birthdate: birthdate,
-            age: age,
-            experience: experience,
-            source: source || 'registro-direto',
-            interests: interests,
+            birthdate: dataNascimento,
+            age: idade,
+            experience: experiencia,
+            source: fonte || 'registro-direto',
+            interests: interesses,
             createdAt: new Date().toISOString(),
             lastLogin: new Date().toISOString(),
             mesasCriadas: 0,
@@ -322,38 +293,32 @@ async function registerWithEmail(event) {
             profileCompleted: true
         };
         
-        await setDoc(doc(db, 'users', user.uid), userData);
+        await setDoc(doc(db, 'users', usuario.uid), dadosUsuario);
         
         window.location.href = 'mesas.html';
         
     } catch (error) {
         console.error('Erro no registro:', error);
-        showError(getErrorMessage(error.code));
+        mostrarErro(obterMensagemErro(error.code));
     }
 }
 
-
-
-// Mostrar formulário de registro
-function showRegisterForm() {
+function mostrarFormularioRegistro() {
     document.getElementById('email-login-form').style.display = 'none';
     document.getElementById('register-form').style.display = 'block';
 }
 
-// Mostrar formulário de login
-function showLoginForm() {
+function mostrarFormularioLogin() {
     document.getElementById('email-login-form').style.display = 'block';
     document.getElementById('register-form').style.display = 'none';
 }
 
-// Mostrar erro na tela
-function showError(message) {
-    // Criar elemento de erro se não existir
-    let errorDiv = document.getElementById('login-error');
-    if (!errorDiv) {
-        errorDiv = document.createElement('div');
-        errorDiv.id = 'login-error';
-        errorDiv.style.cssText = `
+function mostrarErro(mensagem) {
+    let divErro = document.getElementById('login-error');
+    if (!divErro) {
+        divErro = document.createElement('div');
+        divErro.id = 'login-error';
+        divErro.style.cssText = `
             background: linear-gradient(135deg, #ff6b6b, #ee5a52);
             color: white;
             padding: 1rem;
@@ -364,20 +329,18 @@ function showError(message) {
             animation: slideInDown 0.3s ease-out;
         `;
         
-        const loginContent = document.querySelector('.login-content');
-        loginContent.appendChild(errorDiv);
+        const conteudoLogin = document.querySelector('.login-content');
+        conteudoLogin.appendChild(divErro);
     }
     
-    errorDiv.textContent = message;
+    divErro.textContent = mensagem;
     
-    // Remover erro após 5 segundos
     setTimeout(() => {
-        if (errorDiv) {
-            errorDiv.remove();
+        if (divErro) {
+            divErro.remove();
         }
     }, 5000);
 }
 
-// Exportar funções globais
-window.showRegisterForm = showRegisterForm;
-window.showLoginForm = showLoginForm;
+window.mostrarFormularioRegistro = mostrarFormularioRegistro;
+window.mostrarFormularioLogin = mostrarFormularioLogin;

@@ -19,6 +19,18 @@
                     <li><a href="mesas.html">Mesas</a></li>
                     <li><a href="sobre.html">Sobre</a></li>
                 </ul>
+                <div class="notifications">
+                    <div class="notification-icon" id="notificationIcon">
+                        🔔
+                        <span class="notification-badge" id="notificationBadge" style="display: none;">0</span>
+                    </div>
+                    <div class="notification-dropdown" id="notificationDropdown">
+                        <div class="notification-header">Notificações</div>
+                        <div id="notificationList">
+                            <div class="notification-empty">Nenhuma notificação</div>
+                        </div>
+                    </div>
+                </div>
                 <div class="hamburger">
                     <span></span>
                     <span></span>
@@ -31,7 +43,7 @@
     <main>
         <section class="page-header">
             <div class="container">
-                <h1>📚 Missões Culturais</h1>
+                <h1>Missões Culturais</h1>
                 <p>Guias completos para mestres conduzirem aventuras históricas brasileiras</p>
             </div>
         </section>
@@ -84,6 +96,7 @@
 
     <script type="module" src="js/auth.js"></script>
     <script src="js/common.js"></script>
+    <script src="js/notifications.js"></script>
     <script type="module" src="js/missoes.js"></script>
 </body>
 </html>

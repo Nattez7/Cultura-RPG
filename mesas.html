@@ -15,10 +15,22 @@
                 <ul class="nav-menu">
                     <li><a href="index.html">Início</a></li>
                     <li><a href="personagens.html">Personagens</a></li>
-
+                    <li><a href="missoes.html">Missões</a></li>
                     <li><a href="mesas.html" class="active">Mesas</a></li>
                     <li><a href="sobre.html">Sobre</a></li>
                 </ul>
+                <div class="notifications">
+                    <div class="notification-icon" id="notificationIcon">
+                        🔔
+                        <span class="notification-badge" id="notificationBadge" style="display: none;">0</span>
+                    </div>
+                    <div class="notification-dropdown" id="notificationDropdown">
+                        <div class="notification-header">Notificações</div>
+                        <div id="notificationList">
+                            <div class="notification-empty">Nenhuma notificação</div>
+                        </div>
+                    </div>
+                </div>
                 <div class="hamburger">
                     <span></span>
                     <span></span>
@@ -47,6 +59,9 @@
                 <div id="mesas-tab" class="tab-content active">
                     <div class="mesas-header">
                         <h3>Mesas Abertas para Inscrição</h3>
+                        <button onclick="testNotification()" style="background: #4ecdc4; color: white; border: none; padding: 8px 16px; border-radius: 5px; margin-bottom: 10px; cursor: pointer;">
+                            🔔 Testar Notificação
+                        </button>
                         <div class="filters">
                             <select id="filter-difficulty">
                                 <option value="">Todas as Dificuldades</option>
@@ -207,7 +222,7 @@
                                 </div>
                                 <div class="manage-buttons">
                                     <button class="manage-btn add-btn" onclick="addPlayer()">
-                                        ➕ Adicionar Jogador
+                                        👥 Ver Jogadores Inscritos
                                     </button>
                                 </div>
                             </div>
@@ -306,7 +321,7 @@
             <div class="modal-content candidates-modal">
                 <span class="close">&times;</span>
                 <div class="candidates-content">
-                    <h2>👥 Candidatos à Mesa</h2>
+                    <h2>👥 Jogadores Inscritos</h2>
                     <div id="candidates-list" class="candidates-list">
                         <!-- Candidatos serão carregados aqui -->
                     </div>
@@ -324,6 +339,7 @@
 
     <script type="module" src="js/auth.js"></script>
     <script src="js/common.js"></script>
+    <script src="js/notifications.js"></script>
     <script type="module" src="js/mesas.js"></script>
 </body>
 </html>

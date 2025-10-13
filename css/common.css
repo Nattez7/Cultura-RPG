@@ -65,6 +65,104 @@ body {
     color: #4ecdc4;
 }
 
+/* Notifications */
+.notifications {
+    position: relative;
+    margin-left: 1rem;
+}
+
+.notification-icon {
+    color: #fff;
+    font-size: 1.5rem;
+    cursor: pointer;
+    transition: color 0.3s;
+    position: relative;
+}
+
+.notification-icon:hover {
+    color: #4ecdc4;
+}
+
+.notification-badge {
+    position: absolute;
+    top: -8px;
+    right: -8px;
+    background: #ff6b6b;
+    color: white;
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    font-size: 0.8rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+}
+
+.notification-dropdown {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    width: 320px;
+    max-height: 400px;
+    overflow-y: auto;
+    z-index: 1001;
+    display: none;
+}
+
+.notification-dropdown.show {
+    display: block;
+}
+
+.notification-header {
+    padding: 15px 20px;
+    border-bottom: 1px solid #eee;
+    font-weight: bold;
+    color: #333;
+}
+
+.notification-item {
+    padding: 15px 20px;
+    border-bottom: 1px solid #f5f5f5;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+
+.notification-item:hover {
+    background: #f8f9fa;
+}
+
+.notification-item.unread {
+    background: #f0f8ff;
+    border-left: 4px solid #4ecdc4;
+}
+
+.notification-title {
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 5px;
+}
+
+.notification-message {
+    color: #666;
+    font-size: 0.9rem;
+    margin-bottom: 5px;
+}
+
+.notification-time {
+    color: #999;
+    font-size: 0.8rem;
+}
+
+.notification-empty {
+    padding: 30px 20px;
+    text-align: center;
+    color: #999;
+}
+
 .hamburger {
     display: none;
     flex-direction: column;
@@ -217,6 +315,15 @@ footer {
         left: 0;
     }
     
+    .notification-dropdown {
+        width: 280px;
+        right: -20px;
+    }
+    
+    .notifications {
+        margin-left: 0.5rem;
+    }
+    
     .page-header h1 {
         font-size: 2rem;
     }
@@ -240,4 +347,116 @@ footer {
         width: 95%;
         padding: 15px;
     }
+    
+    .notification-dropdown {
+        width: 250px;
+        right: -30px;
+    }
+    
+    .notification-item {
+        padding: 12px 15px;
+    }
+    
+    .notification-title {
+        font-size: 0.9rem;
+    }
+    
+    .notification-message {
+        font-size: 0.8rem;
+    }
+}
+
+/* Evaluation Styles */
+.btn-evaluation {
+    background: linear-gradient(45deg, #ff9800, #f57c00);
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 25px;
+    font-weight: bold;
+    cursor: pointer;
+    margin-top: 20px;
+    transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.btn-evaluation:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 20px rgba(255, 152, 0, 0.3);
+}
+
+.evaluation-modal {
+    max-width: 600px;
+    max-height: 90vh;
+    overflow-y: auto;
+}
+
+.evaluation-questions {
+    margin-bottom: 20px;
+}
+
+.question-group {
+    margin-bottom: 25px;
+}
+
+.question-group label {
+    display: block;
+    font-weight: bold;
+    margin-bottom: 10px;
+    color: #333;
+}
+
+.rating-scale {
+    margin-bottom: 10px;
+}
+
+.rating-scale input[type="range"] {
+    width: 100%;
+    margin: 10px 0;
+}
+
+.rating-labels {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.9rem;
+    color: #666;
+}
+
+.rating-labels span:nth-child(2) {
+    font-weight: bold;
+    color: #4ecdc4;
+}
+
+.text-feedback, .cultural-impact {
+    margin-bottom: 20px;
+}
+
+.text-feedback label, .cultural-impact label {
+    display: block;
+    font-weight: bold;
+    margin-bottom: 10px;
+    color: #333;
+}
+
+.text-feedback textarea, .cultural-impact textarea {
+    width: 100%;
+    min-height: 80px;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    resize: vertical;
+    font-family: inherit;
+}
+
+.form-buttons {
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+    margin-top: 20px;
+}
+
+.evaluation-section {
+    text-align: center;
+    padding: 20px 0;
+    border-top: 1px solid #eee;
+    margin-top: 20px;
 }

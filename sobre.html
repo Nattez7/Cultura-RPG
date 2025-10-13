@@ -15,10 +15,22 @@
                 <ul class="nav-menu">
                     <li><a href="index.html">Início</a></li>
                     <li><a href="personagens.html">Personagens</a></li>
-
+                    <li><a href="missoes.html">Missões</a></li>
                     <li><a href="mesas.html">Mesas</a></li>
                     <li><a href="sobre.html" class="active">Sobre</a></li>
                 </ul>
+                <div class="notifications">
+                    <div class="notification-icon" id="notificationIcon">
+                        🔔
+                        <span class="notification-badge" id="notificationBadge" style="display: none;">0</span>
+                    </div>
+                    <div class="notification-dropdown" id="notificationDropdown">
+                        <div class="notification-header">Notificações</div>
+                        <div id="notificationList">
+                            <div class="notification-empty">Nenhuma notificação</div>
+                        </div>
+                    </div>
+                </div>
                 <div class="hamburger">
                     <span></span>
                     <span></span>
@@ -55,7 +67,7 @@
         <section class="mission">
             <div class="container">
                 <div class="section-header">
-                    <h2>🎯 Nossa Missão</h2>
+                    <h2>Nossa Missão</h2>
                     <p>Transformar o aprendizado da cultura brasileira em uma experiência divertida e envolvente</p>
                 </div>
                 <div class="mission-grid">
@@ -86,35 +98,35 @@
         <section class="how-it-works">
             <div class="container">
                 <div class="section-header">
-                    <h2>🎲 Como Funciona</h2>
+                    <h2>Como Funciona</h2>
                     <p>Um sistema simples e acessível para todos os níveis de experiência</p>
                 </div>
                 <div class="steps-container">
                     <div class="step-card">
                         <div class="step-number">1</div>
                         <div class="step-content">
-                            <h3>👥 Formação dos Grupos</h3>
+                            <h3>Formação dos Grupos</h3>
                             <p>Reuna de 3 a 6 jogadores com um mestre experiente para conduzir a narrativa e facilitar o aprendizado.</p>
                         </div>
                     </div>
                     <div class="step-card">
                         <div class="step-number">2</div>
                         <div class="step-content">
-                            <h3>🎭 Seleção de Personagens</h3>
+                            <h3>Seleção de Personagens</h3>
                             <p>Cada participante escolhe um personagem histórico brasileiro com características e talentos únicos.</p>
                         </div>
                     </div>
                     <div class="step-card">
                         <div class="step-number">3</div>
                         <div class="step-content">
-                            <h3>🎲 Sessão de Jogo</h3>
+                            <h3>Sessão de Jogo</h3>
                             <p>Aventuras interativas de 2-4 horas que exploram contextos culturais através de interpretação de papéis.</p>
                         </div>
                     </div>
                     <div class="step-card">
                         <div class="step-number">4</div>
                         <div class="step-content">
-                            <h3>✨ Narrativa Colaborativa</h3>
+                            <h3>Narrativa Colaborativa</h3>
                             <p>Os jogadores influenciam o rumo da história com suas decisões e ações criativas.</p>
                         </div>
                     </div>
@@ -126,7 +138,7 @@
             <div class="container">
                 <div class="system-content">
                     <div class="system-text">
-                        <h2>🎲 Sistema de Jogo</h2>
+                        <h2>Sistema de Jogo</h2>
                         <p>Desenvolvemos um sistema simples e intuitivo que foca na narrativa e na experiência cultural, sem complexidades desnecessárias.</p>
                         
                         <div class="attributes">
@@ -154,7 +166,7 @@
                         </div>
                         
                         <div class="dice-rules">
-                            <h4>🎲 Regras dos Dados</h4>
+                            <h4>Regras dos Dados</h4>
                             <div class="rule-item">
                                 <span class="dice-result fail">1-2</span>
                                 <span>Falha - A ação não é bem-sucedida</span>
@@ -185,11 +197,11 @@
         <section class="cta-section">
             <div class="container">
                 <div class="cta-content">
-                    <h2>🚀 Pronto para Explorar a Cultura Brasileira?</h2>
+                    <h2>Pronto para Explorar a Cultura Brasileira?</h2>
                     <p>Junte-se a nós nesta jornada de descoberta e valorização da nossa rica herança cultural!</p>
                     <div class="cta-buttons">
-                        <a href="personagens.html" class="btn-secondary">👥 Conhecer Personagens</a>
-                        <a href="mesas.html" class="btn-primary">🎲 Começar a Jogar</a>
+                        <a href="personagens.html" class="btn-secondary">Conhecer Personagens</a>
+                        <a href="mesas.html" class="btn-primary">Começar a Jogar</a>
                     </div>
                 </div>
             </div>
@@ -226,5 +238,6 @@
 
     <script type="module" src="js/auth.js"></script>
     <script src="js/common.js"></script>
+    <script src="js/notifications.js"></script>
 </body>
 </html>

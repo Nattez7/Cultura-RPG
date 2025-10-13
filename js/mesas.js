@@ -875,66 +875,23 @@ function addPlayer() {
     showCandidatesModal();
 }
 
-// Mostrar modal de candidatos
+// Mostrar modal de candidatos (jogadores inscritos)
 function showCandidatesModal() {
     const candidatesList = document.getElementById('candidates-list');
     
-    // Simular candidatos (em um sistema real, viria do banco de dados)
-    const candidatos = [
-        {
-            id: 'cand1',
-            nick: 'HistoriaFan',
-            idade: 25,
-            personagem: 'Zumbi dos Palmares',
-            experiencia: 'Iniciante'
-        },
-        {
-            id: 'cand2', 
-            nick: 'RPGMaster',
-            idade: 30,
-            personagem: 'Santos Dumont',
-            experiencia: 'Experiente'
-        },
-        {
-            id: 'cand3',
-            nick: 'CulturaGamer',
-            idade: 22,
-            personagem: 'Tarsila do Amaral',
-            experiencia: 'Intermediário'
-        },
-        {
-            id: 'cand4',
-            nick: 'SertanejoRPG',
-            idade: 28,
-            personagem: 'Maria Bonita',
-            experiencia: 'Avançado'
-        },
-        {
-            id: 'cand5',
-            nick: 'EcoGamer',
-            idade: 24,
-            personagem: 'Chico Mendes',
-            experiencia: 'Intermediário'
-        }
-    ];
-    
-    if (candidatos.length === 0) {
-        candidatesList.innerHTML = '<p class="no-candidates">Nenhum candidato disponível no momento.</p>';
+    if (!currentManagedMesa || !currentManagedMesa.jogadores || currentManagedMesa.jogadores.length === 0) {
+        candidatesList.innerHTML = '<p class="no-candidates">Nenhum jogador inscrito na mesa.</p>';
     } else {
-        candidatesList.innerHTML = candidatos.map(candidato => `
+        candidatesList.innerHTML = currentManagedMesa.jogadores.map(jogador => `
             <div class="candidate-item">
                 <div class="candidate-info">
                     <div class="candidate-header">
-                        <span class="candidate-nick">👤 ${candidato.nick}</span>
-                        <span class="candidate-age">🎂 ${candidato.idade} anos</span>
-                    </div>
-                    <div class="candidate-details">
-                        <span class="candidate-character">🎭 ${candidato.personagem}</span>
-                        <span class="candidate-exp">🎯 ${candidato.experiencia}</span>
+                        <span class="candidate-nick">👤 ${jogador.nome}</span>
+                        <span class="candidate-date">📅 ${new Date(jogador.dataInscricao).toLocaleDateString('pt-BR')}</span>
                     </div>
                 </div>
-                <button class="accept-candidate-btn" onclick="acceptCandidate('${candidato.id}', '${candidato.nick}', '${candidato.personagem}')">
-                    ✓ Aceitar
+                <button class="remove-player-btn" onclick="removePlayer('${jogador.userId}')">
+                    ❌ Remover
                 </button>
             </div>
         `).join('');
@@ -949,34 +906,7 @@ function closeCandidatesModal() {
     document.getElementById('candidates-modal').style.display = 'none';
 }
 
-// Aceitar candidato
-function acceptCandidate(candidateId, nick, personagem) {
-    if (!currentManagedMesa) return;
-    
-    const novoJogador = {
-        userId: candidateId,
-        nome: nick,
-        personagem: personagem,
-        dataInscricao: new Date().toISOString()
-    };
-    
-    if (!currentManagedMesa.jogadores) currentManagedMesa.jogadores = [];
-    currentManagedMesa.jogadores.push(novoJogador);
-    currentManagedMesa.currentPlayers++;
-    
-    if (currentManagedMesa.currentPlayers >= currentManagedMesa.maxPlayers) {
-        currentManagedMesa.status = 'cheia';
-    }
-    
-    updateMesaData(currentManagedMesa.id, {
-        jogadores: currentManagedMesa.jogadores,
-        currentPlayers: currentManagedMesa.currentPlayers,
-        status: currentManagedMesa.status
-    });
-    
-    alert(`${nick} foi adicionado à mesa!`);
-    closeCandidatesModal();
-}
+
 
 // Remover jogador
 function removePlayer(userId) {
@@ -1336,7 +1266,39 @@ function closeMasterGuideModal() {
     if (modal) modal.style.display = 'none';
 }
 
+// Função para formatar data
+function formatDate(dateString) {
+    const date = new Date(dateString);
+    return date.toLocaleString('pt-BR', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+    });
+}
+
+// Função de teste para notificações
+function testNotification() {
+    if (window.addTableNotification) {
+        const agora = new Date();
+        agora.setHours(agora.getHours() + 2); // 2 horas no futuro
+        const dataFormatada = formatDate(agora.toISOString());
+        
+        window.addTableNotification(
+            'Mesa de Teste - Aventura em Palmares',
+            dataFormatada,
+            `${window.location.origin}/mesa.html?codigo=TEST123`
+        );
+        
+        alert('Notificação de teste enviada! Verifique o ícone de sino no header.');
+    } else {
+        alert('Sistema de notificações não carregado.');
+    }
+}
+
 // Exportar funções globais
+window.testNotification = testNotification;
 window.showTab = showTab;
 window.joinMesa = joinMesa;
 window.gerenciarMesa = gerenciarMesa;
@@ -1352,7 +1314,7 @@ window.addPlayer = addPlayer;
 window.removePlayer = removePlayer;
 window.closeEditModal = closeEditModal;
 window.closeCandidatesModal = closeCandidatesModal;
-window.acceptCandidate = acceptCandidate;
+
 window.toggleCustomMission = toggleCustomMission;
 window.toggleEditCustomMission = toggleEditCustomMission;
 window.showMasterGuide = showMasterGuide;

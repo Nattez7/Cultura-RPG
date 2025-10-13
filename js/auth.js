@@ -4,61 +4,58 @@ import {
     onAuthStateChanged
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
-let currentUser = null;
+let usuarioAtual = null;
 
-// Verificar estado de autenticação
 onAuthStateChanged(auth, (user) => {
-    currentUser = user;
-    updateAuthUI();
+    usuarioAtual = user;
+    atualizarMenuAuth();
 });
 
-function updateAuthUI() {
-    const navMenu = document.querySelector('.nav-menu');
-    if (!navMenu) return;
+function atualizarMenuAuth() {
+    const menuNav = document.querySelector('.nav-menu');
+    if (!menuNav) return;
 
-    // Remover itens de auth existentes
-    const existingAuthItems = navMenu.querySelectorAll('.auth-item');
-    existingAuthItems.forEach(item => item.remove());
+    const itensAuthExistentes = menuNav.querySelectorAll('.auth-item');
+    itensAuthExistentes.forEach(item => item.remove());
 
-    if (currentUser) {
-        // Usuário logado
-        const userItem = document.createElement('li');
-        userItem.className = 'auth-item';
-        userItem.innerHTML = `<a href="perfil.html" style="display: flex; align-items: center; gap: 0.5rem; text-decoration: none; color: inherit;">
-            ${currentUser.photoURL ? `<img src="${currentUser.photoURL}" alt="${currentUser.displayName}" style="width: 24px; height: 24px; border-radius: 50%;">` : ''}
-            ${currentUser.displayName || 'Usuário'}
+    if (usuarioAtual) {
+        const itemUsuario = document.createElement('li');
+        itemUsuario.className = 'auth-item';
+        itemUsuario.innerHTML = `<a href="perfil.html" style="display: flex; align-items: center; gap: 0.5rem; text-decoration: none; color: inherit;">
+            ${usuarioAtual.photoURL ? `<img src="${usuarioAtual.photoURL}" alt="${usuarioAtual.displayName}" style="width: 24px; height: 24px; border-radius: 50%;">` : ''}
+            ${usuarioAtual.displayName || 'Usuário'}
         </a>`;
         
-        const logoutItem = document.createElement('li');
-        logoutItem.className = 'auth-item';
-        logoutItem.innerHTML = `<a href="#" onclick="logout()">Sair</a>`;
+        const itemSair = document.createElement('li');
+        itemSair.className = 'auth-item';
+        itemSair.innerHTML = `<a href="#" onclick="sair()">Sair</a>`;
         
-        navMenu.appendChild(userItem);
-        navMenu.appendChild(logoutItem);
+        menuNav.appendChild(itemUsuario);
+        menuNav.appendChild(itemSair);
     } else {
-        // Usuário não logado
-        const loginItem = document.createElement('li');
-        loginItem.className = 'auth-item';
-        loginItem.innerHTML = `<a href="login.html">Entrar</a>`;
-        navMenu.appendChild(loginItem);
+        const itemLogin = document.createElement('li');
+        itemLogin.className = 'auth-item';
+        itemLogin.innerHTML = `<a href="login.html">Entrar</a>`;
+        menuNav.appendChild(itemLogin);
     }
 }
 
-// Redirecionar para login se não estiver autenticado
-function redirectToLogin() {
-    if (!currentUser && !window.location.pathname.includes('login.html')) {
+function redirecionarParaLogin() {
+    if (!usuarioAtual && !window.location.pathname.includes('login.html')) {
         window.location.href = 'login.html';
     }
 }
 
-// Verificar autenticação ao carregar páginas
+// só roda quando o firebase já carregou
 document.addEventListener('DOMContentLoaded', () => {
-    // Aguardar um pouco para o Firebase carregar
-    setTimeout(redirectToLogin, 1000);
+    onAuthStateChanged(auth, (user) => {
+        if (!user && !window.location.pathname.includes('login.html')) {
+            window.location.href = 'login.html';
+        }
+    });
 });
 
-// Logout
-window.logout = async () => {
+window.sair = async () => {
     try {
         await signOut(auth);
         window.location.href = 'index.html';
@@ -67,14 +64,12 @@ window.logout = async () => {
     }
 };
 
-// Verificar se usuário está logado (para páginas protegidas)
-window.requireAuth = () => {
-    if (!currentUser) {
+window.verificarAuth = () => {
+    if (!usuarioAtual) {
         window.location.href = 'login.html';
         return false;
     }
     return true;
 };
 
-// Exportar para uso em outros arquivos
-window.getCurrentUser = () => currentUser;
+window.obterUsuarioAtual = () => usuarioAtual;
