@@ -52,8 +52,6 @@
                     <button class="tab-btn active" onclick="showProfileTab('dados')">Meus Dados</button>
                     <button class="tab-btn" onclick="showProfileTab('historico')">Histórico de Mesas</button>
                     <button class="tab-btn" onclick="openEvaluationModal()">📊 Avaliação</button>
-                    <button class="tab-btn active" onclick="mostrarAbaPeril('dados')">Meus Dados</button>
-                    <button class="tab-btn" onclick="mostrarAbaPeril('historico')">Histórico de Mesas</button>
                 </div>
 
                 <!-- Aba Meus Dados -->
@@ -194,75 +192,205 @@
     <div id="evaluation-modal" class="modal">
         <div class="modal-content evaluation-modal">
             <span class="close" onclick="closeEvaluationModal()">&times;</span>
-            <h2>📊 Avaliação da Experiência</h2>
+            <h2>📝 Formulário de Avaliação — Plataforma Cultura RPG</h2>
+            <p style="margin-bottom: 20px; color: #666;">Objetivo: Coletar opiniões e sugestões dos usuários que testaram o site Cultura RPG, desenvolvido como parte de um Trabalho de Conclusão de Curso em Ciência da Computação.</p>
             
             <form id="evaluation-form">
-                <div class="evaluation-questions">
+                <div class="evaluation-section">
+                    <h3>1. Informações Gerais</h3>
+                    
                     <div class="question-group">
-                        <label>Como você avalia a qualidade das sessões de RPG?</label>
-                        <div class="rating-scale">
-                            <input type="range" id="quality" min="1" max="10" value="5">
-                            <div class="rating-labels">
-                                <span>1 (Ruim)</span>
-                                <span id="quality-value">5</span>
-                                <span>10 (Excelente)</span>
-                            </div>
+                        <label>Nome (opcional):</label>
+                        <div class="radio-group">
+                            <label><input type="radio" name="name-option" value="no-name" checked> Prefiro não informar</label>
+                            <label><input type="radio" name="name-option" value="provide-name"> <input type="text" id="user-name" placeholder="Seu nome"></label>
                         </div>
                     </div>
                     
                     <div class="question-group">
-                        <label>O quanto você se divertiu jogando?</label>
-                        <div class="rating-scale">
-                            <input type="range" id="fun" min="1" max="10" value="5">
-                            <div class="rating-labels">
-                                <span>1 (Nada)</span>
-                                <span id="fun-value">5</span>
-                                <span>10 (Muito)</span>
-                            </div>
+                        <label>Idade:</label>
+                        <div class="radio-group">
+                            <label><input type="radio" name="age" value="under-18"> Menos de 18</label>
+                            <label><input type="radio" name="age" value="18-24"> 18–24</label>
+                            <label><input type="radio" name="age" value="25-34"> 25–34</label>
+                            <label><input type="radio" name="age" value="35-44"> 35–44</label>
+                            <label><input type="radio" name="age" value="45-plus"> 45 ou mais</label>
                         </div>
                     </div>
                     
                     <div class="question-group">
-                        <label>Como avalia a facilidade de uso da plataforma?</label>
-                        <div class="rating-scale">
-                            <input type="range" id="usability" min="1" max="10" value="5">
-                            <div class="rating-labels">
-                                <span>1 (Difícil)</span>
-                                <span id="usability-value">5</span>
-                                <span>10 (Fácil)</span>
-                            </div>
+                        <label>Nível de familiaridade com RPG:</label>
+                        <div class="radio-group">
+                            <label><input type="radio" name="rpg-familiarity" value="none"> Nenhuma</label>
+                            <label><input type="radio" name="rpg-familiarity" value="low"> Baixa</label>
+                            <label><input type="radio" name="rpg-familiarity" value="medium"> Média</label>
+                            <label><input type="radio" name="rpg-familiarity" value="high"> Alta</label>
                         </div>
                     </div>
                     
                     <div class="question-group">
-                        <label>Recomendaria o Cultura RPG para outros?</label>
-                        <div class="rating-scale">
-                            <input type="range" id="recommendation" min="1" max="10" value="5">
-                            <div class="rating-labels">
-                                <span>1 (Não)</span>
-                                <span id="recommendation-value">5</span>
-                                <span>10 (Sim)</span>
-                            </div>
+                        <label>Você costuma acessar sites sobre RPG?</label>
+                        <div class="radio-group">
+                            <label><input type="radio" name="rpg-sites" value="yes"> Sim</label>
+                            <label><input type="radio" name="rpg-sites" value="no"> Não</label>
                         </div>
                     </div>
                 </div>
                 
-                <div class="text-feedback">
-                    <label>Comentários e sugestões:</label>
-                    <textarea id="feedback-text" placeholder="Compartilhe sua experiência, sugestões de melhoria ou qualquer comentário..."></textarea>
-                </div>
-                
-                <div class="cultural-impact">
-                    <label>O quanto isso ajudou você a conhecer mais sobre a cultura brasileira?</label>
-                    <div class="rating-scale">
-                        <input type="range" id="cultural-learning" min="1" max="10" value="5">
-                        <div class="rating-labels">
-                            <span>1 (Nada)</span>
-                            <span id="cultural-value">5</span>
-                            <span>10 (Muito)</span>
+                <div class="evaluation-section">
+                    <h3>2. Experiência de Uso</h3>
+                    
+                    <div class="question-group">
+                        <label>Como você acessou o site?</label>
+                        <div class="radio-group">
+                            <label><input type="radio" name="device" value="computer"> Computador</label>
+                            <label><input type="radio" name="device" value="mobile"> Celular</label>
+                            <label><input type="radio" name="device" value="tablet"> Tablet</label>
                         </div>
                     </div>
-                    <textarea id="cultural-text" placeholder="Descreva o que você aprendeu sobre a cultura brasileira e como isso impactou sua visão..."></textarea>
+                    
+                    <div class="question-group">
+                        <label>O site carregou corretamente e sem travamentos?</label>
+                        <div class="radio-group">
+                            <label><input type="radio" name="loading" value="yes"> Sim</label>
+                            <label><input type="radio" name="loading" value="partially"> Parcialmente</label>
+                            <label><input type="radio" name="loading" value="no"> Não</label>
+                        </div>
+                    </div>
+                    
+                    <div class="question-group">
+                        <label>A navegação entre as páginas foi:</label>
+                        <div class="radio-group">
+                            <label><input type="radio" name="navigation" value="very-easy"> Muito fácil</label>
+                            <label><input type="radio" name="navigation" value="easy"> Fácil</label>
+                            <label><input type="radio" name="navigation" value="regular"> Regular</label>
+                            <label><input type="radio" name="navigation" value="difficult"> Difícil</label>
+                            <label><input type="radio" name="navigation" value="very-difficult"> Muito difícil</label>
+                        </div>
+                    </div>
+                    
+                    <div class="question-group">
+                        <label>As informações do site estavam organizadas e fáceis de encontrar?</label>
+                        <div class="radio-group">
+                            <label><input type="radio" name="organization" value="yes"> Sim</label>
+                            <label><input type="radio" name="organization" value="partially"> Parcialmente</label>
+                            <label><input type="radio" name="organization" value="no"> Não</label>
+                        </div>
+                    </div>
+                    
+                    <div class="question-group">
+                        <label>O tempo de carregamento das páginas foi adequado?</label>
+                        <div class="radio-group">
+                            <label><input type="radio" name="load-time" value="yes"> Sim</label>
+                            <label><input type="radio" name="load-time" value="partially"> Parcialmente</label>
+                            <label><input type="radio" name="load-time" value="no"> Não</label>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="evaluation-section">
+                    <h3>3. Aspectos Visuais e Design</h3>
+                    
+                    <div class="question-group">
+                        <label>Avalie o visual do site:</label>
+                        <div class="radio-group">
+                            <label><input type="radio" name="visual" value="excellent"> Excelente</label>
+                            <label><input type="radio" name="visual" value="good"> Bom</label>
+                            <label><input type="radio" name="visual" value="regular"> Regular</label>
+                            <label><input type="radio" name="visual" value="bad"> Ruim</label>
+                        </div>
+                    </div>
+                    
+                    <div class="question-group">
+                        <label>As cores, fontes e imagens são agradáveis e combinam com a proposta?</label>
+                        <div class="radio-group">
+                            <label><input type="radio" name="design-harmony" value="yes"> Sim</label>
+                            <label><input type="radio" name="design-harmony" value="partially"> Parcialmente</label>
+                            <label><input type="radio" name="design-harmony" value="no"> Não</label>
+                        </div>
+                    </div>
+                    
+                    <div class="question-group">
+                        <label>O site é responsivo (funciona bem em diferentes tamanhos de tela)?</label>
+                        <div class="radio-group">
+                            <label><input type="radio" name="responsive" value="yes"> Sim</label>
+                            <label><input type="radio" name="responsive" value="partially"> Parcialmente</label>
+                            <label><input type="radio" name="responsive" value="no"> Não</label>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="evaluation-section">
+                    <h3>4. Funcionalidades e Conteúdo</h3>
+                    
+                    <div class="question-group">
+                        <label>As funcionalidades do site (login, cadastro, navegação, etc.) funcionaram corretamente?</label>
+                        <div class="radio-group">
+                            <label><input type="radio" name="functionality" value="yes"> Sim</label>
+                            <label><input type="radio" name="functionality" value="partially"> Parcialmente</label>
+                            <label><input type="radio" name="functionality" value="no"> Não</label>
+                        </div>
+                    </div>
+                    
+                    <div class="question-group">
+                        <label>O conteúdo do site é relevante para quem se interessa por RPG?</label>
+                        <div class="radio-group">
+                            <label><input type="radio" name="content-relevance" value="yes"> Sim</label>
+                            <label><input type="radio" name="content-relevance" value="partially"> Parcialmente</label>
+                            <label><input type="radio" name="content-relevance" value="no"> Não</label>
+                        </div>
+                    </div>
+                    
+                    <div class="question-group">
+                        <label>Você encontrou erros ou bugs durante o uso?</label>
+                        <div class="radio-group">
+                            <label><input type="radio" name="bugs" value="yes"> Sim</label>
+                            <label><input type="radio" name="bugs" value="no"> Não</label>
+                        </div>
+                        <textarea id="bugs-description" placeholder="Se sim, descreva os erros encontrados..."></textarea>
+                    </div>
+                </div>
+                
+                <div class="evaluation-section">
+                    <h3>5. Avaliação Geral</h3>
+                    
+                    <div class="question-group">
+                        <label>Qual foi sua experiência geral com o site?</label>
+                        <div class="radio-group">
+                            <label><input type="radio" name="overall-experience" value="excellent"> Excelente</label>
+                            <label><input type="radio" name="overall-experience" value="good"> Boa</label>
+                            <label><input type="radio" name="overall-experience" value="regular"> Regular</label>
+                            <label><input type="radio" name="overall-experience" value="bad"> Ruim</label>
+                        </div>
+                    </div>
+                    
+                    <div class="question-group">
+                        <label>O que mais te chamou atenção positivamente?</label>
+                        <textarea id="positive-aspects" placeholder="Descreva os aspectos positivos..."></textarea>
+                    </div>
+                    
+                    <div class="question-group">
+                        <label>O que você acha que precisa melhorar?</label>
+                        <textarea id="improvements" placeholder="Sugestões de melhoria..."></textarea>
+                    </div>
+                    
+                    <div class="question-group">
+                        <label>Você recomendaria o site para outras pessoas interessadas em RPG?</label>
+                        <div class="radio-group">
+                            <label><input type="radio" name="recommendation" value="yes"> Sim</label>
+                            <label><input type="radio" name="recommendation" value="maybe"> Talvez</label>
+                            <label><input type="radio" name="recommendation" value="no"> Não</label>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="evaluation-section">
+                    <h3>6. Comentários Finais</h3>
+                    
+                    <div class="question-group">
+                        <label>Deixe aqui qualquer comentário, crítica ou sugestão adicional:</label>
+                        <textarea id="final-comments" placeholder="Comentários finais..."></textarea>
+                    </div>
                 </div>
                 
                 <div class="form-buttons">

@@ -309,22 +309,18 @@ async function lidarComUploadAvatar(evento) {
         return;
     }
     
-    // Validar tamanho (máximo 5MB)
-    if (arquivo.size > 5 * 1024 * 1024) {
-        alert('A imagem deve ter no máximo 5MB.');
+    // Validar tamanho (máximo 2MB)
+    if (arquivo.size > 2 * 1024 * 1024) {
+        alert('A imagem deve ter no máximo 2MB.');
         return;
     }
     
     try {
-        // Converter para base64 para preview
-        const leitor = new FileReader();
-        leitor.onload = function(e) {
-            document.getElementById('user-avatar').src = e.target.result;
-        };
-        leitor.readAsDataURL(arquivo);
+        // Comprimir e redimensionar imagem
+        const urlFoto = await comprimirImagem(arquivo, 150, 150, 0.8);
         
-        // Salvar URL da imagem no perfil
-        const urlFoto = await converterParaBase64(arquivo);
+        // Preview da imagem
+        document.getElementById('user-avatar').src = urlFoto;
         
         await setDoc(doc(db, 'users', usuarioAtual.uid), {
             photoURL: urlFoto,
@@ -333,19 +329,52 @@ async function lidarComUploadAvatar(evento) {
         
         dadosUsuario.photoURL = urlFoto;
         
+        // Atualizar header com nova foto
+        if (window.atualizarInterfaceAuth) {
+            window.atualizarInterfaceAuth(urlFoto);
+        }
+        
     } catch (erro) {
         console.error('Erro ao fazer upload do avatar:', erro);
         alert('Erro ao fazer upload da imagem.');
     }
 }
 
-// Converter arquivo para base64
-function converterParaBase64(arquivo) {
-    return new Promise((resolve, reject) => {
-        const leitor = new FileReader();
-        leitor.onload = () => resolve(leitor.result);
-        leitor.onerror = reject;
-        leitor.readAsDataURL(arquivo);
+// Comprimir imagem
+function comprimirImagem(arquivo, maxWidth, maxHeight, qualidade) {
+    return new Promise((resolve) => {
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+        const img = new Image();
+        
+        img.onload = function() {
+            // Calcular dimensões mantendo proporção
+            let { width, height } = img;
+            
+            if (width > height) {
+                if (width > maxWidth) {
+                    height = (height * maxWidth) / width;
+                    width = maxWidth;
+                }
+            } else {
+                if (height > maxHeight) {
+                    width = (width * maxHeight) / height;
+                    height = maxHeight;
+                }
+            }
+            
+            canvas.width = width;
+            canvas.height = height;
+            
+            // Desenhar imagem redimensionada
+            ctx.drawImage(img, 0, 0, width, height);
+            
+            // Converter para base64 comprimido
+            const imagemComprimida = canvas.toDataURL('image/jpeg', qualidade);
+            resolve(imagemComprimida);
+        };
+        
+        img.src = URL.createObjectURL(arquivo);
     });
 }
 
@@ -361,51 +390,41 @@ function closeEvaluationModal() {
 }
 
 function setupRatingSliders() {
-    const sliders = ['quality', 'fun', 'usability', 'recommendation', 'cultural-learning'];
-    
-    sliders.forEach(sliderId => {
-        const slider = document.getElementById(sliderId);
-        const valueDisplay = document.getElementById(sliderId === 'cultural-learning' ? 'cultural-value' : sliderId + '-value');
-        
-        if (slider && valueDisplay) {
-            slider.addEventListener('input', function() {
-                valueDisplay.textContent = this.value;
-            });
-        }
-    });
+    // Não há mais sliders no novo formulário
 }
 
 async function submitEvaluation(event) {
     event.preventDefault();
     
+    const formData = new FormData(event.target);
+    const userName = formData.get('name-option') === 'provide-name' ? document.getElementById('user-name').value : 'Anônimo';
+    
     const evaluation = {
         to_email: 'contato.culturarpg@gmail.com',
         user_email: usuarioAtual.email,
-        user_name: dadosUsuario?.nick || usuarioAtual.displayName || 'Usuário',
-        quality: document.getElementById('quality').value,
-        fun: document.getElementById('fun').value,
-        usability: document.getElementById('usability').value,
-        recommendation: document.getElementById('recommendation').value,
-        cultural_learning: document.getElementById('cultural-learning').value,
-        feedback_text: document.getElementById('feedback-text').value,
-        cultural_text: document.getElementById('cultural-text').value,
+        user_name: userName,
+        feedback_text: `FORMULÁRIO DE AVALIAÇÃO - CULTURA RPG\n\n1. INFORMAÇÕES GERAIS:\n- Nome: ${userName}\n- Idade: ${formData.get('age') || 'Não informado'}\n- Familiaridade com RPG: ${formData.get('rpg-familiarity') || 'Não informado'}\n- Acessa sites de RPG: ${formData.get('rpg-sites') || 'Não informado'}\n\n2. EXPERIÊNCIA DE USO:\n- Dispositivo usado: ${formData.get('device') || 'Não informado'}\n- Site carregou corretamente: ${formData.get('loading') || 'Não informado'}\n- Navegação: ${formData.get('navigation') || 'Não informado'}\n- Informações organizadas: ${formData.get('organization') || 'Não informado'}\n- Tempo de carregamento: ${formData.get('load-time') || 'Não informado'}\n\n3. ASPECTOS VISUAIS:\n- Visual do site: ${formData.get('visual') || 'Não informado'}\n- Cores/fontes/imagens: ${formData.get('design-harmony') || 'Não informado'}\n- Responsividade: ${formData.get('responsive') || 'Não informado'}\n\n4. FUNCIONALIDADES:\n- Funcionalidades funcionaram: ${formData.get('functionality') || 'Não informado'}\n- Conteúdo relevante: ${formData.get('content-relevance') || 'Não informado'}\n- Encontrou bugs: ${formData.get('bugs') || 'Não informado'}\n- Descrição dos bugs: ${document.getElementById('bugs-description').value || 'Nenhum'}\n\n5. AVALIAÇÃO GERAL:\n- Experiência geral: ${formData.get('overall-experience') || 'Não informado'}\n- Aspectos positivos: ${document.getElementById('positive-aspects').value || 'Não informado'}\n- Melhorias sugeridas: ${document.getElementById('improvements').value || 'Não informado'}\n- Recomendaria: ${formData.get('recommendation') || 'Não informado'}\n\n6. COMENTÁRIOS FINAIS:\n${document.getElementById('final-comments').value || 'Nenhum comentário adicional'}\n\nData/Hora: ${new Date().toLocaleString('pt-BR')}`,
+        cultural_text: 'Formulário de Avaliação TCC',
         submitted_at: new Date().toLocaleString('pt-BR')
     };
     
     try {
-        // Enviar por email usando EmailJS
-        if (typeof emailjs !== 'undefined') {
-            await emailjs.send(EMAILJS_CONFIG.SERVICE_ID, EMAILJS_CONFIG.TEMPLATE_ID, evaluation);
-        }
-        
-        // Salvar no Firebase como backup
+        // Salvar no Firebase primeiro
         await setDoc(doc(db, 'evaluations', usuarioAtual.uid + '_' + Date.now()), evaluation);
+        
+        // Tentar enviar por email (não bloquear se falhar)
+        try {
+            if (typeof emailjs !== 'undefined') {
+                await emailjs.send(EMAILJS_CONFIG.SERVICE_ID, EMAILJS_CONFIG.TEMPLATE_ID, evaluation);
+            }
+        } catch (emailError) {
+            console.log('Aviso: Email não enviado, mas dados salvos:', emailError);
+        }
         
         alert('Avaliação enviada com sucesso! Obrigado pelo seu feedback.');
         closeEvaluationModal();
     } catch (error) {
         console.error('Erro ao enviar avaliação:', error);
-        console.log('Detalhes do erro:', error.message || error);
         alert('Erro ao enviar avaliação. Tente novamente.');
     }
 }

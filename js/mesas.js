@@ -482,7 +482,7 @@ function criarCardMesa(mesa) {
                     👥 ${mesa.currentPlayers}/${mesa.maxPlayers} jogadores
                 </span>
                 <button class="join-btn" 
-                        onclick="entrarMesa('${mesa.id}')" 
+                        onclick="window.entrarMesa('${mesa.id}')" 
                         ${mesa.status !== 'aberta' ? 'disabled' : ''}>
                     ${mesa.status === 'aberta' ? 'Inscrever-se' : 'Indisponível'}
                 </button>
@@ -530,6 +530,20 @@ async function entrarMesa(idMesa) {
             currentPlayers: mesa.currentPlayers,
             status: mesa.status
         });
+        
+        // Adicionar notificação de candidatura
+        setTimeout(() => {
+            if (window.notificationSystem) {
+                const dataFormatada = formatarData(mesa.data);
+                window.notificationSystem.addNotification(
+                    'Candidatura Enviada!',
+                    `Você se candidatou para a mesa "${mesa.nome}". Data: ${dataFormatada}`,
+                    `${window.location.origin}/mesa.html?codigo=${mesa.codigo}`,
+                    mesa.data,
+                    idMesa
+                );
+            }
+        }, 100);
         
         alert(`Inscrição realizada com sucesso! O mestre ${mesa.mestre} entrará em contato.`);
     } catch (erro) {
@@ -710,14 +724,14 @@ function criarAcoesMestre(mesa) {
         <div class="mesa-actions">
             <div class="mesa-code">
                 <strong>Código:</strong> ${mesa.codigo}
-                <button class="copy-btn" onclick="copiarLinkMesa('${mesa.codigo}')" title="Copiar link">
+                <button class="copy-btn" onclick="window.copiarLinkMesa('${mesa.codigo}')" title="Copiar link">
                     📋
                 </button>
             </div>
-            <button class="join-btn" onclick="gerenciarMesa('${mesa.id}')">
+            <button class="join-btn" onclick="window.gerenciarMesa('${mesa.id}')">
                 Gerenciar Mesa
             </button>
-            <button class="join-btn" onclick="cancelarMesa('${mesa.id}')" 
+            <button class="join-btn" onclick="window.cancelarMesa('${mesa.id}')" 
                     style="background: linear-gradient(45deg, #dc3545, #c82333);">
                 Cancelar Mesa
             </button>
@@ -731,14 +745,14 @@ function criarAcoesJogador(mesa) {
         <div class="mesa-actions">
             <div class="mesa-code">
                 <strong>Código:</strong> ${mesa.codigo}
-                <button class="copy-btn" onclick="copiarLinkMesa('${mesa.codigo}')" title="Copiar link">
+                <button class="copy-btn" onclick="window.copiarLinkMesa('${mesa.codigo}')" title="Copiar link">
                     📋
                 </button>
             </div>
             <span style="color: #666;">
                 Inscrito
             </span>
-            <button class="join-btn" onclick="sairMesa('${mesa.id}')"
+            <button class="join-btn" onclick="window.sairMesa('${mesa.id}')"
                     style="background: linear-gradient(45deg, #dc3545, #c82333);">
                 Sair da Mesa
             </button>
@@ -751,7 +765,7 @@ let currentManagedMesa = null;
 
 // Gerenciar mesa (mestre)
 function gerenciarMesa(mesaId) {
-    const mesa = gameState.mesas.find(m => m.id === mesaId);
+    const mesa = estadoJogo.mesas.find(m => m.id === mesaId);
     if (!mesa) return;
     
     currentManagedMesa = mesa;
@@ -959,8 +973,8 @@ async function cancelarMesa(mesaId) {
 }
 
 // Sair da mesa (jogador)
-async function sairMesa(idMesa) {
-    if (!confirm('Tem certeza que deseja sair desta mesa?')) return;
+async function sairMesa(idMesa, silencioso = false) {
+    if (!silencioso && !confirm('Tem certeza que deseja sair desta mesa?')) return;
     
     const mesa = estadoJogo.mesas.find(m => m.id === idMesa);
     
@@ -979,9 +993,14 @@ async function sairMesa(idMesa) {
                 status: mesa.status
             });
             
-            alert('Você saiu da mesa com sucesso!');
+            if (!silencioso) {
+                alert('Você saiu da mesa com sucesso!');
+            }
         } catch (erro) {
-            alert('Erro ao sair da mesa: ' + erro.message);
+            if (!silencioso) {
+                alert('Erro ao sair da mesa: ' + erro.message);
+            }
+            throw erro;
         }
     }
 }
@@ -1282,29 +1301,19 @@ function formatDate(dateString) {
     });
 }
 
-// Função de teste para notificações
-function testNotification() {
-    if (window.addTableNotification) {
-        const agora = new Date();
-        agora.setHours(agora.getHours() + 2); // 2 horas no futuro
-        const dataFormatada = formatDate(agora.toISOString());
-        
-        window.addTableNotification(
-            'Mesa de Teste - Aventura em Palmares',
-            dataFormatada,
-            `${window.location.origin}/mesa.html?codigo=TEST123`
-        );
-        
-        alert('Notificação de teste enviada! Verifique o ícone de sino no header.');
-    } else {
-        alert('Sistema de notificações não carregado.');
-    }
-}
 
-// Exportar funções globais
-window.testNotification = testNotification;
-window.showTab = showTab;
-window.joinMesa = joinMesa;
+
+// Exportar funções e variáveis globais
+window.showTab = mostrarAba;
+window.entrarMesa = entrarMesa;
+window.estadoJogo = estadoJogo;
+window.usuarioAtual = null;
+
+// Atualizar usuário atual globalmente
+onAuthStateChanged(auth, (usuario) => {
+    usuarioAtual = usuario;
+    window.usuarioAtual = usuario;
+});
 
 function formatarData(stringData) {
     return new Date(stringData).toLocaleString('pt-BR');

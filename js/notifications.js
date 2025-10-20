@@ -31,13 +31,14 @@ class NotificationSystem {
         }
     }
 
-    addNotification(title, message, tableLink, tableTime) {
+    addNotification(title, message, tableLink, tableTime, tableId = null) {
         const notification = {
             id: Date.now(),
             title,
             message,
             tableLink,
             tableTime,
+            tableId,
             timestamp: new Date().toISOString(),
             read: false
         };
@@ -82,12 +83,20 @@ class NotificationSystem {
 
         list.innerHTML = this.notifications.map(notification => {
             const timeAgo = this.getTimeAgo(new Date(notification.timestamp));
+            const showUncandidateBtn = notification.tableId && notification.title.includes('Candidatura Enviada');
+            
             return `
-                <div class="notification-item ${!notification.read ? 'unread' : ''}" 
-                     onclick="notificationSystem.handleNotificationClick(${notification.id})">
-                    <div class="notification-title">${notification.title}</div>
-                    <div class="notification-message">${notification.message}</div>
-                    <div class="notification-time">${timeAgo}</div>
+                <div class="notification-item ${!notification.read ? 'unread' : ''}">
+                    <div class="notification-content" onclick="window.notificationSystem.handleNotificationClick(${notification.id})">
+                        <div class="notification-title">${notification.title}</div>
+                        <div class="notification-message">${notification.message}</div>
+                        <div class="notification-time">${timeAgo}</div>
+                    </div>
+                    ${showUncandidateBtn ? `
+                        <button class="uncandidate-btn" onclick="window.notificationSystem.uncandidateFromTable('${notification.tableId}', ${notification.id})">
+                            Descandidatar
+                        </button>
+                    ` : ''}
                 </div>
             `;
         }).join('');
@@ -130,17 +139,50 @@ class NotificationSystem {
             tableTime
         );
     }
+
+    // Descandidatar de mesa
+    async uncandidateFromTable(tableId, notificationId) {
+        if (!confirm('Tem certeza que deseja se descandidatar desta mesa?')) return;
+        
+        try {
+            // Chamar função de sair da mesa existente (modo silencioso)
+            if (window.sairMesa) {
+                await window.sairMesa(tableId, true);
+                alert('Você se descandidatou da mesa com sucesso!');
+            }
+            
+            // Remover notificação
+            this.notifications = this.notifications.filter(n => n.id !== notificationId);
+            this.saveNotifications();
+            this.updateBadge();
+            this.loadNotifications();
+            
+        } catch (error) {
+            console.error('Erro ao descandidatar:', error);
+            alert('Erro ao se descandidatar da mesa.');
+            return;
+        }
+    }
 }
 
 // Inicializar sistema de notificações
 let notificationSystem;
-document.addEventListener('DOMContentLoaded', () => {
-    notificationSystem = new NotificationSystem();
-});
 
 // Função global para adicionar notificações (pode ser chamada de outras páginas)
-window.addTableNotification = (tableName, tableTime, tableLink) => {
+window.addTableNotification = (tableName, tableTime, tableLink, tableId = null) => {
     if (notificationSystem) {
-        notificationSystem.simulateTableSelection(tableName, tableTime, tableLink);
+        notificationSystem.addNotification(
+            'Candidatura Enviada!',
+            `Você se candidatou para a mesa "${tableName}". Data: ${tableTime}`,
+            tableLink,
+            tableTime,
+            tableId
+        );
     }
 };
+
+// Expor sistema de notificações globalmente
+window.notificationSystem = null;
+document.addEventListener('DOMContentLoaded', () => {
+    window.notificationSystem = new NotificationSystem();
+});

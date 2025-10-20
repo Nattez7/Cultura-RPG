@@ -51,17 +51,14 @@
         <section class="game-section">
             <div class="container">
                 <div class="game-tabs">
-                    <button class="tab-btn active" onclick="showTab('mesas')">Mesas Disponíveis</button>
-                    <button class="tab-btn" onclick="showTab('criar')">Criar Mesa</button>
-                    <button class="tab-btn" onclick="showTab('minhas')">Minhas Mesas</button>
+                    <button class="tab-btn active" onclick="window.showTab('mesas')">Mesas Disponíveis</button>
+                    <button class="tab-btn" onclick="window.showTab('criar')">Criar Mesa</button>
+                    <button class="tab-btn" onclick="window.showTab('minhas')">Minhas Mesas</button>
                 </div>
 
                 <div id="mesas-tab" class="tab-content active">
                     <div class="mesas-header">
                         <h3>Mesas Abertas para Inscrição</h3>
-                        <button onclick="testNotification()" style="background: #4ecdc4; color: white; border: none; padding: 8px 16px; border-radius: 5px; margin-bottom: 10px; cursor: pointer;">
-                            🔔 Testar Notificação
-                        </button>
                         <div class="filters">
                             <select id="filter-difficulty">
                                 <option value="">Todas as Dificuldades</option>
@@ -205,10 +202,10 @@
                         <div class="manage-section">
                             <h3>🎲 Mesa</h3>
                             <div class="manage-buttons">
-                                <button class="manage-btn edit-btn" onclick="editMesa()">
+                                <button class="manage-btn edit-btn" onclick="window.editMesa()">
                                     ✏️ Editar Mesa
                                 </button>
-                                <button class="manage-btn delete-btn" onclick="deleteMesa()">
+                                <button class="manage-btn delete-btn" onclick="window.deleteMesa()">
                                     🗑️ Excluir Mesa
                                 </button>
                             </div>
@@ -221,14 +218,14 @@
                                     <!-- Jogadores atuais serão carregados aqui -->
                                 </div>
                                 <div class="manage-buttons">
-                                    <button class="manage-btn add-btn" onclick="addPlayer()">
+                                    <button class="manage-btn add-btn" onclick="window.addPlayer()">
                                         👥 Ver Jogadores Inscritos
                                     </button>
                                 </div>
                             </div>
                         </div>
                     </div>
-                    <button class="btn-secondary" onclick="closeManageModal()">Fechar</button>
+                    <button class="btn-secondary" onclick="window.closeManageModal()">Fechar</button>
                 </div>
             </div>
         </div>
