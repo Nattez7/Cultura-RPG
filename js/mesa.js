@@ -55,11 +55,30 @@ canvas.addEventListener('mousedown', (e) => {
     canvas.classList.add('dragging');
 });
 
+// Event listeners globais para desenho
+document.addEventListener('mousedown', (e) => {
+    if (drawMode) {
+        startDrawing(e);
+    }
+});
+
+document.addEventListener('mousemove', (e) => {
+    if (drawMode && isDrawing) {
+        draw(e);
+    }
+});
+
+document.addEventListener('mouseup', () => {
+    if (drawMode) {
+        stopDrawing();
+    }
+});
+
 canvas.addEventListener('mousemove', (e) => {
-    // Atualizar coordenadas
+    // Atualizar coordenadas - usar a mesma lógica para desenho
     const rect = canvas.getBoundingClientRect();
-    const x = Math.floor((e.clientX - rect.left) / zoom);
-    const y = Math.floor((e.clientY - rect.top) / zoom);
+    const x = Math.floor((e.clientX - rect.left - panX) / zoom);
+    const y = Math.floor((e.clientY - rect.top - panY) / zoom);
     document.getElementById('coordinates').textContent = `X: ${x}, Y: ${y}`;
     
     if (drawMode && isDrawing && !tempPanMode) {
@@ -260,11 +279,11 @@ let selectedColor = '#ffffff';
 let isDrawing = false;
 let drawMode = false;
 let selectMode = true;
-let drawCanvas, drawCtx;
 let lastX = 0;
 let lastY = 0;
-let currentPath = [];
-let drawingPaths = [];
+let currentPath = null;
+let currentColor = '#EBD677';
+let currentSize = 3;
 let rulerMode = false;
 let rulerPoints = [];
 let rulerLine = null;
@@ -533,38 +552,97 @@ function startTokenDrag(e, token) {
     document.addEventListener('mouseup', onMouseUp);
 }
 
-// Chat
+// Chat compartilhado
+let chatMessages = [];
+let lastChatUpdate = 0;
+let chatSyncInterval;
+
 function addChatMessage(sender, message) {
-    const chatMessages = document.getElementById('chat-messages');
-    const messageDiv = document.createElement('div');
-    messageDiv.className = 'chat-message';
+    const timestamp = Date.now();
+    const messageObj = { sender, message, timestamp, id: timestamp + Math.random() };
     
-    const senderColor = sender === 'Sistema' ? 'var(--accent)' : 
-                       sender === 'Mestre' ? '#FFD700' : '#4CAF50';
+    // Adicionar à lista local
+    chatMessages.push(messageObj);
     
-    if (sender) {
-        messageDiv.innerHTML = `<strong style="color: ${senderColor};">${sender}:</strong> ${message}`;
-    } else {
-        messageDiv.innerHTML = message; // Para mensagens sem remetente (como múltiplas rolagens)
-    }
+    // Salvar no localStorage compartilhado
+    saveChatToStorage();
     
-    chatMessages.appendChild(messageDiv);
-    
-    // Limitar número de mensagens (máximo 100)
-    const messages = chatMessages.children;
-    if (messages.length > 100) {
-        chatMessages.removeChild(messages[0]);
-    }
-    
-    chatMessages.scrollTop = chatMessages.scrollHeight;
+    // Renderizar mensagens
+    renderChatMessages();
 }
 
-function limparChat() {
-    if (confirm('Limpar todo o histórico do chat?')) {
-        const chatMessages = document.getElementById('chat-messages');
-        chatMessages.innerHTML = '<div class="chat-message"><strong style="color: #FFD700;">Mestre:</strong> Chat limpo. Bem-vindos à aventura!</div>';
+function saveChatToStorage() {
+    const chatKey = `chat-${mesaData?.codigo || 'default'}`;
+    localStorage.setItem(chatKey, JSON.stringify({
+        messages: chatMessages,
+        lastUpdate: Date.now()
+    }));
+}
+
+function loadChatFromStorage() {
+    const chatKey = `chat-${mesaData?.codigo || 'default'}`;
+    const saved = localStorage.getItem(chatKey);
+    
+    if (saved) {
+        const data = JSON.parse(saved);
+        chatMessages = data.messages || [];
+        lastChatUpdate = data.lastUpdate || 0;
+        renderChatMessages();
     }
 }
+
+function syncChat() {
+    const chatKey = `chat-${mesaData?.codigo || 'default'}`;
+    const saved = localStorage.getItem(chatKey);
+    
+    if (saved) {
+        const data = JSON.parse(saved);
+        if (data.lastUpdate > lastChatUpdate) {
+            chatMessages = data.messages || [];
+            lastChatUpdate = data.lastUpdate;
+            renderChatMessages();
+        }
+    }
+}
+
+function renderChatMessages() {
+    const chatContainer = document.getElementById('chat-messages');
+    chatContainer.innerHTML = '';
+    
+    // Limitar a 100 mensagens mais recentes
+    const recentMessages = chatMessages.slice(-100);
+    
+    recentMessages.forEach(msgObj => {
+        const messageDiv = document.createElement('div');
+        messageDiv.className = 'chat-message';
+        
+        const senderColor = msgObj.sender === 'Sistema' ? 'var(--accent)' : 
+                           msgObj.sender === 'Mestre' ? '#FFD700' : '#4CAF50';
+        
+        if (msgObj.sender) {
+            messageDiv.innerHTML = `<strong style="color: ${senderColor};">${msgObj.sender}:</strong> ${msgObj.message}`;
+        } else {
+            messageDiv.innerHTML = msgObj.message;
+        }
+        
+        chatContainer.appendChild(messageDiv);
+    });
+    
+    chatContainer.scrollTop = chatContainer.scrollHeight;
+}
+
+function startChatSync() {
+    // Sincronizar a cada 2 segundos
+    chatSyncInterval = setInterval(syncChat, 2000);
+}
+
+function stopChatSync() {
+    if (chatSyncInterval) {
+        clearInterval(chatSyncInterval);
+    }
+}
+
+
 
 function sendChatMessage() {
     const input = document.getElementById('chat-input');
@@ -681,15 +759,7 @@ document.getElementById('dice-input').addEventListener('keypress', (e) => {
     }
 });
 
-// Inicializar canvas de desenho
-function initDrawCanvas() {
-    drawCanvas = document.getElementById('draw-canvas');
-    drawCtx = drawCanvas.getContext('2d');
-    drawCtx.strokeStyle = '#EBD677';
-    drawCtx.lineWidth = 3;
-    drawCtx.lineCap = 'round';
-    drawCtx.lineJoin = 'round';
-}
+
 
 // Toggle modo seleção
 function toggleSelectMode() {
@@ -721,15 +791,11 @@ function fecharModalDesenho() {
 }
 
 function ativarDesenho() {
-    if (!drawCtx) {
-        initDrawCanvas();
-    }
-    
     const corSelecionada = document.querySelector('.draw-color-btn.selected')?.dataset.color || '#EBD677';
     const tamanho = document.getElementById('brush-size').value;
     
-    drawCtx.strokeStyle = corSelecionada;
-    drawCtx.lineWidth = parseInt(tamanho);
+    currentColor = corSelecionada;
+    currentSize = parseInt(tamanho);
     
     drawMode = true;
     selectMode = false;
@@ -739,14 +805,8 @@ function ativarDesenho() {
     
     drawBtn.classList.add('active');
     selectBtn.classList.remove('active');
-    drawCanvas.style.pointerEvents = 'auto';
-    canvas.style.cursor = 'crosshair';
     
-    // Adicionar eventos ao canvas de desenho
-    drawCanvas.addEventListener('mousedown', startDrawing);
-    drawCanvas.addEventListener('mousemove', draw);
-    drawCanvas.addEventListener('mouseup', stopDrawing);
-    drawCanvas.addEventListener('mouseleave', stopDrawing);
+    canvas.style.cursor = 'crosshair';
     
     fecharModalDesenho();
 }
@@ -760,56 +820,83 @@ function desativarDesenho() {
     
     drawBtn.classList.remove('active');
     selectBtn.classList.add('active');
-    drawCanvas.style.pointerEvents = 'none';
-    canvas.style.cursor = 'grab';
     
-    // Remover eventos do canvas de desenho
-    drawCanvas.removeEventListener('mousedown', startDrawing);
-    drawCanvas.removeEventListener('mousemove', draw);
-    drawCanvas.removeEventListener('mouseup', stopDrawing);
-    drawCanvas.removeEventListener('mouseleave', stopDrawing);
+    canvas.style.cursor = 'grab';
 }
 
-// Funções de desenho
+// Funções de desenho no canvas
 function startDrawing(e) {
     if (!drawMode) return;
     e.preventDefault();
     e.stopPropagation();
     isDrawing = true;
-    const rect = drawCanvas.getBoundingClientRect();
-    lastX = e.clientX - rect.left;
-    lastY = e.clientY - rect.top;
     
-    currentPath = [{ x: lastX, y: lastY }];
+    const coords = getCanvasCoordinates(e);
+    lastX = coords.x;
+    lastY = coords.y;
+    
+    // Criar elemento de desenho no canvas
+    currentPath = document.createElement('div');
+    currentPath.className = 'drawing-element';
+    currentPath.style.position = 'absolute';
+    currentPath.style.left = lastX + 'px';
+    currentPath.style.top = lastY + 'px';
+    currentPath.style.width = '1px';
+    currentPath.style.height = '1px';
+    currentPath.style.pointerEvents = 'none';
+    currentPath.style.zIndex = '10';
+    
+    const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+    svg.style.position = 'absolute';
+    svg.style.left = '0';
+    svg.style.top = '0';
+    svg.style.width = '2000px';
+    svg.style.height = '2000px';
+    svg.style.overflow = 'visible';
+    
+    const pathElement = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+    pathElement.setAttribute('stroke', currentColor);
+    pathElement.setAttribute('stroke-width', currentSize / zoom);
+    pathElement.setAttribute('fill', 'none');
+    pathElement.setAttribute('stroke-linecap', 'round');
+    pathElement.setAttribute('stroke-linejoin', 'round');
+    pathElement.setAttribute('d', `M 0 0`);
+    
+    svg.appendChild(pathElement);
+    currentPath.appendChild(svg);
+    canvas.appendChild(currentPath);
 }
 
 function draw(e) {
-    if (!isDrawing || !drawMode) return;
+    if (!isDrawing || !drawMode || !currentPath) return;
     e.preventDefault();
     e.stopPropagation();
     
-    const rect = drawCanvas.getBoundingClientRect();
-    const currentX = e.clientX - rect.left;
-    const currentY = e.clientY - rect.top;
+    const coords = getCanvasCoordinates(e);
+    const currentX = coords.x;
+    const currentY = coords.y;
     
-    // Desenhar no canvas em tempo real
-    drawCtx.beginPath();
-    drawCtx.moveTo(lastX, lastY);
-    drawCtx.lineTo(currentX, currentY);
-    drawCtx.stroke();
+    // Calcular coordenadas relativas ao ponto inicial
+    const relativeX = (currentX - lastX);
+    const relativeY = (currentY - lastY);
     
-    currentPath.push({ x: currentX, y: currentY });
-    
-    lastX = currentX;
-    lastY = currentY;
+    // Atualizar o path SVG
+    const pathElement = currentPath.querySelector('path');
+    const currentD = pathElement.getAttribute('d');
+    pathElement.setAttribute('d', currentD + ` L ${relativeX} ${relativeY}`);
+}
+
+// Função para obter coordenadas absolutas no canvas
+function getCanvasCoordinates(e) {
+    const rect = canvas.getBoundingClientRect();
+    const x = (e.clientX - rect.left) / zoom;
+    const y = (e.clientY - rect.top) / zoom;
+    return { x, y };
 }
 
 function stopDrawing() {
-    if (isDrawing && currentPath.length > 1) {
-        createDrawingElement();
-    }
     isDrawing = false;
-    currentPath = [];
+    currentPath = null;
 }
 
 function createDrawingElement() {
@@ -885,7 +972,6 @@ canvas.addEventListener('contextmenu', (e) => {
 // Limpar desenhos
 function clearDrawings() {
     if (confirm('Limpar todos os desenhos?')) {
-        drawCtx.clearRect(0, 0, 4000, 4000);
         document.querySelectorAll('.drawing-element').forEach(el => el.remove());
     }
 }
@@ -894,7 +980,6 @@ function clearDrawings() {
 window.addEventListener('load', () => {
     loadMesaFromURL();
     carregarPersonagens();
-    initDrawCanvas();
     
     // Ativar modo seleção por padrão
     toggleSelectMode();
@@ -906,6 +991,15 @@ window.addEventListener('load', () => {
     
     // Event listener para parar desenho ao sair do canvas
     canvas.addEventListener('mouseleave', stopDrawing);
+    
+    // Inicializar chat compartilhado
+    loadChatFromStorage();
+    startChatSync();
+});
+
+// Parar sincronização ao sair da página
+window.addEventListener('beforeunload', () => {
+    stopChatSync();
 });
 
 // Adicionar texto no grid
@@ -1184,11 +1278,8 @@ function toggleRulerMode() {
 function handleRulerClick(e) {
     if (!rulerMode) return;
     
-    const rect = canvas.getBoundingClientRect();
-    const x = (e.clientX - rect.left - panX) / zoom;
-    const y = (e.clientY - rect.top - panY) / zoom;
-    
-    rulerPoints.push({ x, y });
+    const coords = getCanvasCoordinates(e);
+    rulerPoints.push({ x: coords.x, y: coords.y });
     
     if (rulerPoints.length === 1) {
         addChatMessage('Sistema', '📍 Primeiro ponto marcado. Clique no segundo ponto.');

@@ -99,7 +99,7 @@
         <div class="canvas-container">
             <div class="canvas" id="canvas">
                 <div class="map-layer" id="map-layer"></div>
-                <canvas id="draw-canvas" width="4000" height="4000" style="position: absolute; top: 0; left: 0; z-index: 8; pointer-events: none;"></canvas>
+                <canvas id="draw-canvas"></canvas>
                 <div class="grid-layer" id="grid-layer"></div>
             </div>
             
@@ -118,15 +118,7 @@
         <!-- Chat e Controles -->
         <div class="chat-panel">
             <div class="chat-header">
-                <div style="display: flex; justify-content: space-between; align-items: center;">
-                    <span><i class="fas fa-comments"></i> Chat da Mesa</span>
-                    <button onclick="limparChat()" style="
-                        background: #666; color: white; border: none; padding: 0.25rem 0.5rem;
-                        border-radius: 4px; cursor: pointer; font-size: 0.8rem;
-                    " title="Limpar Chat">
-                        <i class="fas fa-trash"></i>
-                    </button>
-                </div>
+                <span><i class="fas fa-comments"></i> Chat da Mesa</span>
             </div>
             
             <div class="chat-messages" id="chat-messages">
