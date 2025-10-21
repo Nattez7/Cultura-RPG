@@ -379,6 +379,11 @@ function carregarMesasDoFirebase() {
     }
 }
 
+// Filtrar mesas
+function filterMesas() {
+    carregarMesas();
+}
+
 // Carregar mesas
 function carregarMesas() {
     const listaMesas = document.getElementById('mesas-list');
@@ -386,6 +391,7 @@ function carregarMesas() {
     
     const filtroDificuldade = document.getElementById('filter-difficulty')?.value || '';
     const filtroMissao = document.getElementById('filter-mission')?.value || '';
+    const buscaMissao = document.getElementById('search-mission')?.value.toLowerCase() || '';
     
     let mesasFiltradas = estadoJogo.mesas;
     
@@ -397,6 +403,13 @@ function carregarMesas() {
     
     if (filtroMissao) {
         mesasFiltradas = mesasFiltradas.filter(mesa => mesa.missao === filtroMissao);
+    }
+    
+    if (buscaMissao) {
+        mesasFiltradas = mesasFiltradas.filter(mesa => {
+            const infoMissao = obterInfoMissao(mesa);
+            return infoMissao.name.toLowerCase().includes(buscaMissao);
+        });
     }
     
     if (mesasFiltradas.length === 0) {
@@ -411,11 +424,21 @@ function carregarMesas() {
 function criarCardMesa(mesa) {
     const missao = obterInfoMissao(mesa);
     const dataFormatada = formatarData(mesa.data);
-    const classeStatus = `status-${mesa.status}`;
+    const agora = new Date();
+    const dataMesa = new Date(mesa.data);
+    const mesaExpirada = dataMesa < agora;
+    
+    let status = mesa.status;
+    if (mesaExpirada && status === 'aberta') {
+        status = 'expirada';
+    }
+    
+    const classeStatus = `status-${status}`;
     const textoStatus = {
         'aberta': 'Aberta',
         'cheia': 'Lotada',
-        'iniciada': 'Em Andamento'
+        'iniciada': 'Em Andamento',
+        'expirada': 'Expirada'
     };
     
     return `
@@ -483,8 +506,8 @@ function criarCardMesa(mesa) {
                 </span>
                 <button class="join-btn" 
                         onclick="window.entrarMesa('${mesa.id}')" 
-                        ${mesa.status !== 'aberta' ? 'disabled' : ''}>
-                    ${mesa.status === 'aberta' ? 'Inscrever-se' : 'Indisponível'}
+                        ${status !== 'aberta' ? 'disabled' : ''}>
+                    ${status === 'aberta' ? 'Inscrever-se' : status === 'expirada' ? 'Mesa Expirada' : 'Indisponível'}
                 </button>
             </div>
         </div>
@@ -501,6 +524,14 @@ async function entrarMesa(idMesa) {
     
     const mesa = estadoJogo.mesas.find(m => m.id === idMesa);
     if (!mesa || mesa.status !== 'aberta') return;
+    
+    // Verificar se a mesa já expirou
+    const agora = new Date();
+    const dataMesa = new Date(mesa.data);
+    if (dataMesa < agora) {
+        alert('Esta mesa já passou do horário marcado e não aceita mais inscrições.');
+        return;
+    }
     
     // Verificar se já está inscrito
     if (!mesa.jogadores) mesa.jogadores = [];
@@ -1353,3 +1384,4 @@ window.mostrarGuiaMestre = mostrarGuiaMestre;
 window.copiarLinkMesa = copiarLinkMesa;
 window.mostrarModalConvite = mostrarModalConvite;
 window.carregarMinhasMesas = carregarMinhasMesas;
+window.filterMesas = filterMesas;

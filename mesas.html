@@ -60,13 +60,14 @@
                     <div class="mesas-header">
                         <h3>Mesas Abertas para Inscrição</h3>
                         <div class="filters">
-                            <select id="filter-difficulty">
+                            <input type="text" id="search-mission" placeholder="Buscar por nome da missão..." oninput="filterMesas()">
+                            <select id="filter-difficulty" onchange="filterMesas()">
                                 <option value="">Todas as Dificuldades</option>
                                 <option value="iniciante">Iniciante</option>
                                 <option value="intermediario">Intermediário</option>
                                 <option value="avancado">Avançado</option>
                             </select>
-                            <select id="filter-mission">
+                            <select id="filter-mission" onchange="filterMesas()">
                                 <option value="">Todas as Missões</option>
                                 <option value="carnaval">Origens do Carnaval</option>
                                 <option value="quilombo">Resistência de Palmares</option>

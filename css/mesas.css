@@ -62,13 +62,27 @@
     flex-wrap: wrap;
 }
 
-.filters select {
+.filters select,
+.filters input[type="text"] {
     padding: 8px 12px;
     border: 2px solid #ddd;
     border-radius: 10px;
     background: white;
     color: #333;
     font-weight: 500;
+    transition: border-color 0.3s;
+}
+
+.filters select:focus,
+.filters input[type="text"]:focus {
+    outline: none;
+    border-color: #4ecdc4;
+    box-shadow: 0 0 0 3px rgba(78, 205, 196, 0.1);
+}
+
+.filters input[type="text"]::placeholder {
+    color: #999;
+    font-style: italic;
 }
 
 .mesas-list {
@@ -123,6 +137,11 @@
 .status-iniciada {
     background: #ffc107;
     color: #333;
+}
+
+.status-expirada {
+    background: #6c757d;
+    color: white;
 }
 
 .mesa-info {
