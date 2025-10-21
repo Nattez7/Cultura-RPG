@@ -42,7 +42,7 @@ canvas.addEventListener('mousedown', (e) => {
         return;
     }
     if (rulerMode) {
-        handleRulerClick(e);
+        startRuler(e);
         return;
     }
     if (drawMode) {
@@ -81,7 +81,9 @@ canvas.addEventListener('mousemove', (e) => {
     const y = Math.floor((e.clientY - rect.top - panY) / zoom);
     document.getElementById('coordinates').textContent = `X: ${x}, Y: ${y}`;
     
-    if (drawMode && isDrawing && !tempPanMode) {
+    if (rulerMode && isRulerDragging) {
+        updateRuler(e);
+    } else if (drawMode && isDrawing && !tempPanMode) {
         draw(e);
     } else if (isDragging) {
         panX = e.clientX - dragStart.x;
@@ -91,7 +93,9 @@ canvas.addEventListener('mousemove', (e) => {
 });
 
 canvas.addEventListener('mouseup', () => {
-    if (drawMode && !tempPanMode) {
+    if (rulerMode && isRulerDragging) {
+        finishRuler();
+    } else if (drawMode && !tempPanMode) {
         stopDrawing();
     }
     isDragging = false;
@@ -138,6 +142,7 @@ document.getElementById('map-upload').addEventListener('change', function(event)
         const reader = new FileReader();
         reader.onload = function(e) {
             mapLayer.style.backgroundImage = `url(${e.target.result})`;
+            saveMesaState();
         };
         reader.readAsDataURL(file);
     }
@@ -183,13 +188,185 @@ function renderCustomTokens() {
     `).join('');
 }
 
+// Criar token
+function createToken(imageSrc, x, y, name) {
+    const token = document.createElement('div');
+    token.className = 'token';
+    token.style.position = 'absolute';
+    token.style.left = x + 'px';
+    token.style.top = y + 'px';
+    token.style.width = '50px';
+    token.style.height = '50px';
+    token.style.backgroundImage = `url('${imageSrc}')`;
+    token.style.backgroundSize = 'cover';
+    token.style.backgroundPosition = 'center';
+    token.style.backgroundRepeat = 'no-repeat';
+    token.style.borderRadius = '50%';
+    token.style.border = '2px solid #EBD677';
+    token.style.cursor = 'pointer';
+    token.style.zIndex = '5';
+    token.title = name || 'Token';
+    token.dataset.tokenData = JSON.stringify({ imageSrc, name });
+    
+    canvas.appendChild(token);
+    saveMesaState();
+    return token;
+}
+
+// Salvar estado da mesa
+function saveMesaState() {
+    if (!mesaData?.codigo) return;
+    
+    const state = {
+        tokens: Array.from(document.querySelectorAll('.token')).map(token => ({
+            left: token.style.left,
+            top: token.style.top,
+            data: token.dataset.tokenData
+        })),
+        texts: Array.from(document.querySelectorAll('.text-element')).map(text => ({
+            left: text.style.left,
+            top: text.style.top,
+            content: text.textContent,
+            fontSize: text.style.fontSize,
+            color: text.style.color
+        })),
+        drawings: Array.from(document.querySelectorAll('.drawing-element')).map(drawing => ({
+            left: drawing.style.left,
+            top: drawing.style.top,
+            html: drawing.innerHTML
+        })),
+        mapBackground: mapLayer.style.backgroundImage,
+        panX: panX,
+        panY: panY,
+        zoom: zoom
+    };
+    
+    localStorage.setItem(`mesa-state-${mesaData.codigo}`, JSON.stringify(state));
+}
+
+// Carregar estado da mesa
+function loadMesaState() {
+    if (!mesaData?.codigo) return;
+    
+    const saved = localStorage.getItem(`mesa-state-${mesaData.codigo}`);
+    if (!saved) return;
+    
+    const state = JSON.parse(saved);
+    
+    // Limpar elementos existentes
+    document.querySelectorAll('.token, .text-element, .drawing-element').forEach(el => el.remove());
+    
+    // Restaurar tokens
+    state.tokens?.forEach(tokenData => {
+        const data = JSON.parse(tokenData.data);
+        createTokenWithoutSave(data.imageSrc, parseInt(tokenData.left), parseInt(tokenData.top), data.name);
+    });
+    
+    // Restaurar textos
+    state.texts?.forEach(textData => {
+        const text = document.createElement('div');
+        text.className = 'text-element';
+        text.style.position = 'absolute';
+        text.style.left = textData.left;
+        text.style.top = textData.top;
+        text.style.fontSize = textData.fontSize;
+        text.style.color = textData.color;
+        text.textContent = textData.content;
+        canvas.appendChild(text);
+    });
+    
+    // Restaurar desenhos
+    state.drawings?.forEach(drawingData => {
+        const drawing = document.createElement('div');
+        drawing.className = 'drawing-element';
+        drawing.style.position = 'absolute';
+        drawing.style.left = drawingData.left;
+        drawing.style.top = drawingData.top;
+        drawing.style.pointerEvents = 'none';
+        drawing.innerHTML = drawingData.html;
+        canvas.appendChild(drawing);
+    });
+    
+    // Restaurar mapa
+    if (state.mapBackground) {
+        mapLayer.style.backgroundImage = state.mapBackground;
+    }
+    
+    // Restaurar posição da câmera
+    if (state.panX !== undefined) {
+        panX = state.panX;
+        panY = state.panY;
+        zoom = state.zoom || 1;
+        updateTransform();
+    }
+}
+
+// Criar token sem salvar (para carregamento)
+function createTokenWithoutSave(imageSrc, x, y, name) {
+    const token = document.createElement('div');
+    token.className = 'token';
+    token.style.position = 'absolute';
+    token.style.left = x + 'px';
+    token.style.top = y + 'px';
+    token.style.width = '50px';
+    token.style.height = '50px';
+    token.style.backgroundImage = `url('${imageSrc}')`;
+    token.style.backgroundSize = 'cover';
+    token.style.backgroundPosition = 'center';
+    token.style.backgroundRepeat = 'no-repeat';
+    token.style.borderRadius = '50%';
+    token.style.border = '2px solid #EBD677';
+    token.style.cursor = 'pointer';
+    token.style.zIndex = '5';
+    token.title = name || 'Token';
+    token.dataset.tokenData = JSON.stringify({ imageSrc, name });
+    
+    canvas.appendChild(token);
+    return token;
+}
+
+// Arrastar token
+function startTokenDrag(e, token) {
+    const startX = e.clientX - parseInt(token.style.left);
+    const startY = e.clientY - parseInt(token.style.top);
+    
+    function onMouseMove(e) {
+        token.style.left = (e.clientX - startX) + 'px';
+        token.style.top = (e.clientY - startY) + 'px';
+    }
+    
+    function onMouseUp() {
+        document.removeEventListener('mousemove', onMouseMove);
+        document.removeEventListener('mouseup', onMouseUp);
+        saveMesaState();
+    }
+    
+    document.addEventListener('mousemove', onMouseMove);
+    document.addEventListener('mouseup', onMouseUp);
+}
+
+// Selecionar elemento
+function selectElement(element) {
+    document.querySelectorAll('.token, .text-element').forEach(el => {
+        el.classList.remove('selected');
+    });
+    element.classList.add('selected');
+}
+
 // Criar token a partir do personalizado
 function createTokenFromCustom(tokenId) {
-    const customToken = customTokens.find(t => t.id === tokenId);
+    console.log('Criando token:', tokenId);
+    const customToken = customTokens.find(t => t.id == tokenId);
     if (customToken) {
-        const x = 200 + Math.random() * 100;
-        const y = 200 + Math.random() * 100;
+        console.log('Token encontrado:', customToken);
+        // Posição simples fixa para teste
+        const x = 300;
+        const y = 300;
+        
+        console.log('Criando token nas coordenadas:', x, y);
         createToken(customToken.image, x, y, customToken.name);
+    } else {
+        console.log('Token não encontrado!');
     }
 }
 
@@ -285,10 +462,189 @@ let currentPath = null;
 let currentColor = '#EBD677';
 let currentSize = 3;
 let rulerMode = false;
-let rulerPoints = [];
-let rulerLine = null;
+let currentRuler = null;
+let isRulerDragging = false;
 let spacePressed = false;
 let tempPanMode = false;
+
+// Toggle modo régua
+function toggleRulerMode() {
+    rulerMode = !rulerMode;
+    drawMode = false;
+    selectMode = false;
+    
+    const rulerBtn = document.getElementById('ruler-btn');
+    const selectBtn = document.getElementById('select-btn');
+    const drawBtn = document.getElementById('draw-btn');
+    
+    if (rulerMode) {
+        rulerBtn.classList.add('active');
+        selectBtn.classList.remove('active');
+        drawBtn.classList.remove('active');
+        canvas.style.cursor = 'crosshair';
+        
+        // Limpar todas as réguas existentes
+        document.querySelectorAll('.ruler-element').forEach(el => el.remove());
+    } else {
+        rulerBtn.classList.remove('active');
+        selectBtn.classList.add('active');
+        selectMode = true;
+        canvas.style.cursor = 'grab';
+    }
+}
+
+// Funções da régua
+function startRuler(e) {
+    if (!rulerMode) return;
+    e.preventDefault();
+    e.stopPropagation();
+    
+    const coords = getCanvasCoordinates(e);
+    isRulerDragging = true;
+    
+    // Criar objeto régua
+    currentRuler = {
+        startPoint: { x: coords.x, y: coords.y },
+        line: null,
+        text: null,
+        deleteBtn: null
+    };
+    
+    // Criar linha da régua
+    currentRuler.line = document.createElement('div');
+    currentRuler.line.style.position = 'absolute';
+    currentRuler.line.style.background = '#EBD677';
+    currentRuler.line.style.height = '2px';
+    currentRuler.line.style.transformOrigin = 'left center';
+    currentRuler.line.style.pointerEvents = 'none';
+    currentRuler.line.style.zIndex = '15';
+    currentRuler.line.style.left = coords.x + 'px';
+    currentRuler.line.style.top = coords.y + 'px';
+    currentRuler.line.style.width = '0px';
+    canvas.appendChild(currentRuler.line);
+    
+    // Criar texto da distância
+    currentRuler.text = document.createElement('div');
+    currentRuler.text.style.position = 'absolute';
+    currentRuler.text.style.background = 'rgba(0,0,0,0.8)';
+    currentRuler.text.style.color = '#EBD677';
+    currentRuler.text.style.padding = '4px 8px';
+    currentRuler.text.style.borderRadius = '4px';
+    currentRuler.text.style.fontSize = '12px';
+    currentRuler.text.style.fontWeight = 'bold';
+    currentRuler.text.style.pointerEvents = 'auto';
+    currentRuler.text.style.cursor = 'pointer';
+    currentRuler.text.style.zIndex = '16';
+    currentRuler.text.textContent = '0m';
+    
+    // Adicionar duplo clique para mostrar botão de apagar
+    currentRuler.text.addEventListener('dblclick', (e) => {
+        const ruler = e.target.rulerData;
+        if (ruler) {
+            showRulerDeleteButton(e, ruler);
+        }
+    });
+    
+    canvas.appendChild(currentRuler.text);
+}
+
+function updateRuler(e) {
+    if (!isRulerDragging || !currentRuler) return;
+    
+    const coords = getCanvasCoordinates(e);
+    const deltaX = coords.x - currentRuler.startPoint.x;
+    const deltaY = coords.y - currentRuler.startPoint.y;
+    const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+    const angle = Math.atan2(deltaY, deltaX) * 180 / Math.PI;
+    
+    // Atualizar linha
+    currentRuler.line.style.width = distance + 'px';
+    currentRuler.line.style.transform = `rotate(${angle}deg)`;
+    
+    // Atualizar texto
+    const meters = (distance / 40).toFixed(1);
+    currentRuler.text.textContent = `${meters}m`;
+    
+    // Posicionar texto no meio da linha
+    const midX = currentRuler.startPoint.x + (deltaX / 2);
+    const midY = currentRuler.startPoint.y + (deltaY / 2) - 15;
+    currentRuler.text.style.left = midX + 'px';
+    currentRuler.text.style.top = midY + 'px';
+}
+
+function finishRuler() {
+    isRulerDragging = false;
+    
+    // Manter referência da régua no elemento texto
+    if (currentRuler && currentRuler.text) {
+        currentRuler.text.rulerData = currentRuler;
+    }
+    
+    currentRuler = null;
+}
+
+// Mostrar botão de apagar régua
+function showRulerDeleteButton(e, ruler) {
+    e.stopPropagation();
+    console.log('Mostrando botão de apagar para:', ruler);
+    
+    if (ruler.deleteBtn) {
+        ruler.deleteBtn.remove();
+    }
+    
+    ruler.deleteBtn = document.createElement('button');
+    ruler.deleteBtn.textContent = '×';
+    ruler.deleteBtn.style.position = 'absolute';
+    ruler.deleteBtn.style.left = (parseInt(ruler.text.style.left) + 60) + 'px';
+    ruler.deleteBtn.style.top = ruler.text.style.top;
+    ruler.deleteBtn.style.background = '#dc3545';
+    ruler.deleteBtn.style.color = 'white';
+    ruler.deleteBtn.style.border = 'none';
+    ruler.deleteBtn.style.borderRadius = '50%';
+    ruler.deleteBtn.style.width = '20px';
+    ruler.deleteBtn.style.height = '20px';
+    ruler.deleteBtn.style.fontSize = '12px';
+    ruler.deleteBtn.style.cursor = 'pointer';
+    ruler.deleteBtn.style.zIndex = '17';
+    ruler.deleteBtn.title = 'Apagar régua';
+    
+    ruler.deleteBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        deleteRuler(ruler);
+    });
+    
+    canvas.appendChild(ruler.deleteBtn);
+    console.log('Botão criado e adicionado ao canvas');
+    
+    // Remover botão após 5 segundos
+    setTimeout(() => {
+        if (ruler.deleteBtn) {
+            ruler.deleteBtn.remove();
+            ruler.deleteBtn = null;
+        }
+    }, 5000);
+}
+
+// Apagar régua
+function deleteRuler(ruler) {
+    if (ruler.line) {
+        ruler.line.remove();
+    }
+    if (ruler.text) {
+        ruler.text.remove();
+    }
+    if (ruler.deleteBtn) {
+        ruler.deleteBtn.remove();
+    }
+}
+
+// Função para obter coordenadas do canvas
+function getCanvasCoordinates(e) {
+    const rect = canvas.getBoundingClientRect();
+    const x = (e.clientX - rect.left - panX) / zoom;
+    const y = (e.clientY - rect.top - panY) / zoom;
+    return { x, y };
+}
 
 // Carregar personagens disponíveis
 function carregarPersonagens() {
@@ -419,10 +775,86 @@ function criarCardPersonagem(id, personagem) {
     `;
 }
 
+// Sistema de jogadores
+let playersData = [];
+let currentPlayer = null;
+let userProfile = null;
+
+// Gerenciar perfil do usuário
+function loadUserProfile() {
+    const saved = localStorage.getItem('cultura-rpg-profile');
+    if (saved) {
+        userProfile = JSON.parse(saved);
+    }
+    return userProfile;
+}
+
+function saveUserProfile(profile) {
+    localStorage.setItem('cultura-rpg-profile', JSON.stringify(profile));
+    userProfile = profile;
+}
+
+function getUserNick() {
+    // Tentar carregar do perfil salvo
+    const profile = loadUserProfile();
+    if (profile && profile.nick) {
+        return profile.nick;
+    }
+    
+    // Se não tem perfil, pedir e salvar
+    const nick = prompt('Digite seu nick (será salvo para próximas mesas):');
+    if (!nick || nick.trim() === '') {
+        return null;
+    }
+    
+    // Salvar perfil
+    saveUserProfile({ nick: nick.trim() });
+    updateNickDisplay();
+    return nick.trim();
+}
+
+// Alterar nick do usuário
+function alterarNick() {
+    const profile = loadUserProfile();
+    const currentNick = profile?.nick || '';
+    
+    const newNick = prompt('Digite seu novo nick:', currentNick);
+    if (!newNick || newNick.trim() === '') {
+        return;
+    }
+    
+    // Salvar novo nick
+    saveUserProfile({ nick: newNick.trim() });
+    updateNickDisplay();
+    
+    // Se já tem personagem na mesa, atualizar
+    if (currentPlayer) {
+        currentPlayer.nick = newNick.trim();
+        addPlayerToList(currentPlayer);
+        addChatMessage('Sistema', `Jogador alterou nick para: ${newNick.trim()}`);
+    }
+}
+
+// Atualizar display do nick
+function updateNickDisplay() {
+    const profile = loadUserProfile();
+    const nickBtn = document.getElementById('nick-btn');
+    if (profile?.nick) {
+        nickBtn.title = `Nick: ${profile.nick} (clique para alterar)`;
+    }
+}
+
 // Selecionar personagem
 function selecionarPersonagem(personagemId) {
     const personagem = personagensDisponiveis[personagemId];
     if (!personagem) return;
+    
+    // Pegar nick do perfil
+    const nick = getUserNick();
+    if (!nick) {
+        alert('Nick é obrigatório!');
+        return;
+    }
     
     // Criar token do personagem no mapa
     const x = 200 + Math.random() * 100;
@@ -436,6 +868,17 @@ function selecionarPersonagem(personagemId) {
     // Atualizar ficha do personagem
     updateCharacterSheet(personagem);
     
+    // Salvar jogador atual
+    currentPlayer = {
+        nick: nick,
+        personagem: personagem.name,
+        personagemId: personagemId,
+        timestamp: Date.now()
+    };
+    
+    // Adicionar à lista de jogadores
+    addPlayerToList(currentPlayer);
+    
     // Ocultar botão e mostrar ficha
     document.getElementById('add-character-section').style.display = 'none';
     document.getElementById('character-sheet').style.display = 'block';
@@ -443,7 +886,81 @@ function selecionarPersonagem(personagemId) {
     // Fechar modal
     fecharSelecaoPersonagem();
     
-    addChatMessage('Sistema', `${personagem.name} entrou na mesa!`);
+    addChatMessage('Sistema', `${currentPlayer.nick} entrou na mesa como ${personagem.name}!`);
+}
+
+// Adicionar jogador à lista
+function addPlayerToList(player) {
+    // Carregar lista atual
+    loadPlayersList();
+    
+    // Verificar se já existe um jogador com o mesmo nick
+    playersData = playersData.filter(p => p.nick !== player.nick);
+    
+    // Adicionar novo jogador
+    playersData.push(player);
+    
+    // Salvar e renderizar
+    savePlayersList();
+    renderPlayersList();
+}
+
+// Salvar lista de jogadores
+function savePlayersList() {
+    if (!mesaData?.codigo) return;
+    localStorage.setItem(`players-${mesaData.codigo}`, JSON.stringify(playersData));
+}
+
+// Carregar lista de jogadores
+function loadPlayersList() {
+    if (!mesaData?.codigo) return;
+    const saved = localStorage.getItem(`players-${mesaData.codigo}`);
+    if (saved) {
+        playersData = JSON.parse(saved);
+    }
+}
+
+// Renderizar lista de jogadores
+function renderPlayersList() {
+    const container = document.getElementById('players-container');
+    
+    if (playersData.length === 0) {
+        container.innerHTML = '<div style="text-align: center; color: #888; font-style: italic;">Nenhum jogador na mesa ainda</div>';
+        return;
+    }
+    
+    container.innerHTML = playersData.map(player => `
+        <div style="
+            display: flex; align-items: center; gap: 0.75rem; padding: 0.75rem;
+            background: rgba(255,255,255,0.05); border-radius: 6px; margin-bottom: 0.5rem;
+            border-left: 3px solid var(--accent);
+        ">
+            <div style="
+                width: 40px; height: 40px; border-radius: 50%; 
+                background: var(--gradient); display: flex; align-items: center; justify-content: center;
+                font-size: 1.2rem; font-weight: bold; color: var(--accent);
+            ">
+                ${player.nick.charAt(0).toUpperCase()}
+            </div>
+            <div style="flex: 1;">
+                <div style="font-weight: bold; color: var(--text); font-size: 0.9rem;">
+                    ${player.nick}
+                </div>
+                <div style="color: var(--accent); font-size: 0.8rem;">
+                    ${player.personagem}
+                </div>
+            </div>
+            <div style="color: #888; font-size: 0.7rem;">
+                <i class="fas fa-clock"></i>
+            </div>
+        </div>
+    `).join('');
+}
+
+// Sincronizar lista de jogadores
+function syncPlayersList() {
+    loadPlayersList();
+    renderPlayersList();
 }
 
 // Adicionar token do personagem aos tokens personalizados
@@ -507,6 +1024,7 @@ function createToken(imageSrc, x, y, name) {
     token.style.backgroundPosition = 'center';
     token.style.backgroundRepeat = 'no-repeat';
     token.title = name || 'Token';
+    token.dataset.tokenData = JSON.stringify({ imageSrc, name });
     
     // Eventos do token
     token.addEventListener('mousedown', (e) => {
@@ -524,6 +1042,7 @@ function createToken(imageSrc, x, y, name) {
     });
     
     canvas.appendChild(token);
+    saveMesaState();
     return token;
 }
 
@@ -896,6 +1415,9 @@ function getCanvasCoordinates(e) {
 
 function stopDrawing() {
     isDrawing = false;
+    if (currentPath) {
+        saveMesaState();
+    }
     currentPath = null;
 }
 
@@ -976,6 +1498,146 @@ function clearDrawings() {
     }
 }
 
+// Salvar estado da mesa
+function saveMesaState() {
+    if (!mesaData?.codigo) return;
+    
+    const state = {
+        tokens: Array.from(document.querySelectorAll('.token')).map(token => ({
+            left: token.style.left,
+            top: token.style.top,
+            data: token.dataset.tokenData
+        })),
+        texts: Array.from(document.querySelectorAll('.text-element')).map(text => ({
+            left: text.style.left,
+            top: text.style.top,
+            content: text.textContent,
+            fontSize: text.style.fontSize,
+            color: text.style.color
+        })),
+        drawings: Array.from(document.querySelectorAll('.drawing-element')).map(drawing => ({
+            left: drawing.style.left,
+            top: drawing.style.top,
+            html: drawing.innerHTML
+        })),
+        mapBackground: mapLayer.style.backgroundImage,
+        panX: panX,
+        panY: panY,
+        zoom: zoom
+    };
+    
+    localStorage.setItem(`mesa-state-${mesaData.codigo}`, JSON.stringify(state));
+}
+
+// Carregar estado da mesa
+function loadMesaState() {
+    if (!mesaData?.codigo) return;
+    
+    const saved = localStorage.getItem(`mesa-state-${mesaData.codigo}`);
+    if (!saved) return;
+    
+    const state = JSON.parse(saved);
+    
+    // Restaurar tokens
+    state.tokens?.forEach(tokenData => {
+        const data = JSON.parse(tokenData.data);
+        const token = createTokenWithoutSave(data.imageSrc, parseInt(tokenData.left), parseInt(tokenData.top), data.name);
+    });
+    
+    // Restaurar textos
+    state.texts?.forEach(textData => {
+        criarElementoTextoWithoutSave(textData.content, parseInt(textData.left), parseInt(textData.top), textData.fontSize, textData.color);
+    });
+    
+    // Restaurar desenhos
+    state.drawings?.forEach(drawingData => {
+        const drawing = document.createElement('div');
+        drawing.className = 'drawing-element';
+        drawing.style.position = 'absolute';
+        drawing.style.left = drawingData.left;
+        drawing.style.top = drawingData.top;
+        drawing.style.pointerEvents = 'none';
+        drawing.innerHTML = drawingData.html;
+        canvas.appendChild(drawing);
+    });
+    
+    // Restaurar mapa
+    if (state.mapBackground) {
+        mapLayer.style.backgroundImage = state.mapBackground;
+    }
+    
+    // Restaurar posição
+    if (state.panX !== undefined) {
+        panX = state.panX;
+        panY = state.panY;
+        zoom = state.zoom || 1;
+        updateTransform();
+    }
+}
+
+// Versões sem salvamento automático
+function createTokenWithoutSave(imageSrc, x, y, name) {
+    const token = document.createElement('div');
+    token.className = 'token';
+    token.style.left = x + 'px';
+    token.style.top = y + 'px';
+    token.style.backgroundImage = `url('${imageSrc}')`;
+    token.style.backgroundSize = 'cover';
+    token.style.backgroundPosition = 'center';
+    token.style.backgroundRepeat = 'no-repeat';
+    token.title = name || 'Token';
+    token.dataset.tokenData = JSON.stringify({ imageSrc, name });
+    
+    token.addEventListener('mousedown', (e) => {
+        e.stopPropagation();
+        if (selectMode) {
+            startTokenDrag(e, token);
+        }
+    });
+    
+    token.addEventListener('click', (e) => {
+        if (selectMode) {
+            e.stopPropagation();
+            selectElement(token);
+        }
+    });
+    
+    canvas.appendChild(token);
+    return token;
+}
+
+function criarElementoTextoWithoutSave(texto, x, y, fontSize = '14px', color = '#ffffff') {
+    const textElement = document.createElement('div');
+    textElement.className = 'text-element';
+    textElement.style.left = x + 'px';
+    textElement.style.top = y + 'px';
+    textElement.style.fontSize = fontSize;
+    textElement.style.color = color;
+    textElement.textContent = texto;
+    textElement.dataset.originalText = texto;
+    
+    textElement.addEventListener('dblclick', (e) => {
+        e.stopPropagation();
+        editarTexto(textElement);
+    });
+    
+    textElement.addEventListener('mousedown', (e) => {
+        e.stopPropagation();
+        if (selectMode) {
+            startTokenDrag(e, textElement);
+        }
+    });
+    
+    textElement.addEventListener('click', (e) => {
+        if (selectMode) {
+            e.stopPropagation();
+            selectElement(textElement);
+        }
+    });
+    
+    canvas.appendChild(textElement);
+}
+
 // Verificar se já tem personagem criado ao carregar
 window.addEventListener('load', () => {
     loadMesaFromURL();
@@ -995,6 +1657,29 @@ window.addEventListener('load', () => {
     // Inicializar chat compartilhado
     loadChatFromStorage();
     startChatSync();
+    
+    // Inicializar lista de jogadores
+    loadPlayersList();
+    renderPlayersList();
+    updateNickDisplay();
+    
+    // Sincronizar lista de jogadores a cada 3 segundos
+    setInterval(syncPlayersList, 3000);
+    
+    // Carregar estado da mesa após um pequeno delay
+    setTimeout(loadMesaState, 100);
+    
+    // Sincronizar estado da mesa a cada 5 segundos
+    setInterval(() => {
+        if (mesaData?.codigo) {
+            const currentTokens = document.querySelectorAll('.token').length;
+            loadMesaState();
+            const newTokens = document.querySelectorAll('.token').length;
+            if (newTokens !== currentTokens) {
+                console.log('Tokens sincronizados');
+            }
+        }
+    }, 5000);
 });
 
 // Parar sincronização ao sair da página
@@ -1109,6 +1794,7 @@ function confirmarTexto() {
         criarElementoTexto(texto, x, y, fontSize, selectedColor);
     }
     
+    saveMesaState();
     fecharModalTexto();
 }
 
